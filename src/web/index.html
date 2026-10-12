@@ -2,616 +2,1659 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Project BLOC · Frontline Agentic Orchestration Engine</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&family=Outfit:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
+  
+  <!-- Google Sans Flex Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Official Google Material Symbols Outlined (Variable Font: Hairline wght 100..700, fill 0) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
   <style>
-    :root {
-      --blue: #1A73E8;
-      --blue-subtle: #E8F0FE;
-      --green: #1E8E3E;
-      --green-subtle: #E6F4EA;
-      --red: #D93025;
-      --red-subtle: #FCE8E6;
-      --yellow: #F9AB00;
-      --yellow-subtle: #FEF7E0;
-      --ink: #202124;
-      --muted: #5F6368;
-      --line: #DADCE0;
-      --bg: #F8F9FA;
-      --surface: #FFFFFF;
-      --pax: linear-gradient(135deg, #1E8E3E, #12B5CB);
-      --vera: linear-gradient(135deg, #1A73E8, #A142F4);
-      --nexus: linear-gradient(135deg, #F9AB00, #FA7B17);
+    /* ============================================================
+       0. CSS RESET & GLOBAL SCROLLBAR ELIMINATION
+       ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* STRICTLY HIDE ALL HORIZONTAL AND VERTICAL SCROLLBARS */
+    * {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    *::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    /* M3 Material Symbols Hairline Configuration (Google Material 3 Precision) */
+    .ms-icon {
+      font-family: 'Material Symbols Outlined' !important;
+      font-weight: 200 !important;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .ms-icon.sm {
+      font-size: 16px;
+      font-weight: 200 !important;
+      font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 16;
+    }
+    .ms-icon.lg {
+      font-size: 24px;
+      font-weight: 200 !important;
+      font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+    }
+    .ms-icon.hairline {
+      font-weight: 150 !important;
+      font-variation-settings: 'FILL' 0, 'wght' 150, 'GRAD' -25, 'opsz' 20;
+    }
+
+    :root {
+      /* Material 3 (M3) Official Tonal Palette - Google Studio Identity */
+      --m3-primary: #0B57D0;
+      --m3-primary-hover: #0842A0;
+      --m3-primary-subtle: #D3E3FD;
+      --m3-on-primary-subtle: #041E49;
+      --m3-surface: #FFFFFF;
+      --m3-surface-dim: #F0F4F9;
+      --m3-surface-container: #F8F9FA;
+      --m3-surface-container-high: #EDEFEF;
+      --m3-outline: #747775;
+      --m3-outline-variant: #C4C7C5;
+      --m3-on-surface: #1F1F1F;
+      --m3-on-surface-variant: #444746;
+      --m3-tertiary-emerald: #146C2E;
+      --m3-tertiary-subtle: #C4EED0;
+
+      /* M3 Dark Tonal Matrix (For Supervisor Command Horizon) */
+      --m3-dark-bg: #0D1117;
+      --m3-dark-surface: #161B22;
+      --m3-dark-surface-high: #21262D;
+      --m3-dark-outline: #30363D;
+      --m3-dark-primary-glow: #79C0FF;
+      --m3-dark-emerald: #56D364;
+      --m3-dark-amber: #E3B341;
+      --m3-dark-text: #F0F6FC;
+      --m3-dark-text-secondary: #8B949E;
+    }
+
     body {
-      font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0E1217;
-      color: var(--ink);
+      font-family: 'Google Sans Flex', -apple-system, sans-serif;
+      background: var(--m3-dark-bg);
+      color: var(--m3-dark-text);
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* Top Bar */
-    header {
-      background: #181D24;
-      border-bottom: 1px solid #282E38;
-      padding: 10px 24px;
+    /* Ambient Atmosphere */
+    .ambient-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(11, 87, 208, 0.12), transparent 70%);
+      z-index: 0;
+    }
+
+    /* ============================================================
+       1. M3 ENTERPRISE TOP APP BAR
+       ============================================================ */
+    header.m3-top-bar {
+      position: relative;
+      z-index: 50;
+      background: rgba(13, 17, 23, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--m3-dark-outline);
+      padding: 12px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: #fff;
+      flex-shrink: 0;
     }
-    .brand {
+
+    .brand-cluster {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 16px;
+    }
+    .m3-brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0B57D0 0%, #1A73E8 100%);
+      display: grid;
+      place-items: center;
+      color: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(11, 87, 208, 0.35);
+    }
+    .brand-title-text {
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: -0.2px;
-    }
-    .badge {
-      background: linear-gradient(90deg, #4285F4, #34A853);
-      color: #fff;
-      font-size: 10.5px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 99px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .persona-selector {
+      color: #FFFFFF;
       display: flex;
       align-items: center;
       gap: 10px;
-      background: #232934;
-      padding: 4px 12px;
-      border-radius: 99px;
-      border: 1px solid #323A48;
     }
-    .persona-selector select {
+    .m3-badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--m3-dark-text-secondary);
+      letter-spacing: 0.2px;
+    }
+
+    .header-ctrls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .m3-persona-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--m3-dark-outline);
+      padding: 5px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--m3-dark-text-secondary);
+    }
+    .m3-persona-chip select {
       background: transparent;
       border: none;
-      color: #fff;
+      color: #FFFFFF;
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
       outline: none;
       cursor: pointer;
     }
-    .view-toggles {
-      display: flex;
-      background: #232934;
-      border-radius: 8px;
-      padding: 3px;
-      border: 1px solid #323A48;
+    .m3-persona-chip select option {
+      background: #161B22;
+      color: #fff;
     }
-    .view-toggle {
+
+    /* M3 Segmented Button */
+    .m3-segmented-control {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px;
+      border-radius: 12px;
+      border: 1px solid var(--m3-dark-outline);
+    }
+    .m3-seg-item {
       background: transparent;
       border: none;
-      color: #9AA0A6;
-      padding: 6px 14px;
-      border-radius: 6px;
+      color: var(--m3-dark-text-secondary);
+      font-family: inherit;
       font-size: 12.5px;
       font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
-    .view-toggle.active {
-      background: #1A73E8;
-      color: #fff;
+    .m3-seg-item.active {
+      background: #0B57D0;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(11, 87, 208, 0.4);
     }
 
-    /* Main Container */
-    main {
+    /* ============================================================
+       2. WORKSPACE CANVAS
+       ============================================================ */
+    main.workspace-canvas {
       flex: 1;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at 50% 30%, #1A2332 0%, #0E1217 70%);
+      z-index: 10;
     }
 
-    /* Mobile Phone Shell */
-    .phone-wrapper {
-      width: 410px;
+    /* ============================================================
+       3. M3 MOBILE DEVICE SHELL
+       ============================================================ */
+    .m3-phone-shell {
+      width: 404px;
       height: 840px;
-      max-height: 92vh;
-      background: #000;
-      border-radius: 44px;
-      padding: 12px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 2px #323A48;
+      max-height: calc(100vh - 84px);
+      background: #000000;
+      border-radius: 52px;
+      padding: 11px;
+      box-shadow: 
+        0 24px 70px -10px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 0 0 4px #21262D;
       display: flex;
       flex-direction: column;
       position: relative;
     }
-    .notch {
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 24px;
-      background: #000;
-      border-radius: 0 0 16px 16px;
-      z-index: 50;
-    }
-    .phone-screen {
+    .m3-phone-screen {
       flex: 1;
-      background: #fff;
-      border-radius: 34px;
+      background: var(--m3-surface-dim);
+      border-radius: 42px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       position: relative;
     }
 
-    /* App Top Bar */
-    .app-header {
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      padding: 28px 16px 12px;
+    /* Hardware Status Bar */
+    .phone-status-row {
+      height: 44px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--m3-on-surface);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 30;
     }
-    .agent-identity {
+    .phone-pill-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 104px;
+      height: 26px;
+      background: #000000;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 0 10px;
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 600;
+      pointer-events: none;
     }
-    .agent-avatar {
-      width: 36px;
-      height: 36px;
+    .pill-green-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #146C2E;
+      box-shadow: 0 0 8px #146C2E;
+    }
+
+    /* Views */
+    .m3-view-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .m3-view-container.hidden {
+      display: none !important;
+    }
+
+    /* ============================================================
+       SCREEN 1: CHATS LIST (Material 3 Precision)
+       ============================================================ */
+    .m3-chats-header {
+      padding: 6px 20px 12px;
+      background: rgba(240, 244, 249, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--m3-outline-variant);
+      flex-shrink: 0;
+    }
+    .chats-headline-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .m3-title-large {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: var(--m3-on-surface);
+    }
+    .m3-store-chip {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--m3-primary);
+      background: var(--m3-primary-subtle);
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* M3 Search Bar */
+    .m3-search-bar {
+      background: #FFFFFF;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      gap: 10px;
+      border: 1px solid var(--m3-outline-variant);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s;
+    }
+    .m3-search-bar:focus-within {
+      border-color: var(--m3-primary);
+      box-shadow: 0 2px 8px rgba(11, 87, 208, 0.15);
+    }
+    .m3-search-bar input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--m3-on-surface);
+      width: 100%;
+    }
+    .m3-search-bar input::placeholder {
+      color: var(--m3-on-surface-variant);
+    }
+
+    .m3-threads-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .m3-subhead {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--m3-on-surface-variant);
+      padding: 10px 8px 4px;
+    }
+
+    /* Thread Card */
+    .m3-thread-card {
+      background: var(--m3-surface);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      border: 1px solid rgba(196, 199, 197, 0.6);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .m3-thread-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      border-color: var(--m3-primary);
+    }
+    .m3-thread-card.pax-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0F4F9 100%);
+      border: 1px solid #D3E3FD;
+      box-shadow: 0 4px 14px rgba(11, 87, 208, 0.08);
+    }
+
+    .m3-avatar-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar-pax {
+      background: linear-gradient(135deg, #0B57D0 0%, #1A73E8 100%);
+      color: #FFFFFF;
+      box-shadow: 0 3px 10px rgba(11, 87, 208, 0.3);
+    }
+    .avatar-supervisor {
+      background: #283141;
+      color: #A8C7FA;
+    }
+    .avatar-gc {
+      background: #F0F4F9;
+      color: #444746;
+      border: 1px solid var(--m3-outline-variant);
+    }
+    .avatar-live-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #146C2E;
+      border: 2px solid #FFFFFF;
+    }
+
+    .thread-info-column {
+      flex: 1;
+      min-width: 0;
+    }
+    .thread-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+      gap: 8px;
+    }
+    .thread-headline {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--m3-on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+    .thread-time-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--m3-on-surface-variant);
+      flex-shrink: 0;
+    }
+    .thread-preview-text {
+      font-size: 12.5px;
+      color: var(--m3-on-surface-variant);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.35;
+    }
+
+    .m3-tag-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .tag-ai-guide {
+      background: var(--m3-primary-subtle);
+      color: var(--m3-primary);
+    }
+    .tag-org-gc {
+      background: #FEF7D0;
+      color: #7A5900;
+    }
+    .tag-supervisor {
+      background: #E8DEF8;
+      color: #4A4458;
+    }
+    .m3-badge-unread {
+      background: var(--m3-primary);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       SCREEN 2: CONVERSATION VIEW
+       ============================================================ */
+    .convo-app-bar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--m3-outline-variant);
+      padding: 8px 14px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .btn-m3-back {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--m3-primary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 8px;
+    }
+    .convo-title-box {
+      text-align: center;
+      flex: 1;
+      min-width: 0;
+      padding: 0 8px;
+    }
+    .convo-main-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--m3-on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .convo-sub-status {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--m3-tertiary-emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .m3-icon-btn {
+      background: var(--m3-surface-container);
+      border: 1px solid var(--m3-outline-variant);
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 15px;
-      background: var(--pax);
+      cursor: pointer;
+      color: var(--m3-on-surface-variant);
+      transition: background 0.15s;
     }
-    .agent-meta h3 {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.2;
+    .m3-icon-btn:hover {
+      background: var(--m3-surface-container-high);
     }
-    .agent-meta p {
+
+    /* Quota Thermometer Banner */
+    .m3-quota-banner {
+      background: #FFFFFF;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--m3-outline-variant);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .quota-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .quota-caption {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--m3-on-surface-variant);
+      letter-spacing: 0.5px;
+    }
+    .quota-num {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--m3-on-surface);
+    }
+    .quota-bar-track {
+      width: 96px;
+      height: 5px;
+      background: var(--m3-surface-container-high);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .quota-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0B57D0, #146C2E);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Convo Stream */
+    .convo-messages-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-packet-frame {
+      display: flex;
+      flex-direction: column;
+      max-width: 84%;
+    }
+    .msg-packet-frame.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .msg-packet-frame.pax, .msg-packet-frame.peer {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    .msg-author-tag {
+      font-size: 10.5px;
+      font-weight: 650;
+      color: var(--m3-on-surface-variant);
+      margin-bottom: 3px;
+      padding: 0 4px;
+    }
+
+    .m3-bubble {
+      padding: 10px 14px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      border-radius: 18px;
+      position: relative;
+      word-break: break-word;
+    }
+    .m3-bubble.user {
+      background: var(--m3-primary);
+      color: #FFFFFF;
+      border-bottom-right-radius: 4px;
+    }
+    .m3-bubble.pax {
+      background: #FFFFFF;
+      color: var(--m3-on-surface);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--m3-outline-variant);
+    }
+    .m3-bubble.peer {
+      background: var(--m3-surface-container);
+      color: var(--m3-on-surface);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--m3-outline-variant);
+    }
+    .bubble-meta-time {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 4px;
+      text-align: right;
+    }
+    .m3-bubble.pax .bubble-meta-time, .m3-bubble.peer .bubble-meta-time {
+      color: var(--m3-on-surface-variant);
+    }
+
+    /* TELEGRAM-STYLE INLINE ACTION KEYBOARD IN PAX MESSAGE */
+    .m3-inline-action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .m3-inline-btn {
+      background: var(--m3-primary-subtle);
+      border: 1px solid rgba(11, 87, 208, 0.2);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--m3-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .m3-inline-btn:hover {
+      background: #C2E7FF;
+      border-color: var(--m3-primary);
+      transform: translateY(-1px);
+    }
+    .m3-inline-btn.emerald {
+      background: var(--m3-tertiary-subtle);
+      border-color: rgba(20, 108, 46, 0.2);
+      color: var(--m3-tertiary-emerald);
+    }
+    .m3-inline-btn.emerald:hover {
+      background: #A8E8B7;
+    }
+
+    /* INTERACTIVE TASKS MILESTONE CARD */
+    .m3-tasks-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--m3-outline-variant);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 4px 0;
+      width: 100%;
+    }
+    .task-card-header {
+      font-size: 12.5px;
+      font-weight: 750;
+      color: var(--m3-on-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--m3-surface-dim);
+      padding-bottom: 6px;
+    }
+    .task-item-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--m3-outline-variant);
+    }
+    .task-item-line:last-child {
+      border-bottom: none;
+    }
+    .task-item-line b {
+      color: var(--m3-on-surface);
+      font-weight: 700;
+      font-size: 12.5px;
+      display: block;
+    }
+    .task-item-line small {
+      color: var(--m3-on-surface-variant);
       font-size: 11px;
-      color: var(--green);
+      display: block;
+      margin-top: 2px;
+    }
+    .badge-task-verified {
+      background: var(--m3-tertiary-subtle);
+      color: var(--m3-tertiary-emerald);
+      font-weight: 700;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-task-trigger {
+      background: var(--m3-primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 650;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    /* Shift Target Thermometer Banner */
-    .target-banner {
-      background: linear-gradient(135deg, #F8F9FA, #EDF2F7);
-      border-bottom: 1px solid var(--line);
-      padding: 10px 16px;
-    }
-    .target-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      margin-bottom: 5px;
-    }
-    .progress-bar {
-      height: 7px;
-      background: #E2E8F0;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #1E8E3E, #12B5CB);
-      border-radius: 99px;
-      transition: width 0.4s ease;
-      width: 0%;
-    }
-
-    /* Chat Messages Stream */
-    .chat-stream {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: #F8F9FA;
-    }
-    .chat-bubble {
-      max-width: 84%;
-      padding: 10px 14px;
+    /* FRONTLINE 3-SECOND FAST-SALE CARD WITH DUAL OPTIONS */
+    .m3-fast-sale-card {
+      background: #FFFFFF;
       border-radius: 18px;
-      font-size: 13.5px;
-      line-height: 1.45;
-      animation: popIn 0.25s ease;
-    }
-    .chat-bubble.pax {
-      align-self: flex-start;
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--ink);
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .chat-bubble.user {
-      align-self: flex-end;
-      background: var(--blue);
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-    @keyframes popIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 3-Second Fast-Sale Mini-Sheet */
-    .fast-sale-card {
-      background: #fff;
-      border: 1.5px solid #1A73E8;
-      border-radius: 16px;
       padding: 14px;
-      box-shadow: 0 6px 18px rgba(26,115,232,0.14);
-      margin: 4px 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      border: 1px solid #D3E3FD;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      width: 100%;
+      margin: 4px 0;
     }
-    .fs-header {
+    .fsc-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--m3-surface-dim);
+      padding-bottom: 8px;
     }
-    .fs-title {
+    .fsc-title {
+      font-size: 12.5px;
+      font-weight: 750;
+      color: var(--m3-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.2px;
+    }
+    .fsc-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--m3-primary-subtle);
+      color: var(--m3-primary);
+    }
+
+    .fsc-sku-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--m3-outline-variant);
+    }
+    .fsc-sku-title {
       font-size: 13px;
       font-weight: 700;
-      color: var(--blue);
+      color: var(--m3-on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fsc-sku-sub {
+      font-size: 11.5px;
+      color: var(--m3-on-surface-variant);
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .fs-chip {
-      font-size: 10px;
+    .fsc-bonus-val {
+      color: var(--m3-tertiary-emerald);
       font-weight: 700;
-      background: var(--blue-subtle);
-      color: #185ABC;
-      padding: 2px 7px;
-      border-radius: 99px;
+      font-size: 10.5px;
     }
-    .sku-stepper-row {
+
+    .m3-stepper-box {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 8px 10px;
-      background: #F8F9FA;
+      background: var(--m3-surface-dim);
       border-radius: 10px;
-      border: 1px solid #ECEFF1;
+      padding: 2px;
+      flex-shrink: 0;
     }
-    .sku-name {
-      font-size: 12.5px;
-      font-weight: 600;
-      line-height: 1.2;
-    }
-    .sku-price {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .stepper-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-step {
+    .btn-step-ctrl {
       width: 28px;
       height: 28px;
-      border-radius: 50%;
+      border-radius: 8px;
       border: none;
-      background: #E8EAED;
-      color: var(--ink);
+      background: #FFFFFF;
+      color: var(--m3-on-surface);
       font-size: 15px;
       font-weight: 700;
+      cursor: pointer;
       display: grid;
       place-items: center;
-      cursor: pointer;
-      transition: all 0.15s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.1s;
     }
-    .btn-step.add {
-      background: var(--blue);
-      color: #fff;
+    .btn-step-ctrl:active {
+      transform: scale(0.92);
+      background: #E2E8F0;
     }
-    .btn-step:active { transform: scale(0.9); }
-    .step-val {
-      font-size: 14px;
-      font-weight: 700;
-      min-width: 18px;
+    .btn-step-ctrl.add {
+      background: var(--m3-primary);
+      color: #FFFFFF;
+    }
+    .step-counter-val {
+      width: 28px;
       text-align: center;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--m3-on-surface);
     }
-    .barcode-btn {
-      background: #EDF2F7;
-      border: 1.5px dashed #CBD5E0;
-      border-radius: 10px;
-      padding: 8px;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
+
+    /* DUAL ACTION OPTIONS GRID IN FAST-SALE MESSAGE */
+    .fsc-dual-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-fsc-option {
+      background: var(--m3-surface-dim);
+      border: 1px dashed var(--m3-outline-variant);
+      border-radius: 12px;
+      padding: 9px 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
+      font-size: 11.5px;
+      font-weight: 650;
+      color: var(--m3-on-surface-variant);
       cursor: pointer;
       transition: all 0.15s;
     }
-    .barcode-btn:hover { background: #E2E8F0; }
-    .btn-commit {
-      background: linear-gradient(135deg, #1E8E3E, #137333);
-      color: #fff;
-      border: none;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(30,142,62,0.25);
-      transition: all 0.2s;
+    .btn-fsc-option:hover {
+      background: #E8F0FE;
+      border-color: var(--m3-primary);
+      color: var(--m3-primary);
+      border-style: solid;
     }
-    .btn-commit:hover { opacity: 0.95; }
-    .btn-commit:disabled { background: #BDC1C6; cursor: not-allowed; box-shadow: none; }
 
-    /* Bottom Quick Action Bar */
-    .quick-actions {
-      padding: 8px 12px;
-      background: #fff;
-      border-top: 1px solid var(--line);
+    .fsc-totals-footer {
       display: flex;
-      gap: 6px;
-      overflow-x: auto;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+      font-size: 12px;
+      color: var(--m3-on-surface);
     }
-    .action-chip {
-      background: #F1F3F4;
-      border: 1px solid #E0E0E0;
-      border-radius: 99px;
-      padding: 6px 12px;
-      font-size: 11.5px;
-      font-weight: 600;
-      white-space: nowrap;
+    .btn-commit-fsc {
+      background: var(--m3-tertiary-emerald);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 750;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 3px 10px rgba(20, 108, 46, 0.3);
+      transition: opacity 0.2s;
     }
-    .action-chip:hover { background: #E8EAED; }
+    .btn-commit-fsc:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
-    /* Input Bar */
-    .input-bar {
-      padding: 10px 14px 22px;
-      background: #fff;
+    /* M3 Action Pills Below Chat */
+    .m3-quick-pills-bar {
+      padding: 6px 14px;
       display: flex;
       gap: 8px;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .m3-quick-pill {
+      background: #FFFFFF;
+      border: 1px solid var(--m3-outline-variant);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--m3-on-surface);
+      display: flex;
       align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s;
     }
-    .input-bar input {
-      flex: 1;
-      border: 1px solid var(--line);
-      background: #F8F9FA;
-      border-radius: 99px;
-      padding: 10px 16px;
-      font-size: 13px;
-      outline: none;
-      font-family: inherit;
+    .m3-quick-pill:hover {
+      background: var(--m3-surface-dim);
+      border-color: var(--m3-primary);
+      color: var(--m3-primary);
     }
-    .btn-send {
-      width: 38px;
-      height: 38px;
+
+    /* Multi-Row Expanding Composer */
+    .m3-chat-composer {
+      background: #FFFFFF;
+      border-top: 1px solid var(--m3-outline-variant);
+      padding: 8px 14px 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .m3-composer-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: var(--blue);
       border: none;
-      color: #fff;
+      background: var(--m3-surface-dim);
+      color: var(--m3-on-surface-variant);
       display: grid;
       place-items: center;
       cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .m3-composer-btn:hover {
+      background: var(--m3-surface-container-high);
+      color: var(--m3-primary);
     }
 
-    /* Desktop Supervisor Container */
-    .supervisor-wrapper {
-      display: none;
-      width: 1000px;
-      max-width: 95vw;
-      height: 840px;
-      max-height: 92vh;
-      background: #fff;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-      flex-direction: column;
-    }
-    .sup-header {
-      padding: 16px 24px;
-      background: #F8F9FA;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      padding: 20px 24px;
-    }
-    .kpi-card {
-      background: #F8F9FA;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px 18px;
-    }
-    .kpi-card h4 { font-size: 12px; color: var(--muted); font-weight: 600; }
-    .kpi-card .val { font-size: 26px; font-weight: 700; margin: 4px 0; }
-    .kpi-card .sub { font-size: 11px; color: var(--green); font-weight: 600; }
-    .table-container {
+    .m3-composer-hull {
       flex: 1;
-      padding: 0 24px 20px;
-      overflow-y: auto;
+      background: var(--m3-surface-dim);
+      border-radius: 20px;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      border: 1px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
     }
-    table {
+    .m3-composer-hull:focus-within {
+      background: #FFFFFF;
+      border-color: var(--m3-primary);
+      box-shadow: 0 0 0 2px rgba(11, 87, 208, 0.12);
+    }
+    .m3-composer-hull textarea {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    th {
-      text-align: left;
-      padding: 10px 12px;
-      background: #F1F3F4;
-      font-weight: 700;
-      color: var(--muted);
-      border-bottom: 1px solid var(--line);
-    }
-    td {
-      padding: 12px;
-      border-bottom: 1px solid var(--line);
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--m3-on-surface);
+      resize: none;
+      max-height: 100px;
+      line-height: 1.4;
+      display: block;
     }
 
-    /* Modal for Vera Audit */
-    .modal-overlay {
+    .m3-composer-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--m3-primary);
+      color: #FFFFFF;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(11, 87, 208, 0.35);
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .m3-composer-send:active {
+      transform: scale(0.92);
+    }
+
+    /* ============================================================
+       MODAL 1: SKU SEARCH DRAWER (Material Bottom Sheet)
+       ============================================================ */
+    .m3-sheet-scrim {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .m3-sheet-scrim.active {
+      display: flex !important;
+    }
+    .m3-sheet-card {
+      background: #FFFFFF;
+      width: 100%;
+      border-radius: 26px 26px 0 0;
+      padding: 16px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      max-height: 80%;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+      animation: sheetPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes sheetPop {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .m3-drag-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--m3-outline-variant);
+      align-self: center;
+      margin-bottom: 12px;
+    }
+    .sheet-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sheet-title-text {
+      font-size: 16px;
+      font-weight: 750;
+      color: var(--m3-on-surface);
+    }
+
+    .sku-scroll-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sku-card-entry {
+      background: var(--m3-surface-dim);
+      border: 1px solid var(--m3-outline-variant);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .btn-add-sku-item {
+      background: var(--m3-primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ============================================================
+       MODAL 2: VERA VISION AUDIT MODAL
+       ============================================================ */
+    .m3-modal-scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 110;
       display: none;
       place-items: center;
-      z-index: 100;
       padding: 16px;
     }
-    .modal-card {
-      background: #fff;
+    .m3-modal-scrim.active {
+      display: grid;
+    }
+    .m3-modal-card {
+      background: #FFFFFF;
       border-radius: 24px;
       width: 100%;
-      max-width: 360px;
+      max-width: 350px;
       padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    /* ============================================================
+       4. SUPERVISOR COMMAND HORIZON (M3 DARK / VERTEX AI STUDIO IDENTITY)
+       ============================================================ */
+    .m3-supervisor-horizon {
+      width: 100%;
+      max-width: 1120px;
+      height: calc(100vh - 96px);
+      background: var(--m3-dark-surface);
+      border: 1px solid var(--m3-dark-outline);
+      backdrop-filter: blur(28px);
+      border-radius: 24px;
+      padding: 26px;
+      display: none;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+    }
+
+    .horizon-top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--m3-dark-outline);
+      padding-bottom: 18px;
+    }
+    .horizon-titles h2 {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .horizon-titles p {
+      font-size: 13px;
+      color: var(--m3-dark-text-secondary);
+      margin-top: 4px;
+    }
+
+    .horizon-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .m3-stat-card-dark {
+      background: var(--m3-dark-surface-high);
+      border: 1px solid var(--m3-dark-outline);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    .m3-stat-card-dark::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #0B57D0, transparent);
+    }
+    .m3-stat-caption {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--m3-dark-text-secondary);
+    }
+    .m3-stat-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      font-family: 'Google Sans Flex', sans-serif;
+    }
+    .m3-stat-trend {
+      font-size: 11.5px;
+      color: var(--m3-dark-emerald);
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Enterprise Lineage / Org Chart */
+    .m3-lineage-card {
+      background: var(--m3-dark-surface-high);
+      border: 1px solid var(--m3-dark-outline);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .lineage-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .lineage-card-title {
+      font-size: 14.5px;
+      font-weight: 750;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lineage-shield-pill {
+      font-size: 11px;
+      font-weight: 650;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(227, 179, 65, 0.12);
+      color: var(--m3-dark-amber);
+      border: 1px solid rgba(227, 179, 65, 0.25);
+    }
+
+    .org-topology-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .org-node-bar {
+      background: rgba(13, 17, 23, 0.6);
+      border: 1px solid var(--m3-dark-outline);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.15s;
+    }
+    .org-node-bar:hover {
+      border-color: var(--m3-dark-primary-glow);
+    }
+    .org-node-meta {
+      font-size: 11.5px;
+      color: var(--m3-dark-text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .m3-telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      color: #E2E8F0;
+    }
+    .m3-telemetry-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--m3-dark-surface-high);
+      color: var(--m3-dark-text-secondary);
+      font-weight: 700;
+      border-bottom: 1px solid var(--m3-dark-outline);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .m3-telemetry-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--m3-dark-outline);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      <span>PROJECT BLOC</span>
-      <span class="badge">Google Cloud AI Builder Cup 2026</span>
+  <!-- Ambient Glow -->
+  <div class="ambient-glow"></div>
+
+  <!-- ============================================================
+       TOP ENTERPRISE NAVIGATION BAR (M3)
+       ============================================================ -->
+  <header class="m3-top-bar">
+    <div class="brand-cluster">
+      <div class="m3-brand-icon">
+        <span class="ms-icon">grid_view</span>
+      </div>
+      <div class="brand-title-text">
+        <span>PROJECT BLOC</span>
+        <span class="m3-badge-pill">Google Cloud AI Builder Cup 2026</span>
+      </div>
     </div>
 
-    <div style="display: flex; gap: 14px; align-items: center;">
+    <div class="header-ctrls">
       <!-- Persona Switcher -->
-      <div class="persona-selector">
-        <span class="material-symbols-rounded" style="color: #4285F4; font-size: 18px;">account_circle</span>
+      <div class="m3-persona-chip">
+        <span class="ms-icon sm">account_circle</span>
         <select id="userSelector" onchange="switchPersona(this.value)">
           <option value="usr-liza-ph">Liza Santos (SM Megamall · Tagalog)</option>
           <option value="usr-sarah-sg">Sarah Tan (VivoCity · Singlish/EN)</option>
         </select>
       </div>
 
-      <!-- Viewport Toggle -->
-      <div class="view-toggles">
-        <button class="view-toggle active" id="btnPhoneView" onclick="setView('phone')">
-          <span class="material-symbols-rounded" style="font-size: 18px;">smartphone</span>
-          Promoter Mobile PWA
+      <!-- Segmented View Mode -->
+      <div class="m3-segmented-control">
+        <button class="m3-seg-item active" id="btnPhoneView" onclick="setViewMode('phone')">
+          <span class="ms-icon sm">smartphone</span>
+          Promoter PWA
         </button>
-        <button class="view-toggle" id="btnSupView" onclick="setView('supervisor')">
-          <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+        <button class="m3-seg-item" id="btnSupView" onclick="setViewMode('supervisor')">
+          <span class="ms-icon sm">dashboard</span>
           Supervisor Console
         </button>
       </div>
     </div>
   </header>
 
-  <main>
-    <!-- MOBILE PWA PHONE VIEW -->
-    <div class="phone-wrapper" id="phoneWrapper">
-      <div class="notch"></div>
-      <div class="phone-screen">
-        
-        <!-- App Header -->
-        <div class="app-header">
-          <div class="agent-identity">
-            <div class="agent-avatar">P</div>
-            <div class="agent-meta">
-              <h3 id="agentTitle">Pax · Frontline Copilot</h3>
-              <p><span style="color: #1E8E3E;">●</span> Online · <span id="storeBadge">SM Megamall</span></p>
+  <!-- ============================================================
+       WORKSPACE CANVAS
+       ============================================================ -->
+  <main class="workspace-canvas">
+
+    <!-- HARDWARE DEVICE SHELL -->
+    <div class="m3-phone-shell" id="phoneWrapper">
+      <div class="m3-phone-screen">
+
+        <!-- Status Bar -->
+        <div class="phone-status-row">
+          <span>9:41</span>
+          <div class="phone-pill-island">
+            <div class="pill-green-dot"></div>
+            <span>BLOC CORE</span>
+            <span style="opacity: 0.8;">5G</span>
+          </div>
+          <span>100%</span>
+        </div>
+
+        <!-- ======================================================
+             SCREEN 1: CHATS LIST (M3 Hairline Precision)
+             ====================================================== -->
+        <div class="m3-view-container" id="screenChatsList">
+          <div class="m3-chats-header">
+            <div class="chats-headline-bar">
+              <span class="m3-title-large">Chats</span>
+              <div class="m3-store-chip" id="lblRosterStore">
+                <span class="ms-icon sm">storefront</span>
+                <span id="txtRosterStoreName">SM Megamall</span>
+              </div>
+            </div>
+            <div class="m3-search-bar">
+              <span class="ms-icon sm" style="color:var(--m3-on-surface-variant);">search</span>
+              <input type="text" id="chatSearchInput" placeholder="Search chats, teammates, SKUs..." oninput="filterChatList(this.value)">
             </div>
           </div>
-          <button onclick="triggerBriefing()" style="background:#E8F0FE;border:none;color:#1A73E8;padding:6px 10px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer">
-            ☀️ Morning Mission
-          </button>
-        </div>
 
-        <!-- Shift Target Thermometer -->
-        <div class="target-banner">
-          <div class="target-labels">
-            <span>Shift Target: <b id="lblTarget">₱25,000</b></span>
-            <span>Achieved: <b id="lblAchieved" style="color:#1E8E3E">₱0 (0%)</b></span>
+          <div class="m3-threads-stream" id="chatsContainer">
+            <!-- Pinned Copilot -->
+            <div class="m3-subhead">Autonomous Copilot</div>
+            <div class="m3-thread-card pax-card" onclick="openChat('chat-pax')">
+              <div class="m3-avatar-circle avatar-pax">
+                <span class="ms-icon" style="color:#fff;">smart_toy</span>
+                <div class="avatar-live-dot"></div>
+              </div>
+              <div class="thread-info-column">
+                <div class="thread-meta-row">
+                  <div class="thread-headline">
+                    Pax · Frontline Copilot
+                    <span class="m3-tag-pill tag-ai-guide"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">push_pin</span>Pinned</span>
+                  </div>
+                  <span class="thread-time-label">Just now</span>
+                </div>
+                <div class="thread-preview-text">Shift active! Tap Fast-Sale or ask for daily tasks.</div>
+              </div>
+            </div>
+
+            <!-- Org-Chart Managed Channels -->
+            <div class="m3-subhead">Org-Chart Managed Channels</div>
+            <div class="m3-thread-card" onclick="openChat('chat-gc-store')">
+              <div class="m3-avatar-circle avatar-gc">
+                <span class="ms-icon">storefront</span>
+              </div>
+              <div class="thread-info-column">
+                <div class="thread-meta-row">
+                  <div class="thread-headline" id="lblStoreGcName">
+                    # SM Megamall Floor Ops
+                    <span class="m3-tag-pill tag-org-gc"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">verified_user</span>Org GC</span>
+                  </div>
+                  <span class="thread-time-label">09:05 AM</span>
+                </div>
+                <div class="thread-preview-text">Sarah: Cheering for the team! Let's beat yesterday's quota!</div>
+              </div>
+              <span class="m3-badge-unread">2</span>
+            </div>
+
+            <div class="m3-thread-card" onclick="openChat('chat-gc-region')">
+              <div class="m3-avatar-circle avatar-gc">
+                <span class="ms-icon">public</span>
+              </div>
+              <div class="thread-info-column">
+                <div class="thread-meta-row">
+                  <div class="thread-headline">
+                    # JAPAC Retail Operations
+                    <span class="m3-tag-pill tag-org-gc"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">verified_user</span>Org GC</span>
+                  </div>
+                  <span class="thread-time-label">08:00 AM</span>
+                </div>
+                <div class="thread-preview-text">Nexus: Regional morning sell-through telemetry active.</div>
+              </div>
+            </div>
+
+            <!-- Direct Messages -->
+            <div class="m3-subhead">Direct Messages</div>
+            <div class="m3-thread-card" onclick="openChat('chat-lester')">
+              <div class="m3-avatar-circle avatar-supervisor">
+                <span class="ms-icon" style="color:#A8C7FA;">manage_accounts</span>
+                <div class="avatar-live-dot"></div>
+              </div>
+              <div class="thread-info-column">
+                <div class="thread-meta-row">
+                  <div class="thread-headline">
+                    Lester Alarcon
+                    <span class="m3-tag-pill tag-supervisor"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">shield_person</span>Supervisor</span>
+                  </div>
+                  <span class="thread-time-label">09:20 AM</span>
+                </div>
+                <div class="thread-preview-text">Great. Also focus on the promotional bundle packs today...</div>
+              </div>
+              <span class="m3-badge-unread">1</span>
+            </div>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- ======================================================
+             SCREEN 2: ACTIVE CONVERSATION VIEW
+             ====================================================== -->
+        <div class="m3-view-container hidden" id="screenActiveChat">
+          <!-- Convo Top App Bar -->
+          <div class="convo-app-bar">
+            <button class="btn-m3-back" onclick="returnToChatList()">
+              <span class="ms-icon sm">arrow_back_ios_new</span>
+              <span>Chats</span>
+            </button>
+            <div class="convo-title-box">
+              <div class="convo-main-title" id="activeChatTitle">Pax · Frontline Copilot</div>
+              <div class="convo-sub-status" id="activeChatStatus"><span class="ms-icon sm" style="font-size:11px;color:var(--m3-tertiary-emerald);">circle</span> Autonomous Daily Guide</div>
+            </div>
+            <button class="m3-icon-btn" onclick="openSkuSearchSheet()" title="Search SKU">
+              <span class="ms-icon sm">search</span>
+            </button>
+          </div>
+
+          <!-- Shift Quota Indicator Bar -->
+          <div class="m3-quota-banner" id="shiftKpiBanner">
+            <div class="quota-col">
+              <span class="quota-caption">Today's Target Quota</span>
+              <span class="quota-num" id="lblKpiTarget">₱25,000</span>
+            </div>
+            <div class="quota-col" style="align-items: flex-end;">
+              <span class="quota-caption">Shift Sell-Through</span>
+              <span class="quota-num" id="lblKpiCurrent" style="color: var(--m3-tertiary-emerald);">₱0 (0%)</span>
+              <div class="quota-bar-track">
+                <div class="quota-bar-fill" id="kpiProgressFill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Convo Message Stream -->
+          <div class="convo-messages-box" id="activeChatStream">
+            <!-- Messages rendered dynamically -->
+          </div>
+
+          <!-- M3 Quick Action Pills -->
+          <div class="m3-quick-pills-bar" id="quickChipsTray">
+            <button class="m3-quick-pill" onclick="showFastSaleWidget()">
+              <span class="ms-icon sm" style="color:var(--m3-primary);">bolt</span>
+              <span>3-Sec Fast-Sale</span>
+            </button>
+            <button class="m3-quick-pill" onclick="openSkuSearchSheet()">
+              <span class="ms-icon sm" style="color:var(--m3-primary);">search</span>
+              <span>Search SKU</span>
+            </button>
+            <button class="m3-quick-pill" onclick="openVeraAuditModal()">
+              <span class="ms-icon sm" style="color:var(--m3-primary);">photo_camera</span>
+              <span>Vera Shelf Audit</span>
+            </button>
+            <button class="m3-quick-pill" onclick="askPaxTasks()">
+              <span class="ms-icon sm" style="color:var(--m3-primary);">checklist</span>
+              <span>Today's Tasks</span>
+            </button>
+          </div>
+
+          <!-- Multi-Row Expanding Composer Input -->
+          <div class="m3-chat-composer">
+            <button class="m3-composer-btn" onclick="openSkuSearchSheet()" title="Open Product Catalog">
+              <span class="ms-icon">add</span>
+            </button>
+            <button class="m3-composer-btn" onclick="simulateBarcodeScan()" title="Scan Product Barcode">
+              <span class="ms-icon">barcode_scanner</span>
+            </button>
+            <div class="m3-composer-hull">
+              <textarea id="txtChatInput" rows="1" placeholder="Message or ask for tasks..." oninput="autoGrowTextarea(this)" onkeydown="handleChatEnter(event)"></textarea>
+            </div>
+            <button class="m3-composer-send" id="btnSendChat" onclick="sendCurrentChat()">
+              <span class="ms-icon sm" style="color:#fff;">arrow_upward</span>
+            </button>
           </div>
         </div>
 
-        <!-- Chat Stream -->
-        <div class="chat-stream" id="chatStream">
-          <div class="chat-bubble pax">
-            Magandang umaga, Liza! ☀️ Welcome to SM Megamall. Ready na ba ang promo bundles natin today? Click <b>Morning Mission</b> or use the <b>Fast-Sale</b> stepper below!
+        <!-- ======================================================
+             MODAL 1: SKU SEARCH DRAWER (M3 Bottom Sheet)
+             ====================================================== -->
+        <div class="m3-sheet-scrim" id="sheetSkuSearch" onclick="if(event.target===this) closeSkuSearchSheet()">
+          <div class="m3-sheet-card">
+            <div class="m3-drag-handle"></div>
+            <div class="sheet-title-row">
+              <span class="sheet-title-text">Product Catalog & SKU Search</span>
+              <button class="m3-icon-btn" onclick="closeSkuSearchSheet()" style="width:28px;height:28px;">
+                <span class="ms-icon sm">close</span>
+              </button>
+            </div>
+            <div class="m3-search-bar" style="margin-bottom: 12px;">
+              <span class="ms-icon sm" style="color:var(--m3-on-surface-variant);">search</span>
+              <input type="text" id="txtSkuSearchInput" placeholder="Search by name, SKU code, or barcode..." oninput="doSearchSkus(this.value)">
+            </div>
+            <div class="sku-scroll-list" id="skuResultsContainer">
+              <!-- Rendered via JS -->
+            </div>
           </div>
         </div>
 
-        <!-- Quick Action Bar -->
-        <div class="quick-actions">
-          <button class="action-chip" onclick="toggleFastSaleSheet()">
-            <span class="material-symbols-rounded" style="color:#1A73E8;font-size:16px;">bolt</span>
-            ⚡ Fast-Sale
-          </button>
-          <button class="action-chip" onclick="openAuditModal()">
-            <span class="material-symbols-rounded" style="color:#1E8E3E;font-size:16px;">photo_camera</span>
-            📸 Vera Shelf Audit
-          </button>
-          <button class="action-chip" onclick="quickSend('Anong promo natin today?')">
-            <span class="material-symbols-rounded" style="color:#F9AB00;font-size:16px;">help</span>
-            Focus Promo Info
-          </button>
-        </div>
-
-        <!-- Input Bar -->
-        <div class="input-bar">
-          <input type="text" id="txtInput" placeholder="Message Pax or scan barcode..." onkeydown="if(event.key==='Enter') sendChat()">
-          <button class="btn-send" onclick="sendChat()">
-            <span class="material-symbols-rounded" style="font-size:18px;">send</span>
-          </button>
-        </div>
-
-        <!-- Modal for Vera Audit -->
-        <div class="modal-overlay" id="auditModal">
-          <div class="modal-card">
+        <!-- ======================================================
+             MODAL 2: VERA MULTIMODAL VISION PLANOGRAM AUDIT
+             ====================================================== -->
+        <div class="m3-modal-scrim" id="modalAudit" onclick="if(event.target===this) closeVeraAuditModal()">
+          <div class="m3-modal-card">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3 style="font-size:15px;font-weight:700;">📸 Vera Multimodal Shelf Audit</h3>
-              <span class="material-symbols-rounded" style="cursor:pointer;" onclick="closeAuditModal()">close</span>
+              <span style="font-size: 15px; font-weight: 750; color: var(--m3-on-surface); display:flex; gap:6px; align-items:center;">
+                <span class="ms-icon" style="color:var(--m3-primary);">photo_camera</span>
+                Vera Multimodal Vision Audit
+              </span>
+              <button class="m3-icon-btn" onclick="closeVeraAuditModal()" style="width:28px;height:28px;">
+                <span class="ms-icon sm">close</span>
+              </button>
             </div>
-            <div style="height:140px;background:#F1F3F4;border-radius:14px;border:2px dashed #CBD5E0;display:grid;place-items:center;position:relative;overflow:hidden;">
-              <img id="auditPreview" src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=80" style="width:100%;height:100%;object-fit:cover;">
-              <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.7);color:#fff;font-size:9.5px;padding:3px 7px;border-radius:6px;">Sample Retail Endcap</div>
+            
+            <div style="background:#0D1117;height:140px;border-radius:14px;display:grid;place-items:center;color:#8B949E;position:relative;overflow:hidden;">
+              <div style="position:absolute;inset:8px;border:1.5px dashed #79C0FF;border-radius:10px;display:grid;place-items:center;background:rgba(121,192,255,0.06);">
+                <div style="text-align:center;">
+                  <span class="ms-icon lg" style="color:#79C0FF;">center_focus_strong</span>
+                  <div style="font-size:11px;font-weight:650;color:#E2E8F0;margin-top:4px;">Planogram Grid Alignment Active</div>
+                  <div style="font-size:10px;color:#8B949E;">Shelf Endcap #04 Optical Feed</div>
+                </div>
+              </div>
             </div>
-            <div id="auditResultArea" style="font-size:12px;line-height:1.4;display:none;"></div>
-            <button class="btn-commit" id="btnRunAudit" onclick="runVeraAudit()" style="background:#1A73E8;">
-              🔍 Run Gemini 2.5 Vision Analysis
+
+            <div id="auditVerdictBox" style="display:none;background:var(--m3-tertiary-subtle);border:1px solid rgba(20,108,46,0.3);padding:10px;border-radius:12px;font-size:12px;color:var(--m3-tertiary-emerald);">
+              <!-- Audit result -->
+            </div>
+
+            <button class="btn-commit-fsc" id="btnExecuteVera" onclick="executeVeraAudit()">
+              <span class="ms-icon sm">search</span>
+              <span>Run Gemini 2.5 Vision Analysis</span>
             </button>
           </div>
         </div>
@@ -619,249 +1662,568 @@
       </div>
     </div>
 
-    <!-- DESKTOP SUPERVISOR CONSOLE VIEW -->
-    <div class="supervisor-wrapper" id="supervisorWrapper">
-      <div class="sup-header">
-        <div>
-          <h2 style="font-size:18px;font-weight:700;">Retail Operations Command Center</h2>
-          <p style="font-size:12px;color:var(--muted);">JAPAC Regional Real-Time Shift & Sell-Through Telemetry</p>
+    <!-- ============================================================
+         SUPERVISOR COMMAND HORIZON (M3 DARK / VERTEX AI STUDIO IDENTITY)
+         ============================================================ -->
+    <div class="m3-supervisor-horizon" id="supervisorWrapper">
+      <div class="horizon-top-header">
+        <div class="horizon-titles">
+          <h2>
+            <span class="ms-icon" style="color:var(--m3-dark-primary-glow);">monitoring</span>
+            <span>Regional Retail Operations Command Horizon</span>
+          </h2>
+          <p>Real-Time Sell-Through Telemetry · JAPAC Multi-Tenant Matrix · Google Sheets WSS Sync</p>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span class="badge" style="background:#E6F4EA;color:#137333;">🟢 Live WSS Google Sheets Bridge</span>
-          <button onclick="loadSupervisorData()" style="padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Refresh</button>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <h4>TODAY'S TOTAL REVENUE</h4>
-          <div class="val" id="supRevenue">₱70,990</div>
-          <div class="sub">▲ 14.2% vs last shift</div>
-        </div>
-        <div class="kpi-card">
-          <h4>AVG PLANOGRAM COMPLIANCE</h4>
-          <div class="val" id="supCompliance">92%</div>
-          <div class="sub">▲ 4 pts Share of Shelf</div>
-        </div>
-        <div class="kpi-card">
-          <h4>ACTIVE PROMOTERS</h4>
-          <div class="val" id="supCheckins">2 / 2</div>
-          <div class="sub">100% On-Time Check-In</div>
-        </div>
-        <div class="kpi-card">
-          <h4>OPEN EXCEPTIONS</h4>
-          <div class="val" style="color:var(--yellow);" id="supExceptions">1</div>
-          <div class="sub" style="color:var(--muted);">1 Missing Price Tag Flagged</div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(86,211,100,0.12);color:var(--m3-dark-emerald);border:1px solid rgba(86,211,100,0.25);padding:5px 12px;border-radius:999px;font-size:12px;font-weight:650;">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--m3-dark-emerald);box-shadow:0 0 8px var(--m3-dark-emerald);"></div>
+            <span>WSS Bidirectional Link</span>
+          </div>
+          <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:var(--m3-dark-surface-high);border:1px solid var(--m3-dark-outline);color:#fff;">
+            <span class="ms-icon sm">refresh</span>
+            Refresh Telemetry
+          </button>
         </div>
       </div>
 
-      <div class="table-container">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;">Store Performance Breakdown</h3>
-        <table>
+      <!-- KPI Grid -->
+      <div class="horizon-kpi-grid">
+        <div class="m3-stat-card-dark">
+          <span class="m3-stat-caption">Regional Revenue (USD)</span>
+          <span class="m3-stat-num" id="supKpiRevenue">$18,450</span>
+          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 14.2% vs previous shift</span>
+        </div>
+        <div class="m3-stat-card-dark">
+          <span class="m3-stat-caption">Avg Planogram Compliance</span>
+          <span class="m3-stat-num" id="supKpiCompliance">92%</span>
+          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 4 pts Share of Shelf (Vera)</span>
+        </div>
+        <div class="m3-stat-card-dark">
+          <span class="m3-stat-caption">Promoter Attendance Ratio</span>
+          <span class="m3-stat-num" id="supKpiPromoters">2 / 2</span>
+          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;color:var(--m3-dark-emerald);">verified</span> 100% Geofenced Check-In</span>
+        </div>
+        <div class="m3-stat-card-dark">
+          <span class="m3-stat-caption">Open Exceptions Flagged</span>
+          <span class="m3-stat-num" id="supKpiExceptions" style="color:var(--m3-dark-amber);">1</span>
+          <span class="m3-stat-trend" style="color:var(--m3-dark-amber);"><span class="ms-icon sm" style="font-size:14px;color:var(--m3-dark-amber);">error_outline</span> Missing Shelf Tag Detected</span>
+        </div>
+      </div>
+
+      <!-- Enterprise Lineage / Org Chart -->
+      <div class="m3-lineage-card">
+        <div class="lineage-card-top">
+          <div class="lineage-card-title">
+            <span class="ms-icon" style="color:var(--m3-dark-primary-glow);">account_tree</span>
+            <span>Company Org Chart & Automated Channel Governance</span>
+          </div>
+          <span class="lineage-shield-pill">Enterprise Admin Enforced</span>
+        </div>
+        <p style="font-size: 12.5px; color: var(--m3-dark-text-secondary); line-height: 1.5;">
+          All group communication channels are programmatically provisioned and tied to the enterprise corporate hierarchy. Promoters cannot spawn unverified channels, ensuring enterprise auditability and compliance.
+        </p>
+        <div class="org-topology-rows">
+          <div class="org-node-bar">
+            <div>
+              <b style="color:#fff;">JAPAC Retail Operations HQ</b> &mdash; Regional Supervisor: Lester Alarcon
+            </div>
+            <span class="org-node-meta">Channel: # JAPAC Retail Operations (24 Reps)</span>
+          </div>
+          <div class="org-node-bar" style="margin-left: 20px;">
+            <div>
+              <b style="color:#fff;">SM Megamall Branch (PH)</b> &mdash; Promoter: Liza Santos
+            </div>
+            <span class="org-node-meta">Channel: # SM Megamall Floor Ops (6 Members)</span>
+          </div>
+          <div class="org-node-bar" style="margin-left: 20px;">
+            <div>
+              <b style="color:#fff;">FairPrice Xtra VivoCity (SG)</b> &mdash; Promoter: Sarah Tan
+            </div>
+            <span class="org-node-meta">Channel: # FairPrice VivoCity Ops (5 Members)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store Breakdown Table -->
+      <div style="background: var(--m3-dark-surface-high); border: 1px solid var(--m3-dark-outline); border-radius: 18px; padding: 18px;">
+        <h3 style="font-size: 14.5px; font-weight: 750; color: #fff; margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+          <span>Store Sell-Through Telemetry</span>
+        </h3>
+        <table class="m3-telemetry-table">
           <thead>
             <tr>
-              <th>Store Branch</th>
+              <th>Branch Code & Store</th>
               <th>Country</th>
-              <th>Daily Quota</th>
+              <th>Target Quota</th>
               <th>Actual Sell-Through</th>
-              <th>Target %</th>
+              <th>Pacing %</th>
               <th>Shelf Compliance</th>
             </tr>
           </thead>
-          <tbody id="storeTableBody">
-            <tr>
-              <td><b>SM Megamall Cyberzone</b></td>
-              <td>Philippines</td>
-              <td>₱25,000</td>
-              <td>₱18,450</td>
-              <td><span class="badge" style="background:#E8F0FE;color:#185ABC;">74%</span></td>
-              <td>92%</td>
-            </tr>
-            <tr>
-              <td><b>FairPrice Xtra VivoCity</b></td>
-              <td>Singapore</td>
-              <td>SGD $1,200</td>
-              <td>SGD $1,299</td>
-              <td><span class="badge" style="background:#E6F4EA;color:#137333;">108%</span></td>
-              <td>95%</td>
-            </tr>
+          <tbody id="supTableBody">
+            <!-- Populated via JS -->
           </tbody>
         </table>
       </div>
     </div>
+
   </main>
 
   <script>
+    // ============================================================
+    // APPLICATION STATE
+    // ============================================================
     let currentUserId = 'usr-liza-ph';
     let currentStoreId = 'store-sm-mega';
+    let currentChatId = 'chat-pax';
     let focusProducts = [];
+    let allCatalogProducts = [];
     let stepperCounts = {};
     let currencySymbol = '₱';
     let targetAmount = 25000;
-    let currentTotal = 0;
+    let currentShiftTotal = 0;
 
+    // ============================================================
+    // 1. INITIALIZATION & USER STATE
+    // ============================================================
     async function loadUserState() {
       try {
         const res = await fetch(`/api/user/${currentUserId}/state`);
         const data = await res.json();
-        
+
         focusProducts = data.focusProducts || [];
-        currentStoreId = data.store?.id || 'store-sm-mega';
-        targetAmount = data.targetAmount || 25000;
-        currentTotal = data.currentShiftTotal || 0;
-        currencySymbol = data.currency === 'SGD' ? '$' : '₱';
+        currentStoreId = data.store?.id || (currentUserId === 'usr-sarah-sg' ? 'store-fp-vivo' : 'store-sm-mega');
+        
+        // Accurate target amount
+        if (currentUserId === 'usr-sarah-sg') {
+          targetAmount = data.store?.dailyTargetDefault || 1200;
+          currencySymbol = '$';
+        } else {
+          targetAmount = data.store?.dailyTargetDefault || 25000;
+          currencySymbol = '₱';
+        }
 
-        document.getElementById('storeBadge').innerText = data.store?.name || 'Retail Branch';
-        document.getElementById('lblTarget').innerText = `${currencySymbol}${targetAmount.toLocaleString()}`;
-        updateTargetProgress(currentTotal);
+        currentShiftTotal = data.currentShiftTotal || 0;
 
-        // Reset stepper counts
-        focusProducts.forEach(p => { stepperCounts[p.id] = 0; });
+        const storeName = data.store?.name || (currentUserId === 'usr-sarah-sg' ? 'FairPrice VivoCity' : 'SM Megamall');
+        document.getElementById('txtRosterStoreName').innerText = storeName;
+        document.getElementById('lblStoreGcName').innerHTML = `# ${storeName} Floor Ops <span class="m3-tag-pill tag-org-gc"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">verified_user</span>Org GC</span>`;
+        
+        updateKpiBanner(currentShiftTotal);
+
+        // Await catalog products so instant search is ready immediately
+        await fetchCatalogProducts();
       } catch (err) {
         console.error('Failed to load user state:', err);
       }
     }
 
-    function updateTargetProgress(total) {
-      currentTotal = total;
-      const pct = Math.min(100, Math.round((currentTotal / targetAmount) * 100));
-      document.getElementById('lblAchieved').innerText = `${currencySymbol}${currentTotal.toLocaleString()} (${pct}%)`;
-      document.getElementById('progressFill').style.width = `${pct}%`;
-    }
-
-    function switchPersona(userId) {
-      currentUserId = userId;
-      const chatStream = document.getElementById('chatStream');
-      chatStream.innerHTML = '';
-      loadUserState();
-      triggerBriefing();
-    }
-
-    function setView(view) {
-      if (view === 'phone') {
-        document.getElementById('phoneWrapper').style.display = 'flex';
-        document.getElementById('supervisorWrapper').style.display = 'none';
-        document.getElementById('btnPhoneView').classList.add('active');
-        document.getElementById('btnSupView').classList.remove('active');
-      } else {
-        document.getElementById('phoneWrapper').style.display = 'none';
-        document.getElementById('supervisorWrapper').style.display = 'flex';
-        document.getElementById('btnPhoneView').classList.remove('active');
-        document.getElementById('btnSupView').classList.add('active');
-        loadSupervisorData();
-      }
-    }
-
-    async function triggerBriefing() {
-      appendPaxMessage('☀️ Pax is preparing your Morning Mission with Gemini 2.5 Flash...');
+    async function fetchCatalogProducts() {
       try {
-        const res = await fetch('/api/pax/briefing', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUserId })
-        });
-        const data = await res.json();
-        appendPaxMessage(data.briefing);
-        // Automatically open Fast-Sale card
-        renderFastSaleCard();
+        const curr = currentUserId === 'usr-sarah-sg' ? 'SGD' : 'PHP';
+        const res = await fetch(`/api/products?currency=${curr}`);
+        allCatalogProducts = await res.json();
       } catch (err) {
-        appendPaxMessage('Good morning! Ready for today’s shift at the branch.');
-        renderFastSaleCard();
+        allCatalogProducts = focusProducts;
       }
     }
 
-    function renderFastSaleCard() {
-      const chatStream = document.getElementById('chatStream');
+    function updateKpiBanner(total) {
+      currentShiftTotal = total;
+      const pct = Math.min(100, Math.round((currentShiftTotal / targetAmount) * 100));
+      document.getElementById('lblKpiTarget').innerText = `${currencySymbol}${targetAmount.toLocaleString()}`;
+      document.getElementById('lblKpiCurrent').innerText = `${currencySymbol}${currentShiftTotal.toLocaleString()} (${pct}%)`;
+      document.getElementById('kpiProgressFill').style.width = `${pct}%`;
+    }
+
+    // ============================================================
+    // 2. CHATS NAVIGATION & FILTERING
+    // ============================================================
+    function filterChatList(query) {
+      const q = query.trim().toLowerCase();
+      const cards = document.querySelectorAll('#chatsContainer .m3-thread-card');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function openChat(chatId) {
+      currentChatId = chatId;
+      document.getElementById('screenChatsList').classList.add('hidden');
+      document.getElementById('screenActiveChat').classList.remove('hidden');
+
+      const isPax = chatId === 'chat-pax';
+      document.getElementById('shiftKpiBanner').style.display = isPax ? 'flex' : 'none';
+      document.getElementById('quickChipsTray').style.display = isPax ? 'flex' : 'none';
+
+      // Update header
+      if (chatId === 'chat-pax') {
+        document.getElementById('activeChatTitle').innerText = 'Pax · Frontline Copilot';
+        document.getElementById('activeChatStatus').innerHTML = '<span class="ms-icon sm" style="font-size:11px;color:var(--m3-tertiary-emerald);">circle</span> Autonomous Daily Guide';
+        loadPaxConversation();
+      } else if (chatId === 'chat-lester') {
+        document.getElementById('activeChatTitle').innerText = 'Lester Alarcon';
+        document.getElementById('activeChatStatus').innerHTML = '<span class="ms-icon sm" style="font-size:11px;color:var(--m3-tertiary-emerald);">circle</span> Regional Supervisor · Online';
+        loadThreadMessages(chatId);
+      } else if (chatId === 'chat-gc-store') {
+        const storeName = currentUserId === 'usr-sarah-sg' ? 'FairPrice VivoCity' : 'SM Megamall';
+        document.getElementById('activeChatTitle').innerText = `# ${storeName} Floor Ops`;
+        document.getElementById('activeChatStatus').innerHTML = '<span class="ms-icon sm" style="font-size:12px;color:var(--m3-outline);">lock</span> Org-Chart Managed (6 members)';
+        loadThreadMessages(chatId);
+      } else if (chatId === 'chat-gc-region') {
+        document.getElementById('activeChatTitle').innerText = '# JAPAC Retail Operations';
+        document.getElementById('activeChatStatus').innerHTML = '<span class="ms-icon sm" style="font-size:12px;color:var(--m3-outline);">lock</span> Org-Chart Managed (24 members)';
+        loadThreadMessages(chatId);
+      }
+    }
+
+    function returnToChatList() {
+      document.getElementById('screenActiveChat').classList.add('hidden');
+      document.getElementById('screenChatsList').classList.remove('hidden');
+    }
+
+    // ============================================================
+    // 3. CONVERSATION MESSAGES & PAX INTERACTION (TELEGRAM KEYBOARD STYLE)
+    // ============================================================
+    async function loadPaxConversation() {
+      const stream = document.getElementById('activeChatStream');
+      stream.innerHTML = '';
+
+      const isSarah = currentUserId === 'usr-sarah-sg';
+      const greeting = isSarah
+        ? "Morning Sarah! Checked in at FairPrice VivoCity. Today's quota is SGD $1,200. Focus is the 55\" OLED Smart TV. Choose an action below or tap Fast-Sale when ready!"
+        : "Magandang umaga, Liza! Naka-check in ka na sa SM Megamall. Quota natin today is ₱25,000. Let's push the Family Breakfast Bundle A! Choose an action below:";
+
+      appendPaxBubbleWithActions(greeting, [
+        { label: 'bolt', text: '1-Tap Fast-Sale', action: 'showFastSaleWidget()' },
+        { label: 'search', text: 'Search SKU Catalog', action: 'openSkuSearchSheet()' },
+        { label: 'photo_camera', text: 'Vera Shelf Audit', action: 'openVeraAuditModal()', emerald: true },
+        { label: 'checklist', text: 'Shift Tasks & Guide', action: 'showTasksMilestoneCard()' },
+      ]);
+
+      // Render Fast-Sale Stepper Card right below
+      renderFastSaleStepper();
+    }
+
+    async function loadThreadMessages(chatId) {
+      const stream = document.getElementById('activeChatStream');
+      stream.innerHTML = '';
+      try {
+        const res = await fetch(`/api/chats/${chatId}/messages`);
+        const msgs = await res.json();
+        msgs.forEach(m => {
+          appendMessageBubble(m.name, m.text, m.time, m.isUser);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function appendMessageBubble(sender, text, time, isUser) {
+      const stream = document.getElementById('activeChatStream');
+      const wrap = document.createElement('div');
+      wrap.className = `msg-packet-frame ${isUser ? 'user' : 'peer'}`;
+
+      wrap.innerHTML = `
+        <div class="msg-author-tag">${sender}</div>
+        <div class="m3-bubble ${isUser ? 'user' : 'peer'}">
+          ${text}
+          <div class="bubble-meta-time">${time}</div>
+        </div>
+      `;
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendPaxBubble(text) {
+      appendPaxBubbleWithActions(text, [
+        { label: 'bolt', text: 'Record Fast-Sale', action: 'showFastSaleWidget()' },
+        { label: 'search', text: 'Search SKU', action: 'openSkuSearchSheet()' },
+        { label: 'photo_camera', text: 'Vera Audit', action: 'openVeraAuditModal()', emerald: true },
+        { label: 'checklist', text: 'View Tasks', action: 'showTasksMilestoneCard()' }
+      ]);
+    }
+
+    function appendPaxBubbleWithActions(text, actions = []) {
+      const stream = document.getElementById('activeChatStream');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-packet-frame pax';
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      let actionsHtml = '';
+      if (actions.length > 0) {
+        actionsHtml = '<div class="m3-inline-action-grid">';
+        actions.forEach(a => {
+          actionsHtml += `
+            <button class="m3-inline-btn ${a.emerald ? 'emerald' : ''}" onclick="${a.action}">
+              <span class="ms-icon sm">${a.label}</span>
+              <span>${a.text}</span>
+            </button>
+          `;
+        });
+        actionsHtml += '</div>';
+      }
+
+      wrap.innerHTML = `
+        <div class="msg-author-tag">Pax · Frontline Copilot</div>
+        <div class="m3-bubble pax">
+          ${text}
+          <div class="bubble-meta-time">${time}</div>
+        </div>
+        ${actionsHtml}
+      `;
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function showTasksMilestoneCard() {
+      const stream = document.getElementById('activeChatStream');
       const card = document.createElement('div');
-      card.className = 'fast-sale-card';
-      card.id = 'activeFastSaleCard';
+      card.className = 'm3-tasks-card';
+      card.innerHTML = `
+        <div class="task-card-header">
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span class="ms-icon sm" style="color:var(--m3-primary);">checklist</span>
+            <b>Daily Frontline Shift Guide</b>
+          </span>
+          <span class="badge-task-verified">
+            <span class="ms-icon sm">check_circle</span>
+            Active Shift
+          </span>
+        </div>
+        <div class="task-item-line">
+          <div>
+            <b>1. Attendance & GPS Geofence Check-In</b>
+            <small>SM Megamall Branch Verified (08:00 AM)</small>
+          </div>
+          <span class="badge-task-verified">
+            <span class="ms-icon sm">check</span> Done
+          </span>
+        </div>
+        <div class="task-item-line">
+          <div>
+            <b>2. Planogram Shelf Camera Audit</b>
+            <small>Vera Gemini 2.5 Vision Compliance</small>
+          </div>
+          <button class="btn-task-trigger" onclick="openVeraAuditModal()">
+            <span class="ms-icon sm">photo_camera</span> Launch
+          </button>
+        </div>
+        <div class="task-item-line">
+          <div>
+            <b>3. Focus Promotional SKU Sell-Through</b>
+            <small>1-Tap Quantity Stepper (Zero-Typing)</small>
+          </div>
+          <button class="btn-task-trigger" onclick="showFastSaleWidget()">
+            <span class="ms-icon sm">bolt</span> Fast-Sale
+          </button>
+        </div>
+        <div class="task-item-line">
+          <div>
+            <b>4. Catalog Pricing & Stock Lookup</b>
+            <small>Instant SKU Code & Barcode Search</small>
+          </div>
+          <button class="btn-task-trigger" onclick="openSkuSearchSheet()">
+            <span class="ms-icon sm">search</span> Search
+          </button>
+        </div>
+      `;
+      stream.appendChild(card);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendUserBubble(text) {
+      const stream = document.getElementById('activeChatStream');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-packet-frame user';
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      wrap.innerHTML = `
+        <div class="m3-bubble user">
+          ${text}
+          <div class="bubble-meta-time">${time}</div>
+        </div>
+      `;
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    // ============================================================
+    // 4. CHAT INPUT COMPOSER
+    // ============================================================
+    function autoGrowTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(100, el.scrollHeight) + 'px';
+    }
+
+    function handleChatEnter(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendCurrentChat();
+      }
+    }
+
+    async function sendCurrentChat() {
+      const txt = document.getElementById('txtChatInput');
+      const msg = txt.value.trim();
+      if (!msg) return;
+
+      txt.value = '';
+      txt.style.height = 'auto';
+
+      appendUserBubble(msg);
+
+      if (currentChatId === 'chat-pax') {
+        try {
+          const res = await fetch('/api/pax/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUserId, message: msg })
+          });
+          const data = await res.json();
+          appendPaxBubble(data.reply);
+        } catch (err) {
+          appendPaxBubble("Got your note! I'm tracking your shift. Tap Fast-Sale or Vera Shelf Audit anytime.");
+        }
+      } else {
+        try {
+          await fetch(`/api/chats/${currentChatId}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: msg })
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+
+    function askPaxTasks() {
+      showTasksMilestoneCard();
+    }
+
+    // ============================================================
+    // 5. 3-SECOND FAST-SALE CARD WITH DUAL OPTIONS
+    // ============================================================
+    function renderFastSaleStepper() {
+      const stream = document.getElementById('activeChatStream');
+      const widget = document.createElement('div');
+      widget.className = 'm3-fast-sale-card';
+      widget.id = 'activeFastSaleWidget';
 
       let itemsHtml = '';
       focusProducts.forEach(p => {
         stepperCounts[p.id] = stepperCounts[p.id] || 0;
         itemsHtml += `
-          <div class="sku-stepper-row">
-            <div>
-              <div class="sku-name">${p.name}</div>
-              <div class="sku-price">${currencySymbol}${p.unitPrice.toLocaleString()} · +${currencySymbol}${p.commissionPerUnit || 15} incentive</div>
+          <div class="fsc-sku-row">
+            <div style="flex:1;min-width:0;padding-right:8px;">
+              <div class="fsc-sku-title">${p.name}</div>
+              <div class="fsc-sku-sub">
+                ${currencySymbol}${p.unitPrice.toLocaleString()} 
+                <span class="fsc-bonus-val">+${currencySymbol}${p.commissionPerUnit || 25} bonus</span>
+              </div>
             </div>
-            <div class="stepper-controls">
-              <button class="btn-step" onclick="adjustStepper('${p.id}', -1)">-</button>
-              <span class="step-val" id="step-${p.id}">${stepperCounts[p.id]}</span>
-              <button class="btn-step add" onclick="adjustStepper('${p.id}', 1)">+</button>
+            <div class="m3-stepper-box">
+              <button class="btn-step-ctrl" onclick="adjustStepper('${p.id}', -1)" title="Decrease Quantity">
+                <span class="ms-icon sm">remove</span>
+              </button>
+              <span class="step-counter-val" id="qty-${p.id}">${stepperCounts[p.id]}</span>
+              <button class="btn-step-ctrl add" onclick="adjustStepper('${p.id}', 1)" title="Increase Quantity">
+                <span class="ms-icon sm">add</span>
+              </button>
             </div>
           </div>
         `;
       });
 
-      card.innerHTML = `
-        <div class="fs-header">
-          <div class="fs-title">
-            <span class="material-symbols-rounded">bolt</span>
-            3-SECOND FAST-SALE LOG
+      widget.innerHTML = `
+        <div class="fsc-header">
+          <div class="fsc-title">
+            <span class="ms-icon sm">bolt</span>
+            <span>3-SECOND FAST-SALE LOG</span>
           </div>
-          <span class="fs-chip">Zero-Typing</span>
+          <span class="fsc-badge"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">touch_app</span>Zero-Typing</span>
         </div>
         ${itemsHtml}
-        <div class="barcode-btn" onclick="simulateBarcodeScan()">
-          <span class="material-symbols-rounded" style="font-size:18px;">barcode_scanner</span>
-          Tap to Scan Product Box Barcode / QR
+        
+        <!-- DUAL OPTIONS: SEARCH SKU OR SCAN BARCODE -->
+        <div class="fsc-dual-options-grid">
+          <button class="btn-fsc-option" onclick="openSkuSearchSheet()">
+            <span class="ms-icon sm">search</span>
+            <span>Search SKU Catalog</span>
+          </button>
+          <button class="btn-fsc-option" onclick="simulateBarcodeScan()">
+            <span class="ms-icon sm">barcode_scanner</span>
+            <span>Scan Box Barcode</span>
+          </button>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 4px;">
-          <span>Attributed Total: <b id="lblFastSaleTotal">${currencySymbol}0</b></span>
-          <span style="color:#1E8E3E;font-weight:700;" id="lblCommissionTotal">+${currencySymbol}0 bonus</span>
+
+        <div class="fsc-totals-footer">
+          <span>Attributed Total: <b id="fswTotalValue">${currencySymbol}0</b></span>
+          <span style="color:var(--m3-tertiary-emerald);font-weight:700;" id="fswCommissionValue">+${currencySymbol}0 bonus</span>
         </div>
-        <button class="btn-commit" id="btnCommitSale" onclick="commitFastSale()" disabled>
-          ✅ CONFIRM & COMMIT TO SAP / BIGQUERY
+        <button class="btn-commit-fsc" id="btnCommitFastSale" onclick="commitFastSaleAction()" disabled>
+          <span class="ms-icon sm">done_all</span>
+          <span>CONFIRM & COMMIT TO BIGQUERY</span>
         </button>
       `;
 
-      chatStream.appendChild(card);
-      chatStream.scrollTop = chatStream.scrollHeight;
+      stream.appendChild(widget);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function showFastSaleWidget() {
+      const existing = document.getElementById('activeFastSaleWidget');
+      if (existing) existing.remove();
+      renderFastSaleStepper();
     }
 
     function adjustStepper(productId, delta) {
       stepperCounts[productId] = Math.max(0, (stepperCounts[productId] || 0) + delta);
-      const span = document.getElementById(`step-${productId}`);
+      const span = document.getElementById(`qty-${productId}`);
       if (span) span.innerText = stepperCounts[productId];
       recalcFastSaleTotals();
-    }
-
-    function simulateBarcodeScan() {
-      if (focusProducts.length > 0) {
-        const target = focusProducts[0];
-        adjustStepper(target.id, 1);
-        appendUserMessage(`[📷 Beep! Scanned EAN-13: ${target.barcode || '8806091234567'} (${target.name})]`);
-      }
     }
 
     function recalcFastSaleTotals() {
       let subtotal = 0;
       let commission = 0;
-      let totalQty = 0;
+      let totalCount = 0;
 
       focusProducts.forEach(p => {
         const qty = stepperCounts[p.id] || 0;
         subtotal += p.unitPrice * qty;
-        commission += (p.commissionPerUnit || 15) * qty;
-        totalQty += qty;
+        commission += (p.commissionPerUnit || 25) * qty;
+        totalCount += qty;
       });
 
-      document.getElementById('lblFastSaleTotal').innerText = `${currencySymbol}${subtotal.toLocaleString()}`;
-      document.getElementById('lblCommissionTotal').innerText = `+${currencySymbol}${commission.toLocaleString()} bonus`;
+      const lblTotal = document.getElementById('fswTotalValue');
+      const lblComm = document.getElementById('fswCommissionValue');
+      const btn = document.getElementById('btnCommitFastSale');
 
-      const btn = document.getElementById('btnCommitSale');
-      if (btn) btn.disabled = totalQty === 0;
+      if (lblTotal) lblTotal.innerText = `${currencySymbol}${subtotal.toLocaleString()}`;
+      if (lblComm) lblComm.innerText = `+${currencySymbol}${commission.toLocaleString()} bonus`;
+      if (btn) btn.disabled = totalCount === 0;
     }
 
-    async function commitFastSale() {
+    function simulateBarcodeScan() {
+      if (focusProducts.length > 0) {
+        const item = focusProducts[0];
+        adjustStepper(item.id, 1);
+        appendUserBubble(`[Scanned Barcode EAN-13: ${item.barcode || '8806091234567'} (${item.name})]`);
+      }
+    }
+
+    async function commitFastSaleAction() {
       const items = focusProducts.map(p => ({
         productId: p.id,
-        quantity: stepperCounts[p.id] || 0
+        quantity: stepperCounts[p.id] || 0,
       })).filter(i => i.quantity > 0);
 
-      const btn = document.getElementById('btnCommitSale');
-      btn.innerText = 'Syncing with ERP...';
+      const btn = document.getElementById('btnCommitFastSale');
+      btn.innerText = 'Syncing ERP & BigQuery...';
       btn.disabled = true;
 
       try {
@@ -872,142 +2234,182 @@
             userId: currentUserId,
             storeId: currentStoreId,
             items,
-          })
+          }),
         });
         const data = await res.json();
-        
-        appendUserMessage(`⚡ Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale Stepper (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
-        appendPaxMessage(data.paxMessage);
-        updateTargetProgress(data.currentShiftTotal);
 
-        // Reset counts
+        appendUserBubble(`Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale Stepper (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
+        appendPaxBubble(data.paxMessage);
+        updateKpiBanner(data.currentShiftTotal);
+
+        // Reset steppers
         focusProducts.forEach(p => { stepperCounts[p.id] = 0; });
-        const card = document.getElementById('activeFastSaleCard');
+        const card = document.getElementById('activeFastSaleWidget');
         if (card) card.remove();
       } catch (err) {
-        alert('Failed to log sale');
+        alert('Failed to commit sale');
       }
     }
 
-    function toggleFastSaleSheet() {
-      renderFastSaleCard();
+    // ============================================================
+    // 6. SKU SEARCH & CATALOG DRAWER
+    // ============================================================
+    function openSkuSearchSheet() {
+      document.getElementById('sheetSkuSearch').classList.add('active');
+      document.getElementById('txtSkuSearchInput').value = '';
+      doSearchSkus('');
     }
 
-    async function sendChat() {
-      const input = document.getElementById('txtInput');
-      const msg = input.value.trim();
-      if (!msg) return;
-      input.value = '';
+    function closeSkuSearchSheet() {
+      document.getElementById('sheetSkuSearch').classList.remove('active');
+    }
 
-      appendUserMessage(msg);
-      try {
-        const res = await fetch('/api/pax/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUserId, message: msg })
-        });
-        const data = await res.json();
-        appendPaxMessage(data.reply);
-      } catch (err) {
-        appendPaxMessage('Sige, narinig kita! Let me know if you need to log a sale or check promo guidelines.');
+    function doSearchSkus(term) {
+      const container = document.getElementById('skuResultsContainer');
+      const q = term.trim().toLowerCase();
+      const list = allCatalogProducts.filter(p =>
+        !q || p.name.toLowerCase().includes(q) ||
+        p.skuCode.toLowerCase().includes(q) ||
+        (p.barcode && p.barcode.includes(q)) ||
+        p.category.toLowerCase().includes(q)
+      );
+
+      container.innerHTML = '';
+      if (list.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--m3-on-surface-variant);font-size:13px;">No matching catalog items found</div>';
+        return;
       }
+
+      list.forEach(p => {
+        container.innerHTML += `
+          <div class="sku-card-entry">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;color:var(--m3-on-surface);">${p.name}</div>
+              <div style="font-size:11.5px;color:var(--m3-on-surface-variant);">
+                ${p.skuCode} · EAN: ${p.barcode || '8806091234'} · <b>${currencySymbol}${p.unitPrice.toLocaleString()}</b>
+              </div>
+            </div>
+            <button class="btn-add-sku-item" onclick="addSearchedSkuToCart('${p.id}')">
+              <span class="ms-icon sm">add</span> +1 Add
+            </button>
+          </div>
+        `;
+      });
     }
 
-    function quickSend(txt) {
-      document.getElementById('txtInput').value = txt;
-      sendChat();
+    function addSearchedSkuToCart(productId) {
+      closeSkuSearchSheet();
+      showFastSaleWidget();
+      adjustStepper(productId, 1);
     }
 
-    function appendPaxMessage(txt) {
-      const chatStream = document.getElementById('chatStream');
-      const b = document.createElement('div');
-      b.className = 'chat-bubble pax';
-      b.innerHTML = txt;
-      chatStream.appendChild(b);
-      chatStream.scrollTop = chatStream.scrollHeight;
+    // ============================================================
+    // 7. VERA SHELF AUDIT MODAL
+    // ============================================================
+    function openVeraAuditModal() {
+      document.getElementById('modalAudit').classList.add('active');
+      document.getElementById('auditVerdictBox').style.display = 'none';
+      document.getElementById('btnExecuteVera').innerHTML = '<span class="ms-icon sm">search</span> Run Gemini 2.5 Vision Analysis';
     }
 
-    function appendUserMessage(txt) {
-      const chatStream = document.getElementById('chatStream');
-      const b = document.createElement('div');
-      b.className = 'chat-bubble user';
-      b.innerText = txt;
-      chatStream.appendChild(b);
-      chatStream.scrollTop = chatStream.scrollHeight;
+    function closeVeraAuditModal() {
+      document.getElementById('modalAudit').classList.remove('active');
     }
 
-    function openAuditModal() {
-      document.getElementById('auditModal').style.display = 'grid';
-      document.getElementById('auditResultArea').style.display = 'none';
-      document.getElementById('btnRunAudit').innerText = '🔍 Run Gemini 2.5 Vision Analysis';
-    }
-
-    function closeAuditModal() {
-      document.getElementById('auditModal').style.display = 'none';
-    }
-
-    async function runVeraAudit() {
-      const btn = document.getElementById('btnRunAudit');
-      btn.innerText = 'Analyzing with Gemini 2.5 Pro Vision...';
+    async function executeVeraAudit() {
+      const btn = document.getElementById('btnExecuteVera');
+      btn.innerText = 'Analyzing with Gemini 2.5 Vision...';
       btn.disabled = true;
 
       try {
         const res = await fetch('/api/audit/shelf', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUserId, storeId: currentStoreId })
+          body: JSON.stringify({ userId: currentUserId, storeId: currentStoreId }),
         });
         const data = await res.json();
 
-        const resArea = document.getElementById('auditResultArea');
-        resArea.style.display = 'block';
-        resArea.innerHTML = `
-          <div style="background:#E6F4EA;color:#137333;padding:8px;border-radius:8px;font-weight:700;margin-bottom:6px;">
-            ✅ Compliance Score: ${data.complianceScore}% · Share of Shelf: ${data.shareOfShelfPct}%
-          </div>
-          <div><b>Issues Flagged:</b> ${data.detectedIssues.join(', ')}</div>
-          <div style="margin-top:4px;color:var(--muted)"><b>Verdict:</b> ${data.verdict}</div>
+        const box = document.getElementById('auditVerdictBox');
+        box.style.display = 'block';
+        box.innerHTML = `
+          <b><span class="ms-icon sm" style="font-size:14px;color:var(--m3-tertiary-emerald);margin-right:2px;">check_circle</span> Planogram Compliance: ${data.complianceScore}% · Share of Shelf: ${data.shareOfShelfPct}%</b><br>
+          Issues: ${data.detectedIssues.join(', ')}<br>
+          <i>Verdict: ${data.verdict}</i>
         `;
-        btn.innerText = '✅ Audit Logged to Drive & Turso';
-        
-        appendPaxMessage(`📸 <b>Vera Shelf Audit Complete:</b> ${data.complianceScore}% compliance. 1 issue flagged: ${data.detectedIssues[0]}`);
+
+        btn.innerHTML = '<span class="ms-icon sm">check</span> Audit Logged to Drive & Turso';
+        appendPaxBubble(`<span class="ms-icon sm" style="color:var(--m3-primary);margin-right:4px;">photo_camera</span><b>Vera Planogram Audit Complete:</b> Compliance Score ${data.complianceScore}%. Recommended Action: ${data.recommendedAction}`);
       } catch (err) {
-        alert('Audit analysis completed with fallback');
+        alert('Audit completed with fallback benchmark');
       } finally {
         btn.disabled = false;
       }
     }
 
-    async function loadSupervisorData() {
+    // ============================================================
+    // 8. SUPERVISOR COMMAND HORIZON DATA
+    // ============================================================
+    async function loadSupervisorConsoleData() {
       try {
         const res = await fetch('/api/supervisor/dashboard');
         const data = await res.json();
 
-        document.getElementById('supRevenue').innerText = data.overview.totalRevenueNormalizedUSD;
-        document.getElementById('supCompliance').innerText = data.overview.avgCompliancePct;
-        document.getElementById('supCheckins').innerText = data.overview.checkedInPromoters;
-        document.getElementById('supExceptions').innerText = data.overview.openExceptionsCount;
+        document.getElementById('supKpiRevenue').innerText = data.overview.totalRevenueNormalizedUSD;
+        document.getElementById('supKpiCompliance').innerText = data.overview.avgCompliancePct;
+        document.getElementById('supKpiPromoters').innerText = data.overview.checkedInPromoters;
+        document.getElementById('supKpiExceptions').innerText = data.overview.openExceptionsCount;
 
-        const tbody = document.getElementById('storeTableBody');
+        const tbody = document.getElementById('supTableBody');
         tbody.innerHTML = '';
         data.stores.forEach(s => {
           tbody.innerHTML += `
             <tr>
-              <td><b>${s.name}</b></td>
-              <td>${s.country}</td>
+              <td>
+                <b style="color:#fff;">${s.name}</b>
+                <div style="font-size:11px;color:var(--m3-dark-text-secondary);font-family:'JetBrains Mono';">${s.code}</div>
+              </td>
+              <td><span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;">${s.country}</span></td>
               <td>${s.currency} ${s.target?.toLocaleString()}</td>
-              <td>${s.currency} ${s.actualSales.toLocaleString()}</td>
-              <td><span class="badge" style="background:${s.pctAchieved >= 100 ? '#E6F4EA;color:#137333' : '#E8F0FE;color:#185ABC'};">${s.pctAchieved}%</span></td>
-              <td>${s.compliance}%</td>
+              <td style="color:var(--m3-dark-primary-glow);font-weight:700;">${s.currency} ${s.actualSales.toLocaleString()}</td>
+              <td>
+                <span style="background:${s.pctAchieved >= 100 ? 'rgba(86,211,100,0.15)' : 'rgba(121,192,255,0.15)'};color:${s.pctAchieved >= 100 ? 'var(--m3-dark-emerald)' : 'var(--m3-dark-primary-glow)'};padding:3px 8px;border-radius:6px;font-weight:750;">
+                  ${s.pctAchieved}%
+                </span>
+              </td>
+              <td style="color:var(--m3-dark-emerald);font-weight:700;">${s.compliance}%</td>
             </tr>
           `;
         });
       } catch (err) {
-        console.error('Failed to load supervisor data:', err);
+        console.error(err);
       }
     }
 
-    // Initialize
+    // ============================================================
+    // 9. PERSONA & VIEWPORT SWITCHING
+    // ============================================================
+    function switchPersona(userId) {
+      currentUserId = userId;
+      loadUserState();
+      returnToChatList();
+    }
+
+    function setViewMode(mode) {
+      if (mode === 'phone') {
+        document.getElementById('phoneWrapper').style.display = 'flex';
+        document.getElementById('supervisorWrapper').style.display = 'none';
+        document.getElementById('btnPhoneView').classList.add('active');
+        document.getElementById('btnSupView').classList.remove('active');
+      } else {
+        document.getElementById('phoneWrapper').style.display = 'none';
+        document.getElementById('supervisorWrapper').style.display = 'flex';
+        document.getElementById('btnPhoneView').classList.remove('active');
+        document.getElementById('btnSupView').classList.add('active');
+        loadSupervisorConsoleData();
+      }
+    }
+
+    // Initialize on load
     loadUserState();
   </script>
 </body>
