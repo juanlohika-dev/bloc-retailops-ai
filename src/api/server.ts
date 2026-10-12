@@ -127,7 +127,153 @@ app.post('/api/audit/shelf', async (req, res) => {
 });
 
 // ----------------------------------------------------
-// 6. NEXUS SUPERVISOR DASHBOARD
+// 6. PRODUCT CATALOG & SKU SEARCH
+// ----------------------------------------------------
+app.get('/api/products', async (req, res) => {
+  try {
+    const { q, currency } = req.query as { q?: string; currency?: string };
+    const allProducts = await db.select().from(products);
+    let filtered = allProducts;
+    if (currency) {
+      filtered = filtered.filter(p => p.currency === currency);
+    }
+    if (q && q.trim()) {
+      const term = q.trim().toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(term) ||
+        p.skuCode.toLowerCase().includes(term) ||
+        (p.barcode && p.barcode.toLowerCase().includes(term)) ||
+        p.category.toLowerCase().includes(term)
+      );
+    }
+    res.json(filtered);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----------------------------------------------------
+// 7. IN-MEMORY CHAT THREADS (PAX, PEERS, ORG-CHART GC)
+// ----------------------------------------------------
+interface ChatThread {
+  id: string;
+  type: 'agent' | 'direct' | 'group_org_chart';
+  title: string;
+  subtitle: string;
+  avatar: string;
+  badge?: string;
+  isPinned?: boolean;
+  isOrgManaged?: boolean;
+  unreadCount: number;
+  lastMessage: string;
+  lastTime: string;
+}
+
+const threadMessages: Record<string, Array<{ id: string; sender: string; name: string; avatar?: string; text: string; time: string; isUser: boolean }>> = {
+  'chat-lester': [
+    { id: 'm1', sender: 'usr-lester-lead', name: 'Lester Alarcon', text: 'Good morning! Please make sure to complete your morning planogram audit by 11:00 AM.', time: '09:15 AM', isUser: false },
+    { id: 'm2', sender: 'user', name: 'You', text: 'Noted sir Lester! Will take the shelf photo now.', time: '09:18 AM', isUser: true },
+    { id: 'm3', sender: 'usr-lester-lead', name: 'Lester Alarcon', text: 'Great. Also focus on the promotional bundle packs today—we have weekend traffic coming in.', time: '09:20 AM', isUser: false },
+  ],
+  'chat-gc-store': [
+    { id: 'gm1', sender: 'system', name: 'BLOC Ops Engine', text: '📋 [Org Chart Automation] Channel provisioned automatically for SM Megamall Floor Ops.', time: '08:00 AM', isUser: false },
+    { id: 'gm2', sender: 'usr-lester-lead', name: 'Lester Alarcon', text: 'Team, daily quota for today is set at ₱25,000. Let us push the breakfast bundle!', time: '08:30 AM', isUser: false },
+    { id: 'gm3', sender: 'usr-sarah-sg', name: 'Sarah Tan', text: 'Cheering for the Manila team from VivoCity SG! Let us beat yesterday’s numbers! 🔥', time: '09:05 AM', isUser: false },
+  ],
+  'chat-gc-region': [
+    { id: 'rg1', sender: 'system', name: 'Nexus Engine', text: '📊 JAPAC Regional Morning Briefing synced. 2/2 stores currently reporting active sell-through.', time: '08:00 AM', isUser: false },
+    { id: 'rg2', sender: 'usr-lester-lead', name: 'Lester Alarcon', text: 'WSS Google Sheets synchronization is active for all store promoters.', time: '09:30 AM', isUser: false },
+  ],
+};
+
+app.get('/api/chats/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const isSarah = userId === 'usr-sarah-sg';
+    const storeName = isSarah ? 'FairPrice VivoCity' : 'SM Megamall';
+
+    const threads: ChatThread[] = [
+      {
+        id: 'chat-pax',
+        type: 'agent',
+        title: 'Pax · Frontline Copilot',
+        subtitle: 'Autonomous AI Orchestrator & Daily Guide',
+        avatar: '🤖',
+        badge: 'Verified AI Guide',
+        isPinned: true,
+        unreadCount: 0,
+        lastMessage: '☀️ Shift active! Tap to record Fast-Sale or ask for daily tasks.',
+        lastTime: 'Just now',
+      },
+      {
+        id: 'chat-lester',
+        type: 'direct',
+        title: 'Lester Alarcon',
+        subtitle: 'Regional Retail Supervisor · Online',
+        avatar: '👨‍💼',
+        badge: 'Supervisor',
+        unreadCount: 1,
+        lastMessage: 'Great. Also focus on the promotional bundle packs today...',
+        lastTime: '09:20 AM',
+      },
+      {
+        id: 'chat-gc-store',
+        type: 'group_org_chart',
+        title: `# ${storeName} Floor Ops`,
+        subtitle: 'Auto-synced via Company Org Chart (6 members)',
+        avatar: '🏬',
+        badge: 'Org-Chart GC',
+        isOrgManaged: true,
+        unreadCount: 2,
+        lastMessage: 'Sarah: Cheering for the team! Let us beat yesterday’s numbers!',
+        lastTime: '09:05 AM',
+      },
+      {
+        id: 'chat-gc-region',
+        type: 'group_org_chart',
+        title: '# JAPAC Retail Operations',
+        subtitle: 'Enterprise HQ & Regional Promoters (24 members)',
+        avatar: '🌏',
+        badge: 'Org-Chart GC',
+        isOrgManaged: true,
+        unreadCount: 0,
+        lastMessage: 'Nexus: JAPAC Regional Morning Briefing synced.',
+        lastTime: '08:00 AM',
+      },
+    ];
+
+    res.json(threads);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/chats/:chatId/messages', (req, res) => {
+  const { chatId } = req.params;
+  const list = threadMessages[chatId] || [];
+  res.json(list);
+});
+
+app.post('/api/chats/:chatId/messages', (req, res) => {
+  const { chatId } = req.params;
+  const { text } = req.body;
+  if (!threadMessages[chatId]) {
+    threadMessages[chatId] = [];
+  }
+  const newMsg = {
+    id: `m-${Date.now()}`,
+    sender: 'user',
+    name: 'You',
+    text: text || '',
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    isUser: true,
+  };
+  threadMessages[chatId].push(newMsg);
+  res.json(newMsg);
+});
+
+// ----------------------------------------------------
+// 8. NEXUS SUPERVISOR DASHBOARD & ORG CHART
 // ----------------------------------------------------
 app.get('/api/supervisor/dashboard', async (req, res) => {
   try {
