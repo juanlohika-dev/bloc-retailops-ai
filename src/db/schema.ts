@@ -183,3 +183,51 @@ export const chatMessages = sqliteTable('chat_messages', {
   metadata: text('metadata', { mode: 'json' }),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
+
+// ==========================================
+// 12. USER INVITATIONS & ONBOARDING (RBAC)
+// ==========================================
+export const userInvitations = sqliteTable('user_invitations', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  email: text('email').notNull(),
+  role: text('role').notNull().default('promoter'),              // 'company_admin' | 'supervisor' | 'promoter'
+  token: text('token').notNull().unique(),                      // Secure onboarding token
+  assignedStoreIds: text('assigned_store_ids', { mode: 'json' }), // Optional pre-assigned store routes
+  invitedBy: text('invited_by').notNull().references(() => users.id),
+  status: text('status').notNull().default('pending'),           // 'pending' | 'accepted' | 'expired' | 'revoked'
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 13. AUDIT LOGS (Compliance & Security Governance)
+// ==========================================
+export const auditLogs = sqliteTable('audit_logs', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  actorId: text('actor_id').references(() => users.id),          // User who performed the action
+  action: text('action').notNull(),                              // e.g. "user.invite", "role.change", "store.create", "sale.void"
+  resourceType: text('resource_type').notNull(),                 // "user", "store", "product", "promotion", "shift"
+  resourceId: text('resource_id'),
+  details: text('details', { mode: 'json' }),                    // Diff / metadata before & after
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 14. API KEYS (Enterprise Integrations & POS Webhooks)
+// ==========================================
+export const apiKeys = sqliteTable('api_keys', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  name: text('name').notNull(),                                 // e.g. "SAP ERP Sync Connector", "Cashier Webhook"
+  keyHash: text('key_hash').notNull().unique(),                 // SHA-256 hashed secret
+  prefix: text('prefix').notNull(),                             // Public prefix e.g. "bloc_live_..."
+  scopes: text('scopes', { mode: 'json' }).notNull(),            // Array of scopes e.g. ["sales:write", "stores:read"]
+  lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }),
+  active: integer('active', { mode: 'boolean' }).default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});

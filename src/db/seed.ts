@@ -1,5 +1,5 @@
 import { db } from './client';
-import { workspaces, users, stores, products, shifts, blocks } from './schema';
+import { workspaces, users, stores, storeAssignments, products, shifts, shelfAudits, blocks } from './schema';
 
 export async function seedDatabase() {
   console.log('🌱 Seeding Project BLOC Turso Database...');
@@ -8,6 +8,7 @@ export async function seedDatabase() {
   const workspaceId = 'ws-japac-retail';
   await db.insert(workspaces).values({
     id: workspaceId,
+    slug: 'japac-retail',
     name: 'JAPAC Retail Operations',
     baseCurrency: 'SGD',
     driveFolderId: 'drive-folder-bloc-media-vault',
@@ -125,7 +126,100 @@ export async function seedDatabase() {
       isFocusPromo: true,
       displayOrder: 3,
     },
+    {
+      id: 'prod-smart-tv-43',
+      workspaceId,
+      skuCode: 'SMART-43-UHD',
+      barcode: '8806093322114',
+      name: '43" UHD 4K Smart Display',
+      category: 'Consumer Electronics',
+      unitPrice: 14990,
+      currency: 'PHP',
+      commissionPerUnit: 350,
+      isFocusPromo: true,
+      displayOrder: 2,
+    },
   ]).onConflictDoNothing();
 
-  console.log('✅ Database seeded successfully with demo stores, promoters, and focus SKUs!');
+  // 5. Store Assignments (Roster)
+  await db.insert(storeAssignments).values([
+    {
+      id: 'assign-sarah-vivo',
+      workspaceId,
+      userId: 'usr-sarah-sg',
+      storeId: 'store-fp-vivo',
+      assignedTarget: 1200,
+      active: true,
+    },
+    {
+      id: 'assign-liza-mega',
+      workspaceId,
+      userId: 'usr-liza-ph',
+      storeId: 'store-sm-mega',
+      assignedTarget: 25000,
+      active: true,
+    },
+  ]).onConflictDoNothing();
+
+  // 6. Active Shifts
+  const todayDate = new Date().toISOString().split('T')[0];
+  await db.insert(shifts).values([
+    {
+      id: 'shift-sarah-seed',
+      userId: 'usr-sarah-sg',
+      storeId: 'store-fp-vivo',
+      shiftDate: todayDate,
+      clockInTime: new Date(),
+      gpsVerified: true,
+      targetAmount: 1200,
+      currency: 'SGD',
+      status: 'active',
+    },
+    {
+      id: 'shift-liza-seed',
+      userId: 'usr-liza-ph',
+      storeId: 'store-sm-mega',
+      shiftDate: todayDate,
+      clockInTime: new Date(),
+      gpsVerified: true,
+      targetAmount: 25000,
+      currency: 'PHP',
+      status: 'active',
+    },
+  ]).onConflictDoNothing();
+
+  // 7. Initial Seed Shelf Audits
+  await db.insert(shelfAudits).values([
+    {
+      id: 'audit-fp-vivo-01',
+      shiftId: 'shift-sarah-seed',
+      userId: 'usr-sarah-sg',
+      storeId: 'store-fp-vivo',
+      driveImageId: 'drive-vivo-shelf-01',
+      complianceScore: 95,
+      shareOfShelfPct: 42,
+      detectedIssues: ['Minor spacing gap on shelf 3'],
+      geminiVerdict: 'Near-perfect endcap execution aligned with Q4 retail planogram.',
+      timestamp: new Date(Date.now() - 3600000 * 2),
+    },
+    {
+      id: 'audit-sm-mega-01',
+      shiftId: 'shift-liza-seed',
+      userId: 'usr-liza-ph',
+      storeId: 'store-sm-mega',
+      driveImageId: 'drive-mega-shelf-01',
+      complianceScore: 92,
+      shareOfShelfPct: 38,
+      detectedIssues: ['1 missing shelf price tag on row 2', 'Competitor product proximity alert'],
+      geminiVerdict: 'Compliant display; recommend placing promo wobbler on row 1.',
+      timestamp: new Date(Date.now() - 3600000 * 4),
+    },
+  ]).onConflictDoNothing();
+
+  console.log('✅ Database seeded successfully with demo stores, promoters, focus SKUs, and audits!');
 }
+
+seedDatabase().then(() => process.exit(0)).catch((err) => {
+  console.error('❌ Seeding failed:', err);
+  process.exit(1);
+});

@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project BLOC · Frontline Agentic Orchestration Engine</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&family=Outfit:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
+  <style>
+    :root {
+      --blue: #1A73E8;
+      --blue-subtle: #E8F0FE;
+      --green: #1E8E3E;
+      --green-subtle: #E6F4EA;
+      --red: #D93025;
+      --red-subtle: #FCE8E6;
+      --yellow: #F9AB00;
+      --yellow-subtle: #FEF7E0;
+      --ink: #202124;
+      --muted: #5F6368;
+      --line: #DADCE0;
+      --bg: #F8F9FA;
+      --surface: #FFFFFF;
+      --pax: linear-gradient(135deg, #1E8E3E, #12B5CB);
+      --vera: linear-gradient(135deg, #1A73E8, #A142F4);
+      --nexus: linear-gradient(135deg, #F9AB00, #FA7B17);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0E1217;
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    header {
+      background: #181D24;
+      border-bottom: 1px solid #282E38;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .badge {
+      background: linear-gradient(90deg, #4285F4, #34A853);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .persona-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #232934;
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid #323A48;
+    }
+    .persona-selector select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .view-toggles {
+      display: flex;
+      background: #232934;
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid #323A48;
+    }
+    .view-toggle {
+      background: transparent;
+      border: none;
+      color: #9AA0A6;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .view-toggle.active {
+      background: #1A73E8;
+      color: #fff;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 30%, #1A2332 0%, #0E1217 70%);
+    }
+
+    /* Mobile Phone Shell */
+    .phone-wrapper {
+      width: 410px;
+      height: 840px;
+      max-height: 92vh;
+      background: #000;
+      border-radius: 44px;
+      padding: 12px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 2px #323A48;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .notch {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 24px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      z-index: 50;
+    }
+    .phone-screen {
+      flex: 1;
+      background: #fff;
+      border-radius: 34px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* App Top Bar */
+    .app-header {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 28px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .agent-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .agent-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      background: var(--pax);
+    }
+    .agent-meta h3 {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .agent-meta p {
+      font-size: 11px;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Shift Target Thermometer Banner */
+    .target-banner {
+      background: linear-gradient(135deg, #F8F9FA, #EDF2F7);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 16px;
+    }
+    .target-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+    .progress-bar {
+      height: 7px;
+      background: #E2E8F0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1E8E3E, #12B5CB);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* Chat Messages Stream */
+    .chat-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #F8F9FA;
+    }
+    .chat-bubble {
+      max-width: 84%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      animation: popIn 0.25s ease;
+    }
+    .chat-bubble.pax {
+      align-self: flex-start;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .chat-bubble.user {
+      align-self: flex-end;
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 3-Second Fast-Sale Mini-Sheet */
+    .fast-sale-card {
+      background: #fff;
+      border: 1.5px solid #1A73E8;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(26,115,232,0.14);
+      margin: 4px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fs-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fs-chip {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--blue-subtle);
+      color: #185ABC;
+      padding: 2px 7px;
+      border-radius: 99px;
+    }
+    .sku-stepper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #F8F9FA;
+      border-radius: 10px;
+      border: 1px solid #ECEFF1;
+    }
+    .sku-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .sku-price {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .stepper-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-step {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #E8EAED;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-step.add {
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn-step:active { transform: scale(0.9); }
+    .step-val {
+      font-size: 14px;
+      font-weight: 700;
+      min-width: 18px;
+      text-align: center;
+    }
+    .barcode-btn {
+      background: #EDF2F7;
+      border: 1.5px dashed #CBD5E0;
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .barcode-btn:hover { background: #E2E8F0; }
+    .btn-commit {
+      background: linear-gradient(135deg, #1E8E3E, #137333);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(30,142,62,0.25);
+      transition: all 0.2s;
+    }
+    .btn-commit:hover { opacity: 0.95; }
+    .btn-commit:disabled { background: #BDC1C6; cursor: not-allowed; box-shadow: none; }
+
+    /* Bottom Quick Action Bar */
+    .quick-actions {
+      padding: 8px 12px;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .action-chip {
+      background: #F1F3F4;
+      border: 1px solid #E0E0E0;
+      border-radius: 99px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .action-chip:hover { background: #E8EAED; }
+
+    /* Input Bar */
+    .input-bar {
+      padding: 10px 14px 22px;
+      background: #fff;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .input-bar input {
+      flex: 1;
+      border: 1px solid var(--line);
+      background: #F8F9FA;
+      border-radius: 99px;
+      padding: 10px 16px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-send {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--blue);
+      border: none;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    /* Desktop Supervisor Container */
+    .supervisor-wrapper {
+      display: none;
+      width: 1000px;
+      max-width: 95vw;
+      height: 840px;
+      max-height: 92vh;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      flex-direction: column;
+    }
+    .sup-header {
+      padding: 16px 24px;
+      background: #F8F9FA;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      padding: 20px 24px;
+    }
+    .kpi-card {
+      background: #F8F9FA;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .kpi-card h4 { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .kpi-card .val { font-size: 26px; font-weight: 700; margin: 4px 0; }
+    .kpi-card .sub { font-size: 11px; color: var(--green); font-weight: 600; }
+    .table-container {
+      flex: 1;
+      padding: 0 24px 20px;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #F1F3F4;
+      font-weight: 700;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* Modal for Vera Audit */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 360px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>PROJECT BLOC</span>
+      <span class="badge">Google Cloud AI Builder Cup 2026</span>
+    </div>
+
+    <div style="display: flex; gap: 14px; align-items: center;">
+      <!-- Persona Switcher -->
+      <div class="persona-selector">
+        <span class="material-symbols-rounded" style="color: #4285F4; font-size: 18px;">account_circle</span>
+        <select id="userSelector" onchange="switchPersona(this.value)">
+          <option value="usr-liza-ph">Liza Santos (SM Megamall · Tagalog)</option>
+          <option value="usr-sarah-sg">Sarah Tan (VivoCity · Singlish/EN)</option>
+        </select>
+      </div>
+
+      <!-- Viewport Toggle -->
+      <div class="view-toggles">
+        <button class="view-toggle active" id="btnPhoneView" onclick="setView('phone')">
+          <span class="material-symbols-rounded" style="font-size: 18px;">smartphone</span>
+          Promoter Mobile PWA
+        </button>
+        <button class="view-toggle" id="btnSupView" onclick="setView('supervisor')">
+          <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+          Supervisor Console
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- MOBILE PWA PHONE VIEW -->
+    <div class="phone-wrapper" id="phoneWrapper">
+      <div class="notch"></div>
+      <div class="phone-screen">
+        
+        <!-- App Header -->
+        <div class="app-header">
+          <div class="agent-identity">
+            <div class="agent-avatar">P</div>
+            <div class="agent-meta">
+              <h3 id="agentTitle">Pax · Frontline Copilot</h3>
+              <p><span style="color: #1E8E3E;">●</span> Online · <span id="storeBadge">SM Megamall</span></p>
+            </div>
+          </div>
+          <button onclick="triggerBriefing()" style="background:#E8F0FE;border:none;color:#1A73E8;padding:6px 10px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer">
+            ☀️ Morning Mission
+          </button>
+        </div>
+
+        <!-- Shift Target Thermometer -->
+        <div class="target-banner">
+          <div class="target-labels">
+            <span>Shift Target: <b id="lblTarget">₱25,000</b></span>
+            <span>Achieved: <b id="lblAchieved" style="color:#1E8E3E">₱0 (0%)</b></span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <!-- Chat Stream -->
+        <div class="chat-stream" id="chatStream">
+          <div class="chat-bubble pax">
+            Magandang umaga, Liza! ☀️ Welcome to SM Megamall. Ready na ba ang promo bundles natin today? Click <b>Morning Mission</b> or use the <b>Fast-Sale</b> stepper below!
+          </div>
+        </div>
+
+        <!-- Quick Action Bar -->
+        <div class="quick-actions">
+          <button class="action-chip" onclick="toggleFastSaleSheet()">
+            <span class="material-symbols-rounded" style="color:#1A73E8;font-size:16px;">bolt</span>
+            ⚡ Fast-Sale
+          </button>
+          <button class="action-chip" onclick="openAuditModal()">
+            <span class="material-symbols-rounded" style="color:#1E8E3E;font-size:16px;">photo_camera</span>
+            📸 Vera Shelf Audit
+          </button>
+          <button class="action-chip" onclick="quickSend('Anong promo natin today?')">
+            <span class="material-symbols-rounded" style="color:#F9AB00;font-size:16px;">help</span>
+            Focus Promo Info
+          </button>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="input-bar">
+          <input type="text" id="txtInput" placeholder="Message Pax or scan barcode..." onkeydown="if(event.key==='Enter') sendChat()">
+          <button class="btn-send" onclick="sendChat()">
+            <span class="material-symbols-rounded" style="font-size:18px;">send</span>
+          </button>
+        </div>
+
+        <!-- Modal for Vera Audit -->
+        <div class="modal-overlay" id="auditModal">
+          <div class="modal-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3 style="font-size:15px;font-weight:700;">📸 Vera Multimodal Shelf Audit</h3>
+              <span class="material-symbols-rounded" style="cursor:pointer;" onclick="closeAuditModal()">close</span>
+            </div>
+            <div style="height:140px;background:#F1F3F4;border-radius:14px;border:2px dashed #CBD5E0;display:grid;place-items:center;position:relative;overflow:hidden;">
+              <img id="auditPreview" src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=80" style="width:100%;height:100%;object-fit:cover;">
+              <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.7);color:#fff;font-size:9.5px;padding:3px 7px;border-radius:6px;">Sample Retail Endcap</div>
+            </div>
+            <div id="auditResultArea" style="font-size:12px;line-height:1.4;display:none;"></div>
+            <button class="btn-commit" id="btnRunAudit" onclick="runVeraAudit()" style="background:#1A73E8;">
+              🔍 Run Gemini 2.5 Vision Analysis
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DESKTOP SUPERVISOR CONSOLE VIEW -->
+    <div class="supervisor-wrapper" id="supervisorWrapper">
+      <div class="sup-header">
+        <div>
+          <h2 style="font-size:18px;font-weight:700;">Retail Operations Command Center</h2>
+          <p style="font-size:12px;color:var(--muted);">JAPAC Regional Real-Time Shift & Sell-Through Telemetry</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="badge" style="background:#E6F4EA;color:#137333;">🟢 Live WSS Google Sheets Bridge</span>
+          <button onclick="loadSupervisorData()" style="padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Refresh</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <h4>TODAY'S TOTAL REVENUE</h4>
+          <div class="val" id="supRevenue">₱70,990</div>
+          <div class="sub">▲ 14.2% vs last shift</div>
+        </div>
+        <div class="kpi-card">
+          <h4>AVG PLANOGRAM COMPLIANCE</h4>
+          <div class="val" id="supCompliance">92%</div>
+          <div class="sub">▲ 4 pts Share of Shelf</div>
+        </div>
+        <div class="kpi-card">
+          <h4>ACTIVE PROMOTERS</h4>
+          <div class="val" id="supCheckins">2 / 2</div>
+          <div class="sub">100% On-Time Check-In</div>
+        </div>
+        <div class="kpi-card">
+          <h4>OPEN EXCEPTIONS</h4>
+          <div class="val" style="color:var(--yellow);" id="supExceptions">1</div>
+          <div class="sub" style="color:var(--muted);">1 Missing Price Tag Flagged</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;">Store Performance Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Store Branch</th>
+              <th>Country</th>
+              <th>Daily Quota</th>
+              <th>Actual Sell-Through</th>
+              <th>Target %</th>
+              <th>Shelf Compliance</th>
+            </tr>
+          </thead>
+          <tbody id="storeTableBody">
+            <tr>
+              <td><b>SM Megamall Cyberzone</b></td>
+              <td>Philippines</td>
+              <td>₱25,000</td>
+              <td>₱18,450</td>
+              <td><span class="badge" style="background:#E8F0FE;color:#185ABC;">74%</span></td>
+              <td>92%</td>
+            </tr>
+            <tr>
+              <td><b>FairPrice Xtra VivoCity</b></td>
+              <td>Singapore</td>
+              <td>SGD $1,200</td>
+              <td>SGD $1,299</td>
+              <td><span class="badge" style="background:#E6F4EA;color:#137333;">108%</span></td>
+              <td>95%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentUserId = 'usr-liza-ph';
+    let currentStoreId = 'store-sm-mega';
+    let focusProducts = [];
+    let stepperCounts = {};
+    let currencySymbol = '₱';
+    let targetAmount = 25000;
+    let currentTotal = 0;
+
+    async function loadUserState() {
+      try {
+        const res = await fetch(`/api/user/${currentUserId}/state`);
+        const data = await res.json();
+        
+        focusProducts = data.focusProducts || [];
+        currentStoreId = data.store?.id || 'store-sm-mega';
+        targetAmount = data.targetAmount || 25000;
+        currentTotal = data.currentShiftTotal || 0;
+        currencySymbol = data.currency === 'SGD' ? '$' : '₱';
+
+        document.getElementById('storeBadge').innerText = data.store?.name || 'Retail Branch';
+        document.getElementById('lblTarget').innerText = `${currencySymbol}${targetAmount.toLocaleString()}`;
+        updateTargetProgress(currentTotal);
+
+        // Reset stepper counts
+        focusProducts.forEach(p => { stepperCounts[p.id] = 0; });
+      } catch (err) {
+        console.error('Failed to load user state:', err);
+      }
+    }
+
+    function updateTargetProgress(total) {
+      currentTotal = total;
+      const pct = Math.min(100, Math.round((currentTotal / targetAmount) * 100));
+      document.getElementById('lblAchieved').innerText = `${currencySymbol}${currentTotal.toLocaleString()} (${pct}%)`;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+    }
+
+    function switchPersona(userId) {
+      currentUserId = userId;
+      const chatStream = document.getElementById('chatStream');
+      chatStream.innerHTML = '';
+      loadUserState();
+      triggerBriefing();
+    }
+
+    function setView(view) {
+      if (view === 'phone') {
+        document.getElementById('phoneWrapper').style.display = 'flex';
+        document.getElementById('supervisorWrapper').style.display = 'none';
+        document.getElementById('btnPhoneView').classList.add('active');
+        document.getElementById('btnSupView').classList.remove('active');
+      } else {
+        document.getElementById('phoneWrapper').style.display = 'none';
+        document.getElementById('supervisorWrapper').style.display = 'flex';
+        document.getElementById('btnPhoneView').classList.remove('active');
+        document.getElementById('btnSupView').classList.add('active');
+        loadSupervisorData();
+      }
+    }
+
+    async function triggerBriefing() {
+      appendPaxMessage('☀️ Pax is preparing your Morning Mission with Gemini 2.5 Flash...');
+      try {
+        const res = await fetch('/api/pax/briefing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUserId })
+        });
+        const data = await res.json();
+        appendPaxMessage(data.briefing);
+        // Automatically open Fast-Sale card
+        renderFastSaleCard();
+      } catch (err) {
+        appendPaxMessage('Good morning! Ready for today’s shift at the branch.');
+        renderFastSaleCard();
+      }
+    }
+
+    function renderFastSaleCard() {
+      const chatStream = document.getElementById('chatStream');
+      const card = document.createElement('div');
+      card.className = 'fast-sale-card';
+      card.id = 'activeFastSaleCard';
+
+      let itemsHtml = '';
+      focusProducts.forEach(p => {
+        stepperCounts[p.id] = stepperCounts[p.id] || 0;
+        itemsHtml += `
+          <div class="sku-stepper-row">
+            <div>
+              <div class="sku-name">${p.name}</div>
+              <div class="sku-price">${currencySymbol}${p.unitPrice.toLocaleString()} · +${currencySymbol}${p.commissionPerUnit || 15} incentive</div>
+            </div>
+            <div class="stepper-controls">
+              <button class="btn-step" onclick="adjustStepper('${p.id}', -1)">-</button>
+              <span class="step-val" id="step-${p.id}">${stepperCounts[p.id]}</span>
+              <button class="btn-step add" onclick="adjustStepper('${p.id}', 1)">+</button>
+            </div>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div class="fs-header">
+          <div class="fs-title">
+            <span class="material-symbols-rounded">bolt</span>
+            3-SECOND FAST-SALE LOG
+          </div>
+          <span class="fs-chip">Zero-Typing</span>
+        </div>
+        ${itemsHtml}
+        <div class="barcode-btn" onclick="simulateBarcodeScan()">
+          <span class="material-symbols-rounded" style="font-size:18px;">barcode_scanner</span>
+          Tap to Scan Product Box Barcode / QR
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 4px;">
+          <span>Attributed Total: <b id="lblFastSaleTotal">${currencySymbol}0</b></span>
+          <span style="color:#1E8E3E;font-weight:700;" id="lblCommissionTotal">+${currencySymbol}0 bonus</span>
+        </div>
+        <button class="btn-commit" id="btnCommitSale" onclick="commitFastSale()" disabled>
+          ✅ CONFIRM & COMMIT TO SAP / BIGQUERY
+        </button>
+      `;
+
+      chatStream.appendChild(card);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    function adjustStepper(productId, delta) {
+      stepperCounts[productId] = Math.max(0, (stepperCounts[productId] || 0) + delta);
+      const span = document.getElementById(`step-${productId}`);
+      if (span) span.innerText = stepperCounts[productId];
+      recalcFastSaleTotals();
+    }
+
+    function simulateBarcodeScan() {
+      if (focusProducts.length > 0) {
+        const target = focusProducts[0];
+        adjustStepper(target.id, 1);
+        appendUserMessage(`[📷 Beep! Scanned EAN-13: ${target.barcode || '8806091234567'} (${target.name})]`);
+      }
+    }
+
+    function recalcFastSaleTotals() {
+      let subtotal = 0;
+      let commission = 0;
+      let totalQty = 0;
+
+      focusProducts.forEach(p => {
+        const qty = stepperCounts[p.id] || 0;
+        subtotal += p.unitPrice * qty;
+        commission += (p.commissionPerUnit || 15) * qty;
+        totalQty += qty;
+      });
+
+      document.getElementById('lblFastSaleTotal').innerText = `${currencySymbol}${subtotal.toLocaleString()}`;
+      document.getElementById('lblCommissionTotal').innerText = `+${currencySymbol}${commission.toLocaleString()} bonus`;
+
+      const btn = document.getElementById('btnCommitSale');
+      if (btn) btn.disabled = totalQty === 0;
+    }
+
+    async function commitFastSale() {
+      const items = focusProducts.map(p => ({
+        productId: p.id,
+        quantity: stepperCounts[p.id] || 0
+      })).filter(i => i.quantity > 0);
+
+      const btn = document.getElementById('btnCommitSale');
+      btn.innerText = 'Syncing with ERP...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/sales/fast-sale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUserId,
+            storeId: currentStoreId,
+            items,
+          })
+        });
+        const data = await res.json();
+        
+        appendUserMessage(`⚡ Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale Stepper (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
+        appendPaxMessage(data.paxMessage);
+        updateTargetProgress(data.currentShiftTotal);
+
+        // Reset counts
+        focusProducts.forEach(p => { stepperCounts[p.id] = 0; });
+        const card = document.getElementById('activeFastSaleCard');
+        if (card) card.remove();
+      } catch (err) {
+        alert('Failed to log sale');
+      }
+    }
+
+    function toggleFastSaleSheet() {
+      renderFastSaleCard();
+    }
+
+    async function sendChat() {
+      const input = document.getElementById('txtInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+
+      appendUserMessage(msg);
+      try {
+        const res = await fetch('/api/pax/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUserId, message: msg })
+        });
+        const data = await res.json();
+        appendPaxMessage(data.reply);
+      } catch (err) {
+        appendPaxMessage('Sige, narinig kita! Let me know if you need to log a sale or check promo guidelines.');
+      }
+    }
+
+    function quickSend(txt) {
+      document.getElementById('txtInput').value = txt;
+      sendChat();
+    }
+
+    function appendPaxMessage(txt) {
+      const chatStream = document.getElementById('chatStream');
+      const b = document.createElement('div');
+      b.className = 'chat-bubble pax';
+      b.innerHTML = txt;
+      chatStream.appendChild(b);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    function appendUserMessage(txt) {
+      const chatStream = document.getElementById('chatStream');
+      const b = document.createElement('div');
+      b.className = 'chat-bubble user';
+      b.innerText = txt;
+      chatStream.appendChild(b);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    function openAuditModal() {
+      document.getElementById('auditModal').style.display = 'grid';
+      document.getElementById('auditResultArea').style.display = 'none';
+      document.getElementById('btnRunAudit').innerText = '🔍 Run Gemini 2.5 Vision Analysis';
+    }
+
+    function closeAuditModal() {
+      document.getElementById('auditModal').style.display = 'none';
+    }
+
+    async function runVeraAudit() {
+      const btn = document.getElementById('btnRunAudit');
+      btn.innerText = 'Analyzing with Gemini 2.5 Pro Vision...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/audit/shelf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUserId, storeId: currentStoreId })
+        });
+        const data = await res.json();
+
+        const resArea = document.getElementById('auditResultArea');
+        resArea.style.display = 'block';
+        resArea.innerHTML = `
+          <div style="background:#E6F4EA;color:#137333;padding:8px;border-radius:8px;font-weight:700;margin-bottom:6px;">
+            ✅ Compliance Score: ${data.complianceScore}% · Share of Shelf: ${data.shareOfShelfPct}%
+          </div>
+          <div><b>Issues Flagged:</b> ${data.detectedIssues.join(', ')}</div>
+          <div style="margin-top:4px;color:var(--muted)"><b>Verdict:</b> ${data.verdict}</div>
+        `;
+        btn.innerText = '✅ Audit Logged to Drive & Turso';
+        
+        appendPaxMessage(`📸 <b>Vera Shelf Audit Complete:</b> ${data.complianceScore}% compliance. 1 issue flagged: ${data.detectedIssues[0]}`);
+      } catch (err) {
+        alert('Audit analysis completed with fallback');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function loadSupervisorData() {
+      try {
+        const res = await fetch('/api/supervisor/dashboard');
+        const data = await res.json();
+
+        document.getElementById('supRevenue').innerText = data.overview.totalRevenueNormalizedUSD;
+        document.getElementById('supCompliance').innerText = data.overview.avgCompliancePct;
+        document.getElementById('supCheckins').innerText = data.overview.checkedInPromoters;
+        document.getElementById('supExceptions').innerText = data.overview.openExceptionsCount;
+
+        const tbody = document.getElementById('storeTableBody');
+        tbody.innerHTML = '';
+        data.stores.forEach(s => {
+          tbody.innerHTML += `
+            <tr>
+              <td><b>${s.name}</b></td>
+              <td>${s.country}</td>
+              <td>${s.currency} ${s.target?.toLocaleString()}</td>
+              <td>${s.currency} ${s.actualSales.toLocaleString()}</td>
+              <td><span class="badge" style="background:${s.pctAchieved >= 100 ? '#E6F4EA;color:#137333' : '#E8F0FE;color:#185ABC'};">${s.pctAchieved}%</span></td>
+              <td>${s.compliance}%</td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Failed to load supervisor data:', err);
+      }
+    }
+
+    // Initialize
+    loadUserState();
+  </script>
+</body>
+</html>

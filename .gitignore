@@ -24,3 +24,7 @@ Thumbs.db
 
 # Presentation backups
 *.bak.pptx
+
+# Local databases
+local.db*
+
