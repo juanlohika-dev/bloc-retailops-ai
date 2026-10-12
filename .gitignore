@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+service-account*.json
+
+# Build outputs
+.next/
+dist/
+out/
+build/
+*.log
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Presentation backups
+*.bak.pptx
