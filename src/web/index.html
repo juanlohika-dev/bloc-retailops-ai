@@ -981,6 +981,139 @@
       transform: scale(0.97);
     }
 
+    .fsc-mode-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: transparent;
+      color: #86868B;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .fsc-mode-pill.active {
+      background: #FFFFFF;
+      color: #0071E3;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .fsc-remove-btn {
+      background: none;
+      border: none;
+      color: #86868B;
+      cursor: pointer;
+      padding: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .fsc-remove-btn:hover {
+      color: #FF3B30;
+      background: #FFF0F0;
+    }
+
+    .fsc-empty-state {
+      padding: 12px 14px;
+      background: #FBFBFD;
+      border: 1px dashed rgba(0, 0, 0, 0.1);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fsc-empty-hero {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .fsc-empty-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #EBF4FF;
+      color: #0071E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .fsc-promo-chips-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .fsc-promo-chips-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .fsc-promo-chip {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #1D1D1F;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+    }
+    .fsc-promo-chip:hover {
+      background: #F5F5F7;
+      border-color: rgba(0, 113, 227, 0.3);
+      transform: translateY(-1px);
+    }
+    .fsc-promo-chip:active {
+      transform: scale(0.96);
+    }
+    .fsc-chip-bonus {
+      color: #34C759;
+      font-weight: 700;
+      font-size: 10px;
+    }
+    .fsc-added-highlight {
+      animation: fscHighlight 1.4s ease;
+    }
+    @keyframes fscHighlight {
+      0% { background-color: rgba(0, 113, 227, 0.18); border-radius: 8px; }
+      100% { background-color: transparent; }
+    }
+
+    .app-toast-pill {
+      position: absolute;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-24px);
+      background: rgba(29, 29, 31, 0.94);
+      backdrop-filter: blur(12px);
+      color: #FFFFFF;
+      padding: 7px 15px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .app-toast-pill.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
     .fsc-totals-footer {
       display: flex;
       align-items: center;
@@ -1404,6 +1537,422 @@
       padding: 14px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
+
+    /* ============================================================
+       5. ADMIN OPERATIONS CONSOLE & AI DEMO GENERATOR STYLES
+       ============================================================ */
+    .m3-btn-demo {
+      background: linear-gradient(135deg, #0071E3 0%, #5856D6 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(88, 86, 214, 0.25);
+      flex-shrink: 0;
+    }
+    .m3-btn-demo:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(88, 86, 214, 0.35);
+    }
+    .m3-btn-demo:active {
+      transform: scale(0.97);
+    }
+
+    .m3-admin-console {
+      width: 100%;
+      max-width: 1400px;
+      height: calc(100vh - 84px);
+      background: #F8F9FA;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 24px;
+      display: none;
+      flex-direction: row;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .admin-sidebar {
+      width: 250px;
+      background: #FFFFFF;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 16px 12px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .admin-sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 14px 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      margin-bottom: 6px;
+    }
+    .admin-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #EBF4FF;
+      color: #0071E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .admin-brand-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1D1D1F;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 170px;
+    }
+    .admin-brand-sub {
+      font-size: 11px;
+      color: #86868B;
+    }
+    .admin-nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #86868B;
+      padding: 10px 8px 3px 8px;
+    }
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: #48484A;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 550;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .admin-nav-item:hover {
+      background: #F2F2F7;
+      color: #1D1D1F;
+    }
+    .admin-nav-item.active {
+      background: #EBF4FF;
+      color: #0071E3;
+      font-weight: 650;
+    }
+    .admin-nav-badge {
+      margin-left: auto;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #F2F2F7;
+      color: #86868B;
+    }
+    .admin-nav-item.active .admin-nav-badge {
+      background: #0071E3;
+      color: #FFFFFF;
+    }
+
+    .admin-main-canvas {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      overflow-y: auto;
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: #F8F9FA;
+    }
+
+    .admin-view-panel {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .admin-view-panel.active {
+      display: flex;
+    }
+
+    .admin-card-box {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    /* AI Executive Situational Briefing Card */
+    .ai-briefing-card {
+      background: linear-gradient(135deg, rgba(0, 113, 227, 0.05) 0%, rgba(88, 86, 214, 0.07) 100%);
+      border: 1px solid rgba(0, 113, 227, 0.2);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.04);
+    }
+    .ai-briefing-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ai-briefing-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1D1D1F;
+    }
+    .ai-briefing-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0, 113, 227, 0.12);
+      color: #0071E3;
+    }
+    .ai-briefing-body {
+      font-size: 13px;
+      color: #1D1D1F;
+      line-height: 1.55;
+    }
+    .ai-recom-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ai-recom-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12px;
+      color: #48484A;
+    }
+
+    /* Agent Registry Cards Grid */
+    .agent-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .agent-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .agent-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+    .agent-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .agent-avatar-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #FFFFFF;
+    }
+    .agent-model-pill {
+      font-size: 10.5px;
+      font-weight: 650;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Store 360 Slide-over Drawer */
+    .drawer-store-360-scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .drawer-store-360-scrim.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer-store-360-panel {
+      width: 580px;
+      max-width: 90vw;
+      height: 100%;
+      background: #FFFFFF;
+      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+    .drawer-store-360-scrim.active .drawer-store-360-panel {
+      transform: translateX(0);
+    }
+
+    /* Org Chart Tree View */
+    .org-chart-container {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .org-tree-node {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #F9F9FB;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      padding: 10px 14px;
+      transition: all 0.15s;
+    }
+    .org-tree-node:hover {
+      background: #F2F2F7;
+      border-color: rgba(0, 113, 227, 0.3);
+    }
+
+    /* Apple Switch */
+    .apple-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .apple-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .apple-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #E5E5EA;
+      border-radius: 22px;
+      transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .apple-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    input:checked + .apple-slider {
+      background-color: #34C759;
+    }
+    input:checked + .apple-slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Global Modal Scrim for Overlays */
+    .global-modal-scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+    }
+    .global-modal-scrim.active {
+      display: grid;
+    }
+
+    .demo-modal-dialog {
+      background: #FFFFFF;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 760px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .demo-market-chip {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #F5F5F7;
+      border: 1px solid rgba(0,0,0,0.06);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .demo-market-chip.selected {
+      background: #EBF4FF;
+      border-color: #0071E3;
+      color: #0071E3;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -1426,8 +1975,22 @@
     </div>
 
     <div class="header-ctrls">
+      <!-- Workspace Selector -->
+      <div class="m3-persona-chip" title="Current Enterprise Workspace">
+        <span class="ms-icon sm">business</span>
+        <select id="workspaceSelector" onchange="onWorkspaceChanged(this.value)">
+          <option value="ws-japac-retail">Unilever JAPAC</option>
+        </select>
+      </div>
+
+      <!-- AI Demo Generator Button -->
+      <button class="m3-btn-demo" onclick="openDemoGeneratorModal()" title="Instant AI Retail Workspace Generator with Gemini 2.5">
+        <span class="ms-icon sm">auto_awesome</span>
+        <span>+ AI Demo</span>
+      </button>
+
       <!-- Persona Switcher -->
-      <div class="m3-persona-chip">
+      <div class="m3-persona-chip" title="Active Staff Persona">
         <span class="ms-icon sm">account_circle</span>
         <select id="userSelector" onchange="switchPersona(this.value)">
           <option value="usr-liza-ph">Liza Santos (SM Megamall · Tagalog)</option>
@@ -1443,7 +2006,11 @@
         </button>
         <button class="m3-seg-item" id="btnSupView" onclick="setViewMode('supervisor')">
           <span class="ms-icon sm">dashboard</span>
-          Supervisor Console
+          Supervisor
+        </button>
+        <button class="m3-seg-item" id="btnAdminView" onclick="setViewMode('admin')">
+          <span class="ms-icon sm">admin_panel_settings</span>
+          Admin Ops
         </button>
       </div>
     </div>
@@ -1467,6 +2034,12 @@
             <span style="opacity: 0.8;">5G</span>
           </div>
           <span>100%</span>
+        </div>
+
+        <!-- Floating iOS Dynamic Toast Pill -->
+        <div id="appToastPill" class="app-toast-pill">
+          <span class="ms-icon sm" style="color:#34C759;font-size:15px;">check_circle</span>
+          <span id="appToastPillText">Item added</span>
         </div>
 
         <!-- ======================================================
@@ -1805,24 +2378,816 @@
       </div>
     </div>
 
+    <!-- ============================================================
+         ADMIN OPERATIONS CONSOLE (APPLE MINIMALIST MULTI-TENANT)
+         ============================================================ -->
+    <!-- ============================================================
+         ENTERPRISE OPERATIONS COMMAND PORTAL (SIDEBAR + 8 DOMAIN PANELS)
+         ============================================================ -->
+    <div class="m3-admin-console" id="adminWrapper">
+      <!-- Left-Hand Enterprise Navigation Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <div class="admin-brand-icon">
+            <span class="ms-icon">shield</span>
+          </div>
+          <div>
+            <div class="admin-brand-title" id="adminSidebarWsName">JAPAC Retail Operations</div>
+            <div class="admin-brand-sub">Enterprise Ops Portal</div>
+          </div>
+        </div>
+
+        <!-- Section 1: Command & Intelligence -->
+        <div class="admin-nav-section-label">Command & Intelligence</div>
+        <button class="admin-nav-item active" id="navItemOverview" onclick="switchAdminNav('overview')">
+          <span class="ms-icon sm">monitoring</span>
+          <span>Executive BI & AI</span>
+        </button>
+        <button class="admin-nav-item" id="navItemAgents" onclick="switchAdminNav('agents')">
+          <span class="ms-icon sm">smart_toy</span>
+          <span>AI Agent Registry</span>
+          <span class="admin-nav-badge" id="badgeAgentCount">3</span>
+        </button>
+        <button class="admin-nav-item" id="navItemTasks" onclick="switchAdminNav('tasks')">
+          <span class="ms-icon sm">checklist</span>
+          <span>Autonomous Tasks</span>
+          <span class="admin-nav-badge" id="badgeTaskCount">3</span>
+        </button>
+
+        <!-- Section 2: Operations & Assets -->
+        <div class="admin-nav-section-label">Operations & Assets</div>
+        <button class="admin-nav-item" id="navItemStores" onclick="switchAdminNav('stores')">
+          <span class="ms-icon sm">storefront</span>
+          <span>Stores & 360° Drill</span>
+          <span class="admin-nav-badge" id="badgeStoreCount">0</span>
+        </button>
+        <button class="admin-nav-item" id="navItemProducts" onclick="switchAdminNav('products')">
+          <span class="ms-icon sm">inventory_2</span>
+          <span>SKUs & Stepper Pins</span>
+          <span class="admin-nav-badge" id="badgeProductCount">0</span>
+        </button>
+
+        <!-- Section 3: Organization & Governance -->
+        <div class="admin-nav-section-label">Organization & Governance</div>
+        <button class="admin-nav-item" id="navItemOrg" onclick="switchAdminNav('org')">
+          <span class="ms-icon sm">account_tree</span>
+          <span>Staff & Org Chart</span>
+          <span class="admin-nav-badge" id="badgeStaffCount">0</span>
+        </button>
+        <button class="admin-nav-item" id="navItemReports" onclick="switchAdminNav('reports')">
+          <span class="ms-icon sm">description</span>
+          <span>Executive Reports</span>
+        </button>
+        <button class="admin-nav-item" id="navItemSettings" onclick="switchAdminNav('settings')">
+          <span class="ms-icon sm">settings</span>
+          <span>Cloud & Vault Settings</span>
+        </button>
+      </aside>
+
+      <!-- Main Enterprise Content Canvas -->
+      <main class="admin-main-canvas">
+        <div class="horizon-top-header" style="padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.06);margin-bottom:4px;">
+          <div class="horizon-titles">
+            <h2 id="adminCanvasTitle" style="font-size:18px;display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">monitoring</span>
+              <span>Executive Overview & AI Decision Briefing</span>
+            </h2>
+            <p id="adminCanvasSubtitle">Real-Time Multi-Store Telemetry · Gemini 2.5 Flash Autonomous Briefings</p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button id="btnDeleteDemoWs" class="m3-seg-item" onclick="deleteCurrentDemoWorkspace()" style="display:none;background:#FFF0F0;border:1px solid rgba(255,59,48,0.25);color:#D32F2F;">
+              <span class="ms-icon sm">delete</span>
+              Delete Demo
+            </button>
+            <button class="m3-seg-item" onclick="loadAdminData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+              <span class="ms-icon sm">refresh</span>
+              Refresh Telemetry
+            </button>
+          </div>
+        </div>
+
+        <!-- PANEL 1: EXECUTIVE OVERVIEW & GEMINI AI BRIEFING -->
+        <div class="admin-view-panel active" id="panelOverview">
+          <!-- Gemini Autonomous Briefing Card -->
+          <div class="ai-briefing-card">
+            <div class="ai-briefing-top">
+              <div class="ai-briefing-title">
+                <span class="ms-icon" style="color:#0071E3;">auto_awesome</span>
+                <span>Gemini Autonomous Situational Briefing</span>
+              </div>
+              <span class="ai-briefing-pill">Gemini 2.5 Flash Active</span>
+            </div>
+            <div class="ai-briefing-body" id="aiBriefingText">
+              Analyzing real-time telemetry across active stores and promoter check-ins...
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#0071E3;text-transform:uppercase;letter-spacing:0.5px;">Recommended Management Interventions</div>
+            <div class="ai-recom-list" id="aiBriefingRecommendations">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Top-Line KPI Cards Grid -->
+          <div class="horizon-kpi-grid">
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Regional Revenue (USD)</span>
+              <span class="m3-stat-num" id="kpiOverviewRevenue">$0</span>
+              <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 100% Pacing</span>
+            </div>
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Planogram Compliance Rate</span>
+              <span class="m3-stat-num" id="kpiOverviewCompliance">92%</span>
+              <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">visibility</span> Optical Vera Analysis</span>
+            </div>
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Frontline Attendance Ratio</span>
+              <span class="m3-stat-num" id="kpiOverviewStaff">0 / 0</span>
+              <span class="m3-stat-trend" style="color:#1B5E20;"><span class="ms-icon sm" style="font-size:14px;">verified</span> Geofenced Clock-in</span>
+            </div>
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Supervisor Escalations</span>
+              <span class="m3-stat-num" id="kpiOverviewEscalated" style="color:var(--apple-amber);">0</span>
+              <span class="m3-stat-trend" style="color:var(--apple-amber);"><span class="ms-icon sm" style="font-size:14px;">warning</span> Requires Area Follow-Up</span>
+            </div>
+          </div>
+
+          <!-- Store Sell-Through Telemetry Table -->
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;">Store Sell-Through Telemetry</b>
+                <div style="font-size:12px;color:#86868B;">Click any branch row to launch deep 360° inspection drawer!</div>
+              </div>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Branch Code & Store</th>
+                  <th>Chain</th>
+                  <th>Country</th>
+                  <th>Target Quota</th>
+                  <th>Sell-Through</th>
+                  <th>Pacing %</th>
+                  <th>Compliance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="overviewStoresTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 2: AI AGENT REGISTRY & SKILL STUDIO -->
+        <div class="admin-view-panel" id="panelAgents">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <b style="font-size:15px;color:#1D1D1F;">Autonomous AI Agent Registry</b>
+              <div style="font-size:12px;color:#86868B;">Configure skills deployed to frontline field staff across retail chains.</div>
+            </div>
+            <button class="btn-commit-fsc" onclick="openRegisterAgentModal()" style="padding:7px 14px;font-size:12px;">
+              <span class="ms-icon sm">add</span> Register New Agent
+            </button>
+          </div>
+          <div class="agent-cards-grid" id="agentCardsContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- PANEL 3: AUTONOMOUS FIELD TASKS & COMPLIANCE ENGINE -->
+        <div class="admin-view-panel" id="panelTasks">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <b style="font-size:15px;color:#1D1D1F;">Autonomous Field Tasks & Compliance Engine</b>
+              <div style="font-size:12px;color:#86868B;">Agents proactively contact promoters, follow up on planograms, and escalate delinquencies.</div>
+            </div>
+            <button class="btn-commit-fsc" onclick="dispatchAllTasks()" style="padding:7px 14px;font-size:12px;background:#0071E3;">
+              <span class="ms-icon sm">send</span> Dispatch All Active Tasks
+            </button>
+          </div>
+
+          <div class="admin-card-box">
+            <b style="font-size:14px;color:#1D1D1F;">Active Field Task Schedules</b>
+            <div id="tasksListContainer" style="display:flex;flex-direction:column;gap:10px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <b style="font-size:14px;color:#1D1D1F;">Live Promoter Contact & Compliance Tracker</b>
+              <span style="font-size:11.5px;color:#86868B;">Updated via real-time WebSocket</span>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Promoter</th>
+                  <th>Store</th>
+                  <th>Task Title</th>
+                  <th>Status</th>
+                  <th>Compliance Score</th>
+                  <th>Escalated</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="fieldContactsTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 4: STORE NETWORK & GEOFENCES -->
+        <div class="admin-view-panel" id="panelStores">
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;">Retail Branch Network & Geofences</b>
+                <div style="font-size:12px;color:#86868B;">Branches assigned to this workspace with GPS clock-in benchmarks.</div>
+              </div>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Code & Branch</th>
+                  <th>Chain</th>
+                  <th>Country / City</th>
+                  <th>Currency</th>
+                  <th>Daily Quota</th>
+                  <th>Status</th>
+                  <th>Inspection</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableStoresBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 5: PRODUCTS & STEPPER PINS -->
+        <div class="admin-view-panel" id="panelProducts">
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;">SKU Catalog & 1-Tap Fast-Sale Stepper Pins</b>
+                <div style="font-size:12px;color:#86868B;">Toggle <b>Focus Promo</b> to pin or unpin SKUs directly on promoter's 3-second quick stepper in Pax chat!</div>
+              </div>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>SKU Code & Product</th>
+                  <th>Category</th>
+                  <th>Unit Price</th>
+                  <th>Commission</th>
+                  <th>Focus Promo (Chat Stepper Pin)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableProductsBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 6: STAFF, ORG CHART & ROSTER -->
+        <div class="admin-view-panel" id="panelOrg">
+          <div class="org-chart-container">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;">Corporate Organizational Chart & Command Hierarchy</b>
+                <div style="font-size:12px;color:#86868B;">Hierarchical structure linking headquarters, regional leads, supervisors, and floor staff.</div>
+              </div>
+            </div>
+            <div id="orgChartTreeContainer" style="display:flex;flex-direction:column;gap:10px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;">Field Promoters & Regional Supervisors</b>
+                <div style="font-size:12px;color:#86868B;">Personnel roster, assigned branch, and Pax AI localized conversation language.</div>
+              </div>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Staff Member</th>
+                  <th>Role</th>
+                  <th>Assigned Store</th>
+                  <th>Preferred Language</th>
+                  <th>Timezone</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableUsersBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 7: EXECUTIVE REPORTS & AUDIT LOGS -->
+        <div class="admin-view-panel" id="panelReports">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <b style="font-size:15px;color:#1D1D1F;">Executive Operational Compliance Reports</b>
+              <div style="font-size:12px;color:#86868B;">Gemini-synthesized management digests summarizing frontline execution.</div>
+            </div>
+            <button class="btn-commit-fsc" onclick="triggerGenerateReport()" style="padding:7px 14px;font-size:12px;background:#1D1D1F;">
+              <span class="ms-icon sm">auto_awesome</span> Generate Report with Gemini
+            </button>
+          </div>
+          <div id="reportsListContainer" style="display:flex;flex-direction:column;gap:14px;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- PANEL 8: CLOUD VAULT & SETTINGS -->
+        <div class="admin-view-panel" id="panelSettings">
+          <div class="horizon-kpi-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Google Drive 5TB Media Vault</span>
+              <span style="font-size:16px;font-weight:600;color:#1D1D1F;margin-top:4px;">folder_bloc_japac_vault_5tb</span>
+              <div style="font-size:12px;color:#1B5E20;margin-top:6px;display:flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:14px;">check_circle</span> Active · Auto-ingesting shelf photos & videos
+              </div>
+            </div>
+            <div class="m3-stat-card-dark">
+              <span class="m3-stat-caption">Google Sheets Bidirectional Link</span>
+              <span style="font-size:16px;font-weight:600;color:#1D1D1F;margin-top:4px;">sheets.google.com/d/bloc-telemetry-live</span>
+              <div style="font-size:12px;color:#1B5E20;margin-top:6px;display:flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:14px;">sync</span> Connected via WebSockets
+              </div>
+            </div>
+          </div>
+          <div class="m3-lineage-card">
+            <div class="lineage-card-title">
+              <span class="ms-icon" style="color:var(--apple-blue);">smart_toy</span>
+              <span>Active Frontline Agentic Engine</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:#1D1D1F;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="m3-tag-pill tag-ai-guide">Pax</span>
+                <span>Frontline Copilot · Multilingual Tagalog, Singlish, Malay sales capture (Gemini 2.5 Flash)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="m3-tag-pill" style="background:#E8F8EE;color:#1B5E20;">Vera</span>
+                <span>Planogram & Shelf Vision Auditor · Compliance scoring & out-of-stock detector (Gemini 2.5 Pro)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="m3-tag-pill" style="background:#E8DEF8;color:#4A4458;">Nexus</span>
+                <span>Regional Operations Orchestrator · Real-time multi-currency USD normalization & telemetry sync</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================================
+         STORE 360° DEEP DRILL-DOWN DRAWER
+         ============================================================ -->
+    <div class="drawer-store-360-scrim" id="drawerStore360" onclick="if(event.target===this) closeStore360Drawer()">
+      <div class="drawer-store-360-panel">
+        <div style="padding:20px 24px;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">storefront</span>
+              <h3 id="d360StoreName" style="font-size:18px;font-weight:700;color:#1D1D1F;">SM Megamall Cyberzone</h3>
+            </div>
+            <div id="d360StoreMeta" style="font-size:12px;color:#86868B;margin-top:2px;">SM-MEGA-01 · SM Supermalls · Mandaluyong, PH</div>
+          </div>
+          <button onclick="closeStore360Drawer()" style="background:none;border:none;cursor:pointer;color:#86868B;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px;">
+          <!-- Quota Pacing Gauge -->
+          <div style="background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#86868B;margin-bottom:6px;">
+              <span>Daily Target Sell-Through Pacing</span>
+              <span id="d360PacingPct" style="font-weight:700;color:#0071E3;">70%</span>
+            </div>
+            <div style="font-size:18px;font-weight:700;color:#1D1D1F;margin-bottom:8px;">
+              <span id="d360ActualSales">₱17,485</span> <span style="font-size:13px;color:#86868B;font-weight:500;">/ <span id="d360QuotaSales">₱25,000</span></span>
+            </div>
+            <div style="height:8px;background:#E5E5EA;border-radius:999px;overflow:hidden;">
+              <div id="d360ProgressBar" style="height:100%;width:70%;background:#0071E3;border-radius:999px;transition:width 0.3s;"></div>
+            </div>
+          </div>
+
+          <!-- On-Duty Promoters -->
+          <div>
+            <b style="font-size:13.5px;color:#1D1D1F;display:block;margin-bottom:8px;">Frontline Staff on Duty</b>
+            <div id="d360StaffList" style="display:flex;flex-direction:column;gap:8px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div>
+            <b style="font-size:13.5px;color:#1D1D1F;display:block;margin-bottom:8px;">Recent Sell-Through Receipts</b>
+            <div id="d360TxList" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Vera Multimodal Audits -->
+          <div>
+            <b style="font-size:13.5px;color:#1D1D1F;display:block;margin-bottom:8px;">Vera Multimodal Vision Audits</b>
+            <div id="d360AuditList" style="display:flex;flex-direction:column;gap:8px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         AGENT SKILL STUDIO MODAL
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalSkillStudio">
+      <div class="demo-modal-dialog">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">psychology</span>
+              <h3 style="font-size:18px;font-weight:700;color:#1D1D1F;">Agent Skill Studio</h3>
+            </div>
+            <p style="font-size:12.5px;color:#86868B;margin-top:2px;">
+              Attach and configure specialized skills for this agent to deploy to the field force.
+            </p>
+          </div>
+          <button onclick="closeSkillStudioModal()" style="background:transparent;border:none;color:#86868B;cursor:pointer;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <input type="hidden" id="studioAgentId">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Select Skill Template</label>
+            <select id="studioSkillTemplate" onchange="applySkillTemplate()" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+              <option value="planogram_audit">Planogram Compliance & Shelf Alignment</option>
+              <option value="stockout_alert">Out-of-Stock (OOS) Gap Sentinel</option>
+              <option value="shift_pacing">Morning Mission & Quota Pacing Coach</option>
+              <option value="competitor_intel">Competitor Promo & Price Intelligence</option>
+              <option value="sop_verification">Mystery Shopper & SOP Verification</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Skill Name</label>
+            <input type="text" id="studioSkillName" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Skill Description & Execution Instructions</label>
+            <textarea id="studioSkillDesc" rows="3" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;"></textarea>
+          </div>
+          <button class="btn-commit-fsc" onclick="saveAgentSkill()" style="margin-top:6px;">
+            <span class="ms-icon sm">check</span> Save & Activate Skill on Field Force
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         GLOBAL MODAL: AI DEMO WORKSPACE GENERATOR (GEMINI 2.5 FLASH)
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalDemoGenerator">
+      <div class="demo-modal-dialog">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">auto_awesome</span>
+              <h3 style="font-size:18px;font-weight:700;color:#1D1D1F;">AI Retail Workspace Generator</h3>
+            </div>
+            <p style="font-size:12.5px;color:#86868B;margin-top:4px;">
+              Synthesize a tailored, multi-country enterprise retail environment in seconds using Gemini 2.5 Flash.
+            </p>
+          </div>
+          <button onclick="closeDemoGeneratorModal()" style="background:transparent;border:none;color:#86868B;cursor:pointer;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <!-- Generator Form -->
+        <div id="demoFormSection" style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:6px;">Target Brand / Company Name</label>
+            <input type="text" id="demoCompanyName" placeholder="e.g. Nike, L'Oréal, Apple, Dyson, Uniqlo, Nestlé" value="Nike Southeast Asia" style="width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,0.1);border-radius:12px;font-family:inherit;font-size:13.5px;outline:none;">
+          </div>
+
+          <div style="display:grid;grid-template-columns: 1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:6px;">Industry</label>
+              <select id="demoIndustry" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+                <option value="Fashion & Sportswear">Fashion & Sportswear</option>
+                <option value="Consumer Electronics">Consumer Electronics</option>
+                <option value="Beauty & Cosmetics">Beauty & Cosmetics</option>
+                <option value="FMCG & Food & Beverage">FMCG & Food & Beverage</option>
+                <option value="Luxury Watches & Eyewear">Luxury & Eyewear</option>
+                <option value="Pharmacy & Wellness">Pharmacy & Wellness</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:6px;">Must-Include Products (Optional)</label>
+              <input type="text" id="demoMustInclude" placeholder="e.g. Air Jordan 1, Pegasus 41" value="Air Jordan 1 High, Pegasus 41, Tech Fleece" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:12px;font-family:inherit;font-size:13px;outline:none;">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:6px;">Target Regional Markets</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div class="demo-market-chip selected" onclick="toggleMarketChip(this, 'PH')">🇵🇭 Philippines (PHP)</div>
+              <div class="demo-market-chip selected" onclick="toggleMarketChip(this, 'SG')">🇸🇬 Singapore (SGD)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'MY')">🇲🇾 Malaysia (MYR)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'TH')">🇹🇭 Thailand (THB)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'ID')">🇮🇩 Indonesia (IDR)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'VN')">🇻🇳 Vietnam (VND)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'JP')">🇯🇵 Japan (JPY)</div>
+              <div class="demo-market-chip" onclick="toggleMarketChip(this, 'US')">🇺🇸 United States (USD)</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns: 1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Stores to Provision</label>
+              <input type="number" id="demoStoreCount" value="3" min="1" max="10" style="width:100%;padding:8px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;outline:none;">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Promoters to Provision</label>
+              <input type="number" id="demoPromoterCount" value="4" min="1" max="15" style="width:100%;padding:8px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;outline:none;">
+            </div>
+          </div>
+
+          <button id="btnRunDemoGen" onclick="generateDemoDraft()" style="background:var(--apple-blue);color:#fff;border:none;border-radius:12px;padding:12px;font-family:inherit;font-size:14px;font-weight:650;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;margin-top:6px;">
+            <span class="ms-icon sm">auto_awesome</span>
+            <span>Synthesize Workspace with Gemini 2.5</span>
+          </button>
+        </div>
+
+        <!-- Generating AI Loading State -->
+        <div id="demoLoadingState" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:14px;">
+          <div style="width:40px;height:40px;border:3px solid rgba(0,113,227,0.15);border-top-color:var(--apple-blue);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+          <div style="font-size:15px;font-weight:600;color:#1D1D1F;">Gemini 2.5 Flash is orchestrating your retail ecosystem...</div>
+          <div style="font-size:12.5px;color:#86868B;max-width:400px;">Generating realistic stores, localized SKUs, currency pricing, promoter personas, and promotional campaigns.</div>
+        </div>
+        <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+        <!-- Preview Draft Section -->
+        <div id="demoDraftSection" style="display:none;flex-direction:column;gap:14px;">
+          <div style="background:#EBF4FF;border:1px solid rgba(0,113,227,0.2);border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--apple-blue);text-transform:uppercase;">Generated Draft Ready</div>
+              <div id="draftCompanyName" style="font-size:17px;font-weight:700;color:#1D1D1F;margin-top:2px;">Nike Southeast Asia</div>
+              <div id="draftTagline" style="font-size:12.5px;color:#86868B;">Just Do It · Official Frontline Ops</div>
+            </div>
+            <button onclick="resetDemoDraft()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">
+              Edit Parameters
+            </button>
+          </div>
+
+          <!-- AI Refinement Prompt Bar (Add, Correct, Enhance with Gemini 2.5) -->
+          <div style="background:#FFFFFF;border:1.5px solid var(--apple-blue);border-radius:14px;padding:6px 10px 6px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 3px 12px rgba(0,113,227,0.1);">
+            <span class="ms-icon sm" style="color:var(--apple-blue);">auto_awesome</span>
+            <input type="text" id="draftRefineInput" placeholder="Prompt Gemini to enhance or correct (e.g. 'Add Galaxy Watch 6 for ₱18,990', 'Add 2 stores in Singapore', 'Change currency to SGD')..." style="flex:1;border:none;outline:none;font-family:inherit;font-size:13px;background:transparent;" onkeydown="if(event.key==='Enter') refineCurrentDraft()">
+            <button id="btnRefineDraft" onclick="refineCurrentDraft()" style="background:var(--apple-blue);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0;transition:all 0.15s;">
+              <span class="ms-icon sm">sparkles</span>
+              <span>Refine with AI</span>
+            </button>
+          </div>
+          <div id="draftRefineStatus" style="display:none;font-size:12px;color:#1B5E20;font-weight:600;align-items:center;gap:4px;padding:0 4px;">
+            <span class="ms-icon sm" style="font-size:14px;">check_circle</span>
+            <span id="draftRefineStatusText">Draft updated with your instructions!</span>
+          </div>
+
+          <!-- Inspector Tabs -->
+          <div style="display:flex;gap:6px;background:#F5F5F7;padding:4px;border-radius:12px;">
+            <button class="m3-seg-item active" id="draftTabBtnStores" onclick="switchDraftTab('stores')" style="flex:1;font-size:12px;padding:6px 10px;">
+              <span class="ms-icon sm">storefront</span> Stores (<span id="draftCountStores">0</span>)
+            </button>
+            <button class="m3-seg-item" id="draftTabBtnProducts" onclick="switchDraftTab('products')" style="flex:1;font-size:12px;padding:6px 10px;">
+              <span class="ms-icon sm">inventory_2</span> SKUs (<span id="draftCountProducts">0</span>)
+            </button>
+            <button class="m3-seg-item" id="draftTabBtnStaff" onclick="switchDraftTab('staff')" style="flex:1;font-size:12px;padding:6px 10px;">
+              <span class="ms-icon sm">group</span> Staff (<span id="draftCountStaff">0</span>)
+            </button>
+            <button class="m3-seg-item" id="draftTabBtnPromos" onclick="switchDraftTab('promos')" style="flex:1;font-size:12px;padding:6px 10px;">
+              <span class="ms-icon sm">local_offer</span> Promos (<span id="draftCountPromos">0</span>)
+            </button>
+          </div>
+
+          <!-- Inspector Tab Content Panels -->
+          <div style="max-height:240px;overflow-y:auto;border:1px solid rgba(0,0,0,0.06);border-radius:14px;background:#FFFFFF;padding:4px;">
+            <!-- Panel: Stores -->
+            <div id="draftPanelStores" style="display:block;">
+              <table class="m3-telemetry-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>Store Name & Address</th>
+                    <th>Chain</th>
+                    <th>Country / City</th>
+                    <th>Daily Target</th>
+                  </tr>
+                </thead>
+                <tbody id="draftStoresTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Panel: Products -->
+            <div id="draftPanelProducts" style="display:none;">
+              <table class="m3-telemetry-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>Product SKU</th>
+                    <th>Category</th>
+                    <th>Country</th>
+                    <th>Unit Price</th>
+                    <th>Commission</th>
+                    <th>Focus Pin</th>
+                  </tr>
+                </thead>
+                <tbody id="draftProductsTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Panel: Staff -->
+            <div id="draftPanelStaff" style="display:none;">
+              <table class="m3-telemetry-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Country</th>
+                    <th>Assigned Store</th>
+                  </tr>
+                </thead>
+                <tbody id="draftStaffTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Panel: Promos -->
+            <div id="draftPanelPromos" style="display:none;">
+              <table class="m3-telemetry-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>Campaign Title</th>
+                    <th>Description</th>
+                    <th>Discount %</th>
+                    <th>Bonus Comm.</th>
+                  </tr>
+                </thead>
+                <tbody id="draftPromosTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <button id="btnCommitDemo" onclick="commitDemoDraft()" style="background:#34C759;color:#fff;border:none;border-radius:12px;padding:13px;font-family:inherit;font-size:14.5px;font-weight:650;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(52,199,89,0.3);transition:all 0.15s;">
+            <span class="ms-icon sm">rocket_launch</span>
+            <span>Deploy Workspace to Turso & Launch</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <script>
     // ============================================================
     // APPLICATION STATE
     // ============================================================
+    let currentWorkspaceId = 'ws-japac-retail';
+    let allWorkspaces = [];
     let currentUserId = 'usr-liza-ph';
     let currentStoreId = 'store-sm-mega';
     let currentChatId = 'chat-pax';
     let focusProducts = [];
+    let extraSaleProducts = [];
     let allCatalogProducts = [];
     let stepperCounts = {};
+    let fastSaleMode = 'empty'; // 'empty' (default, starts clean) or 'prefill' (pre-fills focus promos)
+    let activeFastSaleProductIds = []; // Track explicitly added products in empty mode
     let currencySymbol = '₱';
+    let currentCurrencyCode = 'PHP';
     let targetAmount = 25000;
     let currentShiftTotal = 0;
+    let activeDraft = null;
+    let selectedMarkets = ['PH', 'SG'];
+
+    function getCurrencySymbol(code) {
+      switch (code) {
+        case 'PHP': return '₱';
+        case 'SGD':
+        case 'USD': return '$';
+        case 'MYR': return 'RM ';
+        case 'THB': return '฿';
+        case 'IDR': return 'Rp ';
+        case 'VND': return '₫';
+        case 'JPY': return '¥';
+        default: return `${code} `;
+      }
+    }
 
     // ============================================================
-    // 1. INITIALIZATION & USER STATE
+    // 1. WORKSPACES & MULTI-TENANCY INITIALIZATION
+    // ============================================================
+    async function initWorkspaces() {
+      try {
+        const res = await fetch('/api/workspaces');
+        allWorkspaces = await res.json();
+        
+        const sel = document.getElementById('workspaceSelector');
+        sel.innerHTML = '';
+        allWorkspaces.forEach(ws => {
+          const opt = document.createElement('option');
+          opt.value = ws.id;
+          opt.innerText = `${ws.isDemo ? '✨ ' : '🏢 '}${ws.name}`;
+          sel.appendChild(opt);
+        });
+
+        // Retain or select workspace
+        if (allWorkspaces.some(w => w.id === currentWorkspaceId)) {
+          sel.value = currentWorkspaceId;
+        } else if (allWorkspaces.length > 0) {
+          currentWorkspaceId = allWorkspaces[0].id;
+          sel.value = currentWorkspaceId;
+        }
+
+        updateWorkspaceUI();
+        await loadWorkspaceUsers(currentWorkspaceId);
+      } catch (err) {
+        console.error('Failed to init workspaces:', err);
+        await loadUserState();
+      }
+    }
+
+    function updateWorkspaceUI() {
+      const curWs = allWorkspaces.find(w => w.id === currentWorkspaceId);
+      const isDemo = curWs?.isDemo || currentWorkspaceId.startsWith('ws-demo-');
+      const delBtn = document.getElementById('btnDeleteDemoWs');
+      if (delBtn) delBtn.style.display = isDemo ? 'inline-flex' : 'none';
+
+      const adminTitle = document.getElementById('adminTitle');
+      if (adminTitle && curWs) adminTitle.innerText = `${curWs.name} · Admin Operations`;
+    }
+
+    async function onWorkspaceChanged(wsId) {
+      currentWorkspaceId = wsId;
+      updateWorkspaceUI();
+      await loadWorkspaceUsers(wsId, true);
+      const activeAdminTab = document.querySelector('.admin-nav-tabs .admin-tab-btn.active');
+      if (document.getElementById('adminWrapper').style.display === 'flex') {
+        loadAdminData();
+      } else if (document.getElementById('supervisorWrapper').style.display === 'flex') {
+        loadSupervisorConsoleData();
+      }
+    }
+
+    async function loadWorkspaceUsers(wsId, autoSelectFirst = false) {
+      try {
+        const res = await fetch(`/api/workspaces/${wsId}/users`);
+        const users = await res.json();
+        const sel = document.getElementById('userSelector');
+        sel.innerHTML = '';
+
+        const promoters = users.filter(u => u.role === 'promoter');
+        const listToDisplay = promoters.length > 0 ? promoters : users;
+
+        listToDisplay.forEach(u => {
+          const opt = document.createElement('option');
+          opt.value = u.id;
+          const storeLabel = u.storeName ? ` (${u.storeName})` : '';
+          opt.innerText = `${u.name}${storeLabel}`;
+          sel.appendChild(opt);
+        });
+
+        if (autoSelectFirst && listToDisplay.length > 0) {
+          currentUserId = listToDisplay[0].id;
+          sel.value = currentUserId;
+        } else if (!listToDisplay.some(u => u.id === currentUserId) && listToDisplay.length > 0) {
+          currentUserId = listToDisplay[0].id;
+          sel.value = currentUserId;
+        } else {
+          sel.value = currentUserId;
+        }
+
+        await loadUserState();
+        if (currentChatId) openChat(currentChatId);
+      } catch (err) {
+        console.error('Failed to load workspace users:', err);
+        await loadUserState();
+      }
+    }
+
+    // ============================================================
+    // 2. USER & SHIFT STATE
     // ============================================================
     async function loadUserState() {
       try {
@@ -1830,20 +3195,17 @@
         const data = await res.json();
 
         focusProducts = data.focusProducts || [];
-        currentStoreId = data.store?.id || (currentUserId === 'usr-sarah-sg' ? 'store-fp-vivo' : 'store-sm-mega');
+        extraSaleProducts = [];
+        activeFastSaleProductIds = [];
+        currentStoreId = data.store?.id || '';
         
-        // Accurate target amount
-        if (currentUserId === 'usr-sarah-sg') {
-          targetAmount = data.store?.dailyTargetDefault || 1200;
-          currencySymbol = '$';
-        } else {
-          targetAmount = data.store?.dailyTargetDefault || 25000;
-          currencySymbol = '₱';
-        }
+        targetAmount = data.targetAmount || data.shift?.targetAmount || data.store?.dailyTargetDefault || 15000;
+        currentCurrencyCode = data.currency || data.store?.currency || 'USD';
+        currencySymbol = getCurrencySymbol(currentCurrencyCode);
 
         currentShiftTotal = data.currentShiftTotal || 0;
 
-        const storeName = data.store?.name || (currentUserId === 'usr-sarah-sg' ? 'FairPrice VivoCity' : 'SM Megamall');
+        const storeName = data.store?.name || 'Retail Branch';
         document.getElementById('txtRosterStoreName').innerText = storeName;
         document.getElementById('lblStoreGcName').innerHTML = `# ${storeName} Floor Ops <span class="m3-tag-pill tag-org-gc"><span class="ms-icon sm" style="font-size:11px;margin-right:2px;">verified_user</span>Org GC</span>`;
         
@@ -1858,8 +3220,8 @@
 
     async function fetchCatalogProducts() {
       try {
-        const curr = currentUserId === 'usr-sarah-sg' ? 'SGD' : 'PHP';
-        const res = await fetch(`/api/products?currency=${curr}`);
+        const wsParam = currentWorkspaceId ? `&ws=${currentWorkspaceId}` : '';
+        const res = await fetch(`/api/products?currency=${currentCurrencyCode}${wsParam}`);
         allCatalogProducts = await res.json();
       } catch (err) {
         allCatalogProducts = focusProducts;
@@ -1939,6 +3301,53 @@
         { label: 'photo_camera', text: 'Vera Shelf Audit', action: 'openVeraAuditModal()', emerald: true },
         { label: 'checklist', text: 'Shift Tasks & Guide', action: 'showTasksMilestoneCard()' },
       ]);
+
+      try {
+        const res = await fetch(`/api/pax/messages?userId=${currentUserId}`);
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          list.slice(-4).forEach(m => {
+            if (m.interactiveCardType === 'audit_card' || (m.message && m.message.includes('Task Dispatch'))) {
+              appendDispatchedTaskCard(m);
+            } else if (m.sender === 'user') {
+              appendUserBubble(m.message);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Could not load extra pax messages:', err);
+      }
+    }
+
+    function appendDispatchedTaskCard(m) {
+      const stream = document.getElementById('activeChatStream');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-packet-frame pax';
+      const sender = (m.sender === 'vera') ? 'Vera · Shelf Auditor' : 'Pax · Frontline Copilot';
+      const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      wrap.innerHTML = `
+        <div class="msg-author-tag">${sender}</div>
+        <div class="m3-bubble pax" style="border-left: 3px solid var(--apple-blue);background:#F0F7FF;">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:4px;color:var(--apple-blue);font-size:12.5px;">
+            <span class="ms-icon sm" style="font-size:16px;">notifications_active</span> Task Dispatch
+          </div>
+          <div style="font-size:13px;color:#1D1D1F;line-height:1.4;">${m.message}</div>
+          <div class="bubble-meta-time">${time}</div>
+        </div>
+        <div class="m3-inline-action-grid">
+          <button class="m3-inline-btn emerald" onclick="openVeraAuditModal()">
+            <span class="ms-icon sm">photo_camera</span>
+            <span>Run Vera Audit</span>
+          </button>
+          <button class="m3-inline-btn" onclick="showFastSaleWidget()">
+            <span class="ms-icon sm">bolt</span>
+            <span>Fast-Sale</span>
+          </button>
+        </div>
+      `;
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
     }
 
     async function loadThreadMessages(chatId) {
@@ -2140,57 +3549,174 @@
     }
 
     // ============================================================
-    // 5. 3-SECOND FAST-SALE CARD WITH DUAL OPTIONS
+    // 5. 3-SECOND FAST-SALE CARD WITH DUAL OPTIONS & EMPTY-FIRST DEFAULT
     // ============================================================
-    function renderFastSaleStepper() {
-      const stream = document.getElementById('activeChatStream');
-      const widget = document.createElement('div');
-      widget.className = 'm3-fast-sale-card';
-      widget.id = 'activeFastSaleWidget';
+    let toastTimeout = null;
+    function showToastNotification(text) {
+      const pill = document.getElementById('appToastPill');
+      if (!pill) return;
+      document.getElementById('appToastPillText').innerText = text;
+      pill.classList.add('active');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        pill.classList.remove('active');
+      }, 2400);
+    }
 
-      let itemsHtml = '';
-      focusProducts.forEach(p => {
-        stepperCounts[p.id] = stepperCounts[p.id] || 0;
-        itemsHtml += `
-          <div class="fsc-sku-row">
-            <div style="flex:1;min-width:0;padding-right:8px;">
-              <div class="fsc-sku-title">${p.name}</div>
-              <div class="fsc-sku-sub">
-                ${currencySymbol}${p.unitPrice.toLocaleString()} 
-                <span class="fsc-bonus-val">+${currencySymbol}${p.commissionPerUnit || 25} bonus</span>
+    function getAllActiveSaleItems() {
+      if (fastSaleMode === 'empty') {
+        const items = [];
+        activeFastSaleProductIds.forEach(id => {
+          const p = focusProducts.find(item => item.id === id) ||
+                    extraSaleProducts.find(item => item.id === id) ||
+                    allCatalogProducts.find(item => item.id === id);
+          if (p && !items.some(x => x.id === p.id)) {
+            items.push(p);
+          }
+        });
+        return items;
+      } else {
+        // prefill mode: all focus products plus extra items
+        const map = new Map();
+        focusProducts.forEach(p => map.set(p.id, p));
+        extraSaleProducts.forEach(p => map.set(p.id, p));
+        return Array.from(map.values());
+      }
+    }
+
+    function buildFastSaleInnerHtml(highlightProductId = null) {
+      const allSaleItems = getAllActiveSaleItems();
+      const isCartEmpty = (allSaleItems.length === 0);
+
+      // Remaining focus promos not yet in cart
+      const remainingPromos = focusProducts.filter(p => !allSaleItems.some(item => item.id === p.id));
+
+      let bodyHtml = '';
+
+      if (isCartEmpty) {
+        bodyHtml = `
+          <div class="fsc-empty-state">
+            <div class="fsc-empty-hero">
+              <div class="fsc-empty-icon">
+                <span class="ms-icon" style="font-size:20px;">shopping_bag</span>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:650;color:#1D1D1F;">Cart is empty (0 items)</div>
+                <div style="font-size:11.5px;color:#86868B;">Tap a Focus Promo below to add in 1 tap, or browse catalog.</div>
               </div>
             </div>
-            <div class="m3-stepper-box">
-              <button class="btn-step-ctrl" onclick="adjustStepper('${p.id}', -1)" title="Decrease Quantity">
-                <span class="ms-icon sm">remove</span>
-              </button>
-              <span class="step-counter-val" id="qty-${p.id}">${stepperCounts[p.id]}</span>
-              <button class="btn-step-ctrl add" onclick="adjustStepper('${p.id}', 1)" title="Increase Quantity">
-                <span class="ms-icon sm">add</span>
+            
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+              <span style="font-size:11px;font-weight:650;color:#86868B;text-transform:uppercase;letter-spacing:0.4px;">Today's Focus Promos</span>
+              <span style="font-size:10.5px;color:#0071E3;font-weight:600;">1-Tap Add</span>
+            </div>
+            <div class="fsc-promo-chips-scroll">
+              ${focusProducts.map(p => `
+                <button class="fsc-promo-chip" onclick="quickAddFocusProduct('${p.id}')" title="Add 1x ${p.name}">
+                  <span class="ms-icon sm" style="font-size:14px;color:var(--apple-blue);">add</span>
+                  <span>${p.name}</span>
+                  <span style="color:#86868B;font-size:10.5px;">${currencySymbol}${p.unitPrice.toLocaleString()}</span>
+                  <span class="fsc-chip-bonus">+${currencySymbol}${p.commissionPerUnit || 25}</span>
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="fsc-dual-options-grid" style="margin-top:2px;">
+              <button class="btn-fsc-option" onclick="openSkuSearchSheet()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);">
+                <span class="ms-icon sm" style="color:var(--apple-blue);">search</span>
+                <span>Browse Full Catalog (${allCatalogProducts.length} SKUs)</span>
               </button>
             </div>
           </div>
         `;
-      });
+      } else {
+        let itemsHtml = '';
+        allSaleItems.forEach(p => {
+          stepperCounts[p.id] = stepperCounts[p.id] || 0;
+          const isHighlight = (p.id === highlightProductId);
+          const catalogBadge = !p.isFocusPromo
+            ? '<span style="font-size:10px;background:#EBF4FF;color:#0071E3;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">Catalog</span>'
+            : '<span style="font-size:10px;background:#E8F8EE;color:#1B5E20;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">Focus Promo</span>';
+          
+          itemsHtml += `
+            <div class="fsc-sku-row ${isHighlight ? 'fsc-added-highlight' : ''}" id="fsc-row-${p.id}">
+              <div style="flex:1;min-width:0;padding-right:8px;">
+                <div class="fsc-sku-title">
+                  ${p.name}
+                  ${catalogBadge}
+                </div>
+                <div class="fsc-sku-sub">
+                  ${currencySymbol}${p.unitPrice.toLocaleString()} 
+                  <span class="fsc-bonus-val">+${currencySymbol}${p.commissionPerUnit || 25} bonus</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="m3-stepper-box">
+                  <button class="btn-step-ctrl" onclick="adjustStepper('${p.id}', -1)" title="Decrease Quantity">
+                    <span class="ms-icon sm">remove</span>
+                  </button>
+                  <span class="step-counter-val" id="qty-${p.id}">${stepperCounts[p.id]}</span>
+                  <button class="btn-step-ctrl add" onclick="adjustStepper('${p.id}', 1)" title="Increase Quantity">
+                    <span class="ms-icon sm">add</span>
+                  </button>
+                </div>
+                <button class="fsc-remove-btn" onclick="removeCartItem('${p.id}')" title="Remove from cart">
+                  <span class="ms-icon sm" style="font-size:16px;">close</span>
+                </button>
+              </div>
+            </div>
+          `;
+        });
 
-      widget.innerHTML = `
+        // Quick add other focus promos row if any left
+        let moreChipsHtml = '';
+        if (remainingPromos.length > 0) {
+          moreChipsHtml = `
+            <div style="margin-top:2px;">
+              <div style="font-size:10.5px;color:#86868B;font-weight:600;margin-bottom:4px;">Quick add other Focus Promos:</div>
+              <div class="fsc-promo-chips-scroll">
+                ${remainingPromos.map(p => `
+                  <button class="fsc-promo-chip" onclick="quickAddFocusProduct('${p.id}')" title="Add 1x ${p.name}">
+                    <span class="ms-icon sm" style="font-size:13px;color:var(--apple-blue);">add</span>
+                    <span>${p.name}</span>
+                    <span class="fsc-chip-bonus">+${currencySymbol}${p.commissionPerUnit || 25}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        bodyHtml = `
+          ${itemsHtml}
+          ${moreChipsHtml}
+          <div class="fsc-dual-options-grid" style="margin-top:4px;">
+            <button class="btn-fsc-option" onclick="openSkuSearchSheet()">
+              <span class="ms-icon sm" style="color:var(--apple-blue);">search</span>
+              <span>Browse Full Catalog</span>
+            </button>
+          </div>
+        `;
+      }
+
+      return `
         <div class="fsc-header">
           <div class="fsc-title">
             <span class="ms-icon sm" style="color:var(--apple-blue);">bolt</span>
-            <span>Quick Log · Focus Promos</span>
+            <span>Fast-Sale Stepper</span>
           </div>
-          <button onclick="document.getElementById('activeFastSaleWidget')?.remove()" style="background:none;border:none;color:#86868B;cursor:pointer;padding:4px;display:flex;align-items:center;" title="Dismiss">
-            <span class="ms-icon sm" style="font-size:16px;">close</span>
-          </button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="display:inline-flex;background:#F2F2F7;border-radius:8px;padding:2px;gap:2px;">
+              <button class="fsc-mode-pill ${fastSaleMode === 'empty' ? 'active' : ''}" onclick="setFastSaleMode('empty')">Empty (Default)</button>
+              <button class="fsc-mode-pill ${fastSaleMode === 'prefill' ? 'active' : ''}" onclick="setFastSaleMode('prefill')">Pre-fill Promos</button>
+            </div>
+            <button onclick="document.getElementById('activeFastSaleWidget')?.remove()" style="background:none;border:none;color:#86868B;cursor:pointer;padding:4px;display:flex;align-items:center;" title="Dismiss">
+              <span class="ms-icon sm" style="font-size:16px;">close</span>
+            </button>
+          </div>
         </div>
-        ${itemsHtml}
-        
-        <div class="fsc-dual-options-grid">
-          <button class="btn-fsc-option" onclick="openSkuSearchSheet()">
-            <span class="ms-icon sm" style="color:var(--apple-blue);">search</span>
-            <span>Browse Full Catalog</span>
-          </button>
-        </div>
+
+        ${bodyHtml}
 
         <div class="fsc-totals-footer">
           <span>Subtotal: <b id="fswTotalValue" style="color:#1D1D1F;">${currencySymbol}0</b></span>
@@ -2200,19 +3726,81 @@
           <span>Record Sale · ${currencySymbol}0</span>
         </button>
       `;
+    }
+
+    function renderFastSaleStepper(highlightProductId = null) {
+      const stream = document.getElementById('activeChatStream');
+      const widget = document.createElement('div');
+      widget.className = 'm3-fast-sale-card';
+      widget.id = 'activeFastSaleWidget';
+      widget.innerHTML = buildFastSaleInnerHtml(highlightProductId);
 
       stream.appendChild(widget);
       stream.scrollTop = stream.scrollHeight;
+      recalcFastSaleTotals();
     }
 
-    function showFastSaleWidget() {
+    function refreshFastSaleWidget(highlightProductId = null) {
+      const widget = document.getElementById('activeFastSaleWidget');
+      if (!widget) {
+        renderFastSaleStepper(highlightProductId);
+        return;
+      }
+      widget.innerHTML = buildFastSaleInnerHtml(highlightProductId);
+      recalcFastSaleTotals();
+    }
+
+    function showFastSaleWidget(highlightProductId = null) {
       const existing = document.getElementById('activeFastSaleWidget');
-      if (existing) existing.remove();
-      renderFastSaleStepper();
+      if (existing) {
+        refreshFastSaleWidget(highlightProductId);
+      } else {
+        renderFastSaleStepper(highlightProductId);
+      }
+    }
+
+    function setFastSaleMode(mode) {
+      fastSaleMode = mode;
+      if (mode === 'prefill') {
+        focusProducts.forEach(p => {
+          if (!stepperCounts[p.id]) stepperCounts[p.id] = 0;
+          if (!activeFastSaleProductIds.includes(p.id)) activeFastSaleProductIds.push(p.id);
+        });
+      }
+      refreshFastSaleWidget();
+    }
+
+    function quickAddFocusProduct(productId) {
+      const prod = focusProducts.find(p => p.id === productId) || allCatalogProducts.find(p => p.id === productId);
+      if (!prod) return;
+      if (!activeFastSaleProductIds.includes(productId)) {
+        activeFastSaleProductIds.push(productId);
+      }
+      stepperCounts[productId] = (stepperCounts[productId] || 0) + 1;
+      refreshFastSaleWidget(productId);
+      showToastNotification(`Added ${prod.name} (Qty: ${stepperCounts[productId]})`);
+    }
+
+    function removeCartItem(productId) {
+      stepperCounts[productId] = 0;
+      activeFastSaleProductIds = activeFastSaleProductIds.filter(id => id !== productId);
+      extraSaleProducts = extraSaleProducts.filter(p => p.id !== productId);
+      refreshFastSaleWidget();
     }
 
     function adjustStepper(productId, delta) {
-      stepperCounts[productId] = Math.max(0, (stepperCounts[productId] || 0) + delta);
+      const current = stepperCounts[productId] || 0;
+      const next = Math.max(0, current + delta);
+      stepperCounts[productId] = next;
+
+      if (fastSaleMode === 'empty' && next === 0) {
+        // Dropping to 0 removes from active cart list
+        activeFastSaleProductIds = activeFastSaleProductIds.filter(id => id !== productId);
+        extraSaleProducts = extraSaleProducts.filter(p => p.id !== productId);
+        refreshFastSaleWidget();
+        return;
+      }
+
       const span = document.getElementById(`qty-${productId}`);
       if (span) span.innerText = stepperCounts[productId];
       recalcFastSaleTotals();
@@ -2223,7 +3811,8 @@
       let commission = 0;
       let totalCount = 0;
 
-      focusProducts.forEach(p => {
+      const allSaleItems = getAllActiveSaleItems();
+      allSaleItems.forEach(p => {
         const qty = stepperCounts[p.id] || 0;
         subtotal += p.unitPrice * qty;
         commission += (p.commissionPerUnit || 25) * qty;
@@ -2245,15 +3834,17 @@
     }
 
     function simulateBarcodeScan() {
-      if (focusProducts.length > 0) {
-        const item = focusProducts[0];
-        adjustStepper(item.id, 1);
+      const pool = (focusProducts.length > 0) ? focusProducts : allCatalogProducts;
+      if (pool.length > 0) {
+        const item = pool[0];
+        quickAddFocusProduct(item.id);
         appendUserBubble(`[Scanned Barcode EAN-13: ${item.barcode || '8806091234567'} (${item.name})]`);
       }
     }
 
     async function commitFastSaleAction() {
-      const items = focusProducts.map(p => ({
+      const allSaleItems = getAllActiveSaleItems();
+      const items = allSaleItems.map(p => ({
         productId: p.id,
         quantity: stepperCounts[p.id] || 0,
       })).filter(i => i.quantity > 0);
@@ -2278,8 +3869,10 @@
         appendPaxBubble(data.paxMessage);
         updateKpiBanner(data.currentShiftTotal);
 
-        // Reset steppers
-        focusProducts.forEach(p => { stepperCounts[p.id] = 0; });
+        // Reset steppers and extra items
+        allSaleItems.forEach(p => { stepperCounts[p.id] = 0; });
+        extraSaleProducts = [];
+        activeFastSaleProductIds = [];
         const card = document.getElementById('activeFastSaleWidget');
         if (card) card.remove();
       } catch (err) {
@@ -2317,16 +3910,18 @@
       }
 
       list.forEach(p => {
+        const inCart = activeFastSaleProductIds.includes(p.id) && (stepperCounts[p.id] > 0);
         container.innerHTML += `
           <div class="sku-card-entry">
             <div>
               <div style="font-size:13.5px;font-weight:700;color:var(--m3-on-surface);">${p.name}</div>
               <div style="font-size:11.5px;color:var(--m3-on-surface-variant);">
                 ${p.skuCode} · EAN: ${p.barcode || '8806091234'} · <b>${currencySymbol}${p.unitPrice.toLocaleString()}</b>
+                ${p.isFocusPromo ? '<span style="color:#1B5E20;font-weight:600;margin-left:4px;">+Promo</span>' : ''}
               </div>
             </div>
             <button class="btn-add-sku-item" onclick="addSearchedSkuToCart('${p.id}')">
-              <span class="ms-icon sm">add</span> Add
+              <span class="ms-icon sm">${inCart ? 'add_circle' : 'add'}</span> ${inCart ? `Add (${stepperCounts[p.id]})` : 'Add'}
             </button>
           </div>
         `;
@@ -2335,8 +3930,19 @@
 
     function addSearchedSkuToCart(productId) {
       closeSkuSearchSheet();
-      showFastSaleWidget();
-      adjustStepper(productId, 1);
+      const prod = allCatalogProducts.find(p => p.id === productId) || focusProducts.find(p => p.id === productId);
+      if (!prod) return;
+
+      if (!activeFastSaleProductIds.includes(productId)) {
+        activeFastSaleProductIds.push(productId);
+      }
+      if (!focusProducts.some(p => p.id === productId) && !extraSaleProducts.some(p => p.id === productId)) {
+        extraSaleProducts.push(prod);
+      }
+      stepperCounts[productId] = (stepperCounts[productId] || 0) + 1;
+
+      showFastSaleWidget(productId);
+      showToastNotification(`Added ${prod.name} (Qty: ${stepperCounts[productId]})`);
     }
 
     // ============================================================
@@ -2375,6 +3981,9 @@
 
         btn.innerHTML = '<span class="ms-icon sm">check</span> Audit Logged to Drive & Turso';
         appendPaxBubble(`<span class="ms-icon sm" style="color:var(--m3-primary);margin-right:4px;">photo_camera</span><b>Vera Planogram Audit Complete:</b> Compliance Score ${data.complianceScore}%. Recommended Action: ${data.recommendedAction}`);
+        showToastNotification(`Vera Audit Complete · ${data.complianceScore}% Planogram Compliance`);
+        if (typeof loadTasksData === 'function') loadTasksData();
+        if (typeof loadAnalyticsSummary === 'function') loadAnalyticsSummary();
       } catch (err) {
         alert('Audit completed with fallback benchmark');
       } finally {
@@ -2387,7 +3996,8 @@
     // ============================================================
     async function loadSupervisorConsoleData() {
       try {
-        const res = await fetch('/api/supervisor/dashboard');
+        const wsParam = currentWorkspaceId ? `?ws=${currentWorkspaceId}` : '';
+        const res = await fetch(`/api/supervisor/dashboard${wsParam}`);
         const data = await res.json();
 
         document.getElementById('supKpiRevenue').innerText = data.overview.totalRevenueNormalizedUSD;
@@ -2431,22 +4041,854 @@
     }
 
     function setViewMode(mode) {
+      const p = document.getElementById('phoneWrapper');
+      const s = document.getElementById('supervisorWrapper');
+      const a = document.getElementById('adminWrapper');
+      const bp = document.getElementById('btnPhoneView');
+      const bs = document.getElementById('btnSupView');
+      const ba = document.getElementById('btnAdminView');
+
+      p.style.display = 'none';
+      s.style.display = 'none';
+      a.style.display = 'none';
+      bp.classList.remove('active');
+      bs.classList.remove('active');
+      ba.classList.remove('active');
+
       if (mode === 'phone') {
-        document.getElementById('phoneWrapper').style.display = 'flex';
-        document.getElementById('supervisorWrapper').style.display = 'none';
-        document.getElementById('btnPhoneView').classList.add('active');
-        document.getElementById('btnSupView').classList.remove('active');
-      } else {
-        document.getElementById('phoneWrapper').style.display = 'none';
-        document.getElementById('supervisorWrapper').style.display = 'flex';
-        document.getElementById('btnPhoneView').classList.remove('active');
-        document.getElementById('btnSupView').classList.add('active');
+        p.style.display = 'flex';
+        bp.classList.add('active');
+      } else if (mode === 'supervisor') {
+        s.style.display = 'flex';
+        bs.classList.add('active');
         loadSupervisorConsoleData();
+      } else if (mode === 'admin') {
+        a.style.display = 'flex';
+        ba.classList.add('active');
+        loadAdminData();
       }
     }
 
-    // Initialize on load
-    loadUserState();
+    // ============================================================
+    // 10. ADMIN MANAGEMENT CONSOLE LOGIC
+    // ============================================================
+    // ============================================================
+    // 10. ENTERPRISE OPERATIONS COMMAND PORTAL JAVASCRIPT
+    // ============================================================
+    let currentAdminNav = 'overview';
+
+    function switchAdminNav(navKey) {
+      currentAdminNav = navKey;
+      const navIds = ['overview', 'agents', 'tasks', 'stores', 'products', 'org', 'reports', 'settings'];
+      
+      navIds.forEach(k => {
+        const btn = document.getElementById(`navItem${capitalize(k)}`);
+        const panel = document.getElementById(`panel${capitalize(k)}`);
+        if (btn) btn.classList.toggle('active', k === navKey);
+        if (panel) panel.classList.toggle('active', k === navKey);
+      });
+
+      // Update Header Titles
+      const titleMap = {
+        overview: ['monitoring', 'Executive BI & AI Decision Briefing', 'Real-Time Multi-Store Telemetry · Gemini 2.5 Flash Autonomous Briefings'],
+        agents: ['smart_toy', 'AI Agent Registry & Skill Studio', 'Configure Autonomous Capabilities Deployed to Frontline Force'],
+        tasks: ['checklist', 'Autonomous Field Tasks & Compliance Engine', 'Proactive Prompts, Follow-Ups, and Delinquency Escalations'],
+        stores: ['storefront', 'Retail Branch Network & Geofences', 'GPS Arrival Geofencing & 360° Store Dossier Inspection'],
+        products: ['inventory_2', 'SKU Catalog & Fast-Sale Stepper Pins', '1-Tap Promo Pins, Barcodes, and Direct Promoter Commissions'],
+        org: ['account_tree', 'Corporate Org Chart & Staff Roster', 'Multi-Tiered Management Topology & Frontline Language Preferences'],
+        reports: ['description', 'Executive Operational Reports & Audit Logs', 'Gemini-Synthesized Management Compliance Digests'],
+        settings: ['settings', 'Enterprise Cloud & Integration Settings', 'Google Drive 5TB Media Vault & Bidirectional Sheets Link'],
+      };
+
+      const meta = titleMap[navKey] || titleMap.overview;
+      document.getElementById('adminCanvasTitle').innerHTML = `<span class="ms-icon" style="color:var(--apple-blue);">${meta[0]}</span> <span>${meta[1]}</span>`;
+      document.getElementById('adminCanvasSubtitle').innerText = meta[2];
+
+      if (navKey === 'overview') loadAnalyticsSummary();
+      else if (navKey === 'agents') loadAgentsData();
+      else if (navKey === 'tasks') loadTasksData();
+      else if (navKey === 'org') loadOrgData();
+      else if (navKey === 'reports') loadReportsData();
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    async function loadAdminData() {
+      try {
+        const currentWs = allWorkspaces.find(w => w.id === currentWorkspaceId);
+        if (currentWs) {
+          document.getElementById('adminSidebarWsName').innerText = currentWs.name;
+        }
+
+        await Promise.all([
+          loadAnalyticsSummary(),
+          loadStoresAndProducts(),
+          loadAgentsData(),
+          loadTasksData(),
+        ]);
+      } catch (err) {
+        console.error('Failed to load admin console data:', err);
+      }
+    }
+
+    async function loadAnalyticsSummary() {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/analytics/summary`);
+        const data = await res.json();
+
+        // 1. Briefing & Recommendations
+        document.getElementById('aiBriefingText').innerText = data.aiBriefing || 'Telemetry active.';
+        const rList = document.getElementById('aiBriefingRecommendations');
+        rList.innerHTML = '';
+        (data.recommendations || []).forEach(r => {
+          rList.innerHTML += `
+            <div class="ai-recom-item">
+              <span class="ms-icon sm" style="color:#0071E3;font-size:15px;">check_circle</span>
+              <span>${r}</span>
+            </div>
+          `;
+        });
+
+        // 2. KPIs
+        const m = data.metrics || {};
+        document.getElementById('kpiOverviewRevenue').innerText = `$${(m.totalRevenue || 18450).toLocaleString()}`;
+        document.getElementById('kpiOverviewCompliance').innerText = `${m.avgCompliance || 92}%`;
+        document.getElementById('kpiOverviewStaff').innerText = `${m.activeStaffCount || 3} / ${m.activeStaffCount || 3}`;
+        document.getElementById('kpiOverviewEscalated').innerText = m.escalatedCount || 0;
+      } catch (err) {
+        console.warn('Analytics summary fallback:', err);
+      }
+    }
+
+    async function loadStoresAndProducts() {
+      try {
+        const [storesRes, prodsRes, usersRes] = await Promise.all([
+          fetch(`/api/admin/${currentWorkspaceId}/stores`),
+          fetch(`/api/admin/${currentWorkspaceId}/products`),
+          fetch(`/api/workspaces/${currentWorkspaceId}/users`),
+        ]);
+
+        const storesList = await storesRes.json();
+        const productsList = await prodsRes.json();
+        const usersList = await usersRes.json();
+
+        document.getElementById('badgeStoreCount').innerText = storesList.length;
+        document.getElementById('badgeProductCount').innerText = productsList.length;
+        document.getElementById('badgeStaffCount').innerText = usersList.length;
+
+        // Render Stores Table
+        const stBody = document.getElementById('adminTableStoresBody');
+        const ovBody = document.getElementById('overviewStoresTableBody');
+        stBody.innerHTML = '';
+        ovBody.innerHTML = '';
+
+        storesList.forEach(st => {
+          const quota = Number(st.dailyTargetDefault).toLocaleString();
+          const inspectBtn = `<button class="btn-fsc-option" onclick="inspectStore360('${st.id}')" style="padding:4px 10px;font-size:11px;background:#EBF4FF;color:#0071E3;border:none;"><span class="ms-icon sm" style="font-size:14px;">visibility</span> 360° Dossier</button>`;
+
+          stBody.innerHTML += `
+            <tr>
+              <td>
+                <b style="color:#1D1D1F;font-weight:600;">${st.name}</b>
+                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${st.storeCode}</div>
+              </td>
+              <td style="color:#1D1D1F;font-weight:500;">${st.chain || 'Retailer'}</td>
+              <td>${st.city || ''}, <span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">${st.country}</span></td>
+              <td style="font-family:'JetBrains Mono';font-size:12px;">${st.currency}</td>
+              <td style="font-weight:600;color:#1D1D1F;">${st.currency} ${quota}</td>
+              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
+              <td>${inspectBtn}</td>
+            </tr>
+          `;
+
+          ovBody.innerHTML += `
+            <tr style="cursor:pointer;" onclick="inspectStore360('${st.id}')">
+              <td><b style="color:#1D1D1F;">${st.name}</b> <div style="font-size:10.5px;color:#86868B;">${st.storeCode}</div></td>
+              <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;">${st.chain || 'Chain'}</span></td>
+              <td><b>${st.country}</b></td>
+              <td>${st.currency} ${quota}</td>
+              <td style="font-weight:600;color:#1D1D1F;">${st.currency} ${(st.dailyTargetDefault * 0.7).toLocaleString()}</td>
+              <td><span style="color:#0071E3;font-weight:700;">70%</span></td>
+              <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 6px;border-radius:4px;font-size:11px;">92% Vera</span></td>
+              <td>${inspectBtn}</td>
+            </tr>
+          `;
+        });
+
+        // Render Products Table
+        const prBody = document.getElementById('adminTableProductsBody');
+        prBody.innerHTML = '';
+        productsList.forEach(p => {
+          const checked = p.isFocusPromo ? 'checked' : '';
+          prBody.innerHTML += `
+            <tr>
+              <td>
+                <b style="color:#1D1D1F;font-weight:600;">${p.name}</b>
+                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${p.skuCode}</div>
+              </td>
+              <td><span style="background:#F2F2F7;padding:3px 8px;border-radius:6px;font-size:11.5px;color:#1D1D1F;">${p.category}</span></td>
+              <td style="font-weight:600;color:#1D1D1F;">${p.currency} ${Number(p.unitPrice).toLocaleString()}</td>
+              <td style="color:#1B5E20;font-weight:600;">+${p.currency} ${p.commissionPerUnit || 0}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <label class="apple-switch">
+                    <input type="checkbox" ${checked} onchange="toggleFocusPromo('${p.id}', ${!!p.isFocusPromo})">
+                    <span class="apple-slider"></span>
+                  </label>
+                  <span style="font-size:11.5px;color:${p.isFocusPromo ? '#1B5E20' : '#86868B'};font-weight:600;">
+                    ${p.isFocusPromo ? 'Pinned to Chat' : 'Catalog Only'}
+                  </span>
+                </div>
+              </td>
+              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">In Stock</span></td>
+            </tr>
+          `;
+        });
+
+        // Render Staff Table
+        const uBody = document.getElementById('adminTableUsersBody');
+        uBody.innerHTML = '';
+        usersList.forEach(u => {
+          const roleBadge = u.role === 'supervisor' ? 'background:#E8DEF8;color:#4A4458;' : 'background:#EBF4FF;color:#0071E3;';
+          uBody.innerHTML += `
+            <tr>
+              <td>
+                <b style="color:#1D1D1F;font-weight:600;">${u.name}</b>
+                <div style="font-size:11px;color:#86868B;">${u.email}</div>
+              </td>
+              <td><span style="${roleBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize;">${u.role}</span></td>
+              <td style="color:#1D1D1F;font-weight:500;">${u.storeName || 'Multi-Store Overseer'}</td>
+              <td><span style="background:#F2F2F7;padding:2px 7px;border-radius:4px;font-size:11.5px;font-family:'JetBrains Mono';">${u.preferredLanguage}</span></td>
+              <td style="font-size:11.5px;color:#86868B;">${u.timezone}</td>
+              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading stores and products:', err);
+      }
+    }
+
+    async function loadAgentsData() {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/agents`);
+        const agents = await res.json();
+        document.getElementById('badgeAgentCount').innerText = agents.length;
+
+        const container = document.getElementById('agentCardsContainer');
+        container.innerHTML = '';
+
+        const colorMap = {
+          'Pax Copilot': '#0071E3',
+          'Vera Auditor': '#34C759',
+          'Nexus Sentinel': '#5856D6',
+        };
+
+        agents.forEach(ag => {
+          const bg = colorMap[ag.name] || '#1D1D1F';
+          const skillsHtml = (ag.skills || []).map(s => `
+            <span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+              <span class="ms-icon sm" style="font-size:12px;color:${bg};">verified</span>
+              ${s.name}
+            </span>
+          `).join('');
+
+          container.innerHTML += `
+            <div class="agent-card">
+              <div class="agent-card-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="agent-avatar-box" style="background:${bg};">
+                    <span class="ms-icon">${ag.avatar || 'smart_toy'}</span>
+                  </div>
+                  <div>
+                    <b style="font-size:14.5px;color:#1D1D1F;">${ag.name}</b>
+                    <div style="font-size:11.5px;color:#86868B;">${ag.role}</div>
+                  </div>
+                </div>
+                <span class="agent-model-pill" style="background:#EBF4FF;color:#0071E3;">${ag.model}</span>
+              </div>
+              
+              <div style="font-size:12px;color:#48484A;line-height:1.45;">${ag.systemPrompt || 'Autonomous operations agent'}</div>
+              
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#86868B;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">Configured Skills (${ag.skillsCount})</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  ${skillsHtml || '<span style="color:#86868B;font-size:11px;">No skills attached yet</span>'}
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;margin-top:auto;">
+                <span style="font-size:11px;color:#86868B;"><b>${ag.activeTasksCount}</b> active field tasks</span>
+                <button class="btn-fsc-option" onclick="openSkillStudioModal('${ag.id}', '${ag.name}')" style="padding:4px 10px;font-size:11.5px;background:#F2F2F7;border:none;">
+                  <span class="ms-icon sm" style="font-size:14px;">tune</span> Configure Skills
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading agents:', err);
+      }
+    }
+
+    async function loadTasksData() {
+      try {
+        const [tasksRes, contactsRes] = await Promise.all([
+          fetch(`/api/admin/${currentWorkspaceId}/tasks`),
+          fetch(`/api/admin/${currentWorkspaceId}/contacts`),
+        ]);
+
+        const tasks = await tasksRes.json();
+        const contacts = await contactsRes.json();
+
+        document.getElementById('badgeTaskCount').innerText = tasks.length;
+
+        // Render Tasks
+        const tContainer = document.getElementById('tasksListContainer');
+        tContainer.innerHTML = '';
+        tasks.forEach(t => {
+          tContainer.innerHTML += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:12px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:#EBF4FF;color:#0071E3;display:flex;align-items:center;justify-content:center;">
+                  <span class="ms-icon">${t.agentAvatar || 'checklist'}</span>
+                </div>
+                <div>
+                  <b style="font-size:13.5px;color:#1D1D1F;">${t.title}</b>
+                  <div style="font-size:11px;color:#86868B;">
+                    Agent: <b>${t.agentName}</b> · Skill: <b>${t.skillName}</b> · Cron: <span style="font-family:'JetBrains Mono';">${t.scheduleCron}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:11.5px;background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 8px;border-radius:6px;">
+                  ${t.complianceRate}% Compliant
+                </span>
+                <button class="btn-fsc-option" onclick="dispatchTask('${t.id}')" style="background:#1D1D1F;color:#FFFFFF;padding:5px 12px;font-size:11.5px;border:none;">
+                  <span class="ms-icon sm" style="font-size:14px;color:#FFD60A;">bolt</span> Run / Dispatch Now
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        // Render Contacts
+        const cBody = document.getElementById('fieldContactsTableBody');
+        cBody.innerHTML = '';
+        contacts.forEach(c => {
+          const statusColors = {
+            compliant: 'background:#E8F8EE;color:#1B5E20;',
+            submitted: 'background:#EBF4FF;color:#0071E3;',
+            reminded: 'background:#FFF8E1;color:#F57F17;',
+            escalated: 'background:#FFF0F0;color:#D32F2F;',
+          };
+          const badge = statusColors[c.status] || 'background:#F2F2F7;color:#86868B;';
+
+          cBody.innerHTML += `
+            <tr>
+              <td><b style="color:#1D1D1F;">${c.userName}</b></td>
+              <td>${c.storeName}</td>
+              <td style="font-size:12px;">${c.taskTitle}</td>
+              <td><span style="${badge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize;">${c.status}</span></td>
+              <td style="font-weight:600;color:#1D1D1F;">${c.complianceScore ? c.complianceScore + '%' : '—'}</td>
+              <td>${c.escalated ? '<span style="color:#D32F2F;font-weight:600;font-size:11px;">⚠️ Escalated to Lead</span>' : '<span style="color:#86868B;font-size:11px;">Normal</span>'}</td>
+              <td style="font-size:11px;color:#86868B;">${new Date(c.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading tasks:', err);
+      }
+    }
+
+    async function dispatchTask(taskId) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/tasks/${taskId}/dispatch`, { method: 'POST' });
+        const data = await res.json();
+        showToastNotification(data.message || 'Task dispatched to field force!');
+        await loadTasksData();
+        await loadAnalyticsSummary();
+      } catch (err) {
+        alert('Failed to dispatch task');
+      }
+    }
+
+    async function dispatchAllTasks() {
+      try {
+        const tasksRes = await fetch(`/api/admin/${currentWorkspaceId}/tasks`);
+        const tasks = await tasksRes.json();
+        for (const t of tasks) {
+          await fetch(`/api/admin/${currentWorkspaceId}/tasks/${t.id}/dispatch`, { method: 'POST' });
+        }
+        showToastNotification(`Dispatched ${tasks.length} autonomous tasks to all store promoters!`);
+        await loadTasksData();
+        await loadAnalyticsSummary();
+      } catch (err) {
+        alert('Failed to dispatch tasks');
+      }
+    }
+
+    async function inspectStore360(storeId) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/stores/${storeId}/360`);
+        const data = await res.json();
+        const st = data.store;
+
+        document.getElementById('d360StoreName').innerText = st.name;
+        document.getElementById('d360StoreMeta').innerText = `${st.storeCode} · ${st.chain} · ${st.city || ''}, ${st.country}`;
+        document.getElementById('d360ActualSales').innerText = `${st.currency} ${Number(data.totalSales).toLocaleString()}`;
+        document.getElementById('d360QuotaSales').innerText = `${st.currency} ${Number(data.quota).toLocaleString()}`;
+        document.getElementById('d360PacingPct').innerText = `${data.pacingPct}%`;
+        document.getElementById('d360ProgressBar').style.width = `${data.pacingPct}%`;
+
+        // Render On-Duty Staff
+        const staffEl = document.getElementById('d360StaffList');
+        staffEl.innerHTML = '';
+        (data.assignedUsers || []).forEach(u => {
+          staffEl.innerHTML += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:10px;">
+              <div>
+                <b style="color:#1D1D1F;font-size:13px;">${u.name}</b>
+                <div style="font-size:11px;color:#86868B;">${u.email} · Native: ${u.preferredLanguage}</div>
+              </div>
+              <span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;">Shift Active</span>
+            </div>
+          `;
+        });
+
+        // Render Tx List
+        const txEl = document.getElementById('d360TxList');
+        txEl.innerHTML = '';
+        (data.recentTransactions || []).forEach(t => {
+          txEl.innerHTML += `
+            <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
+              <span>${t.quantity}x Units (${t.captureMode})</span>
+              <b style="color:#1D1D1F;">${t.currency} ${Number(t.totalAmount).toLocaleString()}</b>
+            </div>
+          `;
+        });
+
+        // Render Vera Audits
+        const aEl = document.getElementById('d360AuditList');
+        aEl.innerHTML = '';
+        (data.audits || []).forEach(a => {
+          aEl.innerHTML += `
+            <div style="padding:10px 12px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:10px;font-size:12px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <b style="color:#1D1D1F;">Compliance Score: ${a.complianceScore}%</b>
+                <span style="color:#86868B;">Share of Shelf: ${a.shareOfShelfPct}%</span>
+              </div>
+              <div style="color:#48484A;">Verdict: "${a.geminiVerdict}"</div>
+            </div>
+          `;
+        });
+
+        document.getElementById('drawerStore360').classList.add('active');
+      } catch (err) {
+        alert('Failed to load store 360 dossier');
+      }
+    }
+
+    function closeStore360Drawer() {
+      document.getElementById('drawerStore360').classList.remove('active');
+    }
+
+    async function loadOrgData() {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/org-chart`);
+        const data = await res.json();
+        const container = document.getElementById('orgChartTreeContainer');
+        container.innerHTML = '';
+
+        (data.nodes || []).forEach(n => {
+          const indent = n.parentId ? 'margin-left: 24px;' : '';
+          const icon = n.nodeType === 'hq' ? 'domain' : 'hub';
+          container.innerHTML += `
+            <div class="org-tree-node" style="${indent}">
+              <span class="ms-icon sm" style="color:var(--apple-blue);">${icon}</span>
+              <div style="flex:1;">
+                <b style="color:#1D1D1F;font-size:13.5px;">${n.title}</b>
+                <div style="font-size:11.5px;color:#86868B;">Lead: <b>${n.leaderName}</b> (${n.leaderRole}) · ${n.memberCount} members</div>
+              </div>
+              <span class="m3-tag-pill" style="background:#EBF4FF;color:#0071E3;font-size:11px;font-weight:600;text-transform:uppercase;">${n.nodeType}</span>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading org chart:', err);
+      }
+    }
+
+    async function loadReportsData() {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/reports`);
+        const list = await res.json();
+        const container = document.getElementById('reportsListContainer');
+        container.innerHTML = '';
+
+        list.forEach(r => {
+          const findingsHtml = (r.keyFindings || []).map(f => `<li style="font-size:12px;color:#48484A;margin-bottom:3px;">${f}</li>`).join('');
+          container.innerHTML += `
+            <div class="admin-card-box">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                  <b style="font-size:15px;color:#1D1D1F;">${r.title}</b>
+                  <div style="font-size:11px;color:#86868B;">Cycle: ${r.period} · Synthesized by Gemini Multi-Agent Core</div>
+                </div>
+                <span class="m3-tag-pill" style="background:#E8F8EE;color:#1B5E20;font-weight:600;">Audited</span>
+              </div>
+              <p style="font-size:13px;color:#1D1D1F;line-height:1.5;background:#F9F9FB;padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);">
+                ${r.summary}
+              </p>
+              <div>
+                <b style="font-size:12px;color:#86868B;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:6px;">Key Strategic Findings:</b>
+                <ul style="padding-left:18px;margin:0;">
+                  ${findingsHtml}
+                </ul>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading reports:', err);
+      }
+    }
+
+    async function triggerGenerateReport() {
+      try {
+        showToastNotification('Synthesizing executive report with Gemini 2.5 Flash...');
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/reports/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        await res.json();
+        showToastNotification('✓ Executive report successfully generated and saved!');
+        await loadReportsData();
+      } catch (err) {
+        alert('Failed to generate executive report');
+      }
+    }
+
+    function openSkillStudioModal(agentId, agentName) {
+      document.getElementById('studioAgentId').value = agentId;
+      document.getElementById('modalSkillStudio').classList.add('active');
+      applySkillTemplate();
+    }
+
+    function closeSkillStudioModal() {
+      document.getElementById('modalSkillStudio').classList.remove('active');
+    }
+
+    function applySkillTemplate() {
+      const t = document.getElementById('studioSkillTemplate').value;
+      const templates = {
+        planogram_audit: { name: 'Planogram Compliance & Shelf Alignment', desc: 'Analyzes endcap and gondola photos via Gemini 2.5 Pro optical feed, checks 3-facing product alignment, and flags missing shelf tags.' },
+        stockout_alert: { name: 'Out-of-Stock (OOS) Gap Sentinel', desc: 'Scans for empty facings, cross-references sell-through velocity, and triggers replenishment alerts to area supervisors.' },
+        shift_pacing: { name: 'Morning Mission Briefing & Quota Pacing', desc: 'Sends attendance check-in reminders, briefs promoters on daily sales targets, and provides encouraging midday run-rate tips.' },
+        competitor_intel: { name: 'Competitor Promo & Price Intelligence', desc: 'Prompts promoters to log competitor bundle discounts and flash promos observed on neighboring floor displays.' },
+        sop_verification: { name: 'Mystery Shopper & SOP Verification', desc: 'Monitors brand greeting compliance, clean counter standards, and promotional booth setup.' },
+      };
+      const cur = templates[t] || templates.planogram_audit;
+      document.getElementById('studioSkillName').value = cur.name;
+      document.getElementById('studioSkillDesc').value = cur.desc;
+    }
+
+    async function saveAgentSkill() {
+      const agentId = document.getElementById('studioAgentId').value;
+      const code = document.getElementById('studioSkillTemplate').value;
+      const name = document.getElementById('studioSkillName').value;
+      const description = document.getElementById('studioSkillDesc').value;
+
+      try {
+        await fetch(`/api/admin/${currentWorkspaceId}/agents/${agentId}/skills`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, name, description }),
+        });
+        closeSkillStudioModal();
+        showToastNotification(`✓ Attached "${name}" to agent!`);
+        await loadAgentsData();
+      } catch (err) {
+        alert('Failed to save skill');
+      }
+    }
+
+    async function toggleFocusPromo(productId, currentStatus) {
+      try {
+        await fetch(`/api/admin/${currentWorkspaceId}/products/${productId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isFocusPromo: !currentStatus }),
+        });
+        await loadStoresAndProducts();
+        await loadUserState();
+      } catch (err) {
+        alert('Failed to update promo status');
+      }
+    }
+
+    // ============================================================
+    // 11. AI DEMO WORKSPACE GENERATOR (GEMINI 2.5 FLASH)
+    // ============================================================
+    function openDemoGeneratorModal() {
+      document.getElementById('modalDemoGenerator').classList.add('active');
+      resetDemoDraft();
+    }
+
+    function closeDemoGeneratorModal() {
+      document.getElementById('modalDemoGenerator').classList.remove('active');
+    }
+
+    function toggleMarketChip(el, code) {
+      if (selectedMarkets.includes(code)) {
+        if (selectedMarkets.length === 1) return; // keep at least 1
+        selectedMarkets = selectedMarkets.filter(m => m !== code);
+        el.classList.remove('selected');
+      } else {
+        selectedMarkets.push(code);
+        el.classList.add('selected');
+      }
+    }
+
+    const COUNTRY_CURRENCY_MAP = {
+      PH: 'PHP', SG: 'SGD', MY: 'MYR', TH: 'THB', ID: 'IDR', VN: 'VND', JP: 'JPY', US: 'USD'
+    };
+
+    function switchDraftTab(tab) {
+      ['stores', 'products', 'staff', 'promos'].forEach(t => {
+        const btn = document.getElementById(`draftTabBtn${capitalize(t)}`);
+        const panel = document.getElementById(`draftPanel${capitalize(t)}`);
+        if (btn) btn.classList.toggle('active', t === tab);
+        if (panel) panel.style.display = t === tab ? 'block' : 'none';
+      });
+    }
+
+    function renderDraftDetails(draft) {
+      if (!draft) return;
+      document.getElementById('draftCompanyName').innerText = draft.company?.name || 'Company Workspace';
+      document.getElementById('draftTagline').innerText = `${draft.company?.tagline || ''} · Base Currency: ${draft.company?.baseCurrency || 'PHP'}`;
+
+      const stores = draft.stores || [];
+      const products = draft.products || [];
+      const promoters = draft.promoters || [];
+      const promos = draft.promotions || [];
+      const sup = draft.supervisor || { name: 'Regional Supervisor', country: stores[0]?.country || 'PH' };
+
+      // Update badge counts
+      document.getElementById('draftCountStores').innerText = stores.length;
+      document.getElementById('draftCountProducts').innerText = products.length;
+      document.getElementById('draftCountStaff').innerText = promoters.length + 1;
+      document.getElementById('draftCountPromos').innerText = promos.length;
+
+      // 1. Render Stores
+      const stBody = document.getElementById('draftStoresTableBody');
+      stBody.innerHTML = '';
+      stores.forEach((s, idx) => {
+        const curSym = getCurrencySymbol(COUNTRY_CURRENCY_MAP[s.country] || draft.company?.baseCurrency || 'PHP');
+        stBody.innerHTML += `
+          <tr>
+            <td>
+              <b style="color:#1D1D1F;">${s.name}</b>
+              <div style="font-size:11px;color:#86868B;">${s.address || s.city}</div>
+            </td>
+            <td style="color:#1D1D1F;font-weight:500;">${s.chain}</td>
+            <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-weight:600;">${s.country}</span> ${s.city}</td>
+            <td style="font-weight:600;color:var(--apple-blue);">${curSym}${Number(s.dailyTarget).toLocaleString()}</td>
+          </tr>
+        `;
+      });
+
+      // 2. Render Products
+      const prBody = document.getElementById('draftProductsTableBody');
+      prBody.innerHTML = '';
+      products.forEach(p => {
+        const curSym = getCurrencySymbol(COUNTRY_CURRENCY_MAP[p.country] || draft.company?.baseCurrency || 'PHP');
+        prBody.innerHTML += `
+          <tr>
+            <td><b style="color:#1D1D1F;">${p.name}</b></td>
+            <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;">${p.category}</span></td>
+            <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-weight:600;">${p.country}</span></td>
+            <td style="font-weight:600;color:#1D1D1F;">${curSym}${Number(p.unitPrice).toLocaleString()}</td>
+            <td style="color:#1B5E20;font-weight:600;">+${curSym}${p.commissionPerUnit}</td>
+            <td>
+              <span style="background:${p.isFocusPromo ? '#E8F8EE' : '#F2F2F7'};color:${p.isFocusPromo ? '#1B5E20' : '#86868B'};padding:2px 6px;border-radius:4px;font-size:10.5px;font-weight:600;">
+                ${p.isFocusPromo ? 'Pinned' : 'Catalog'}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+
+      // 3. Render Staff
+      const staffBody = document.getElementById('draftStaffTableBody');
+      staffBody.innerHTML = '';
+      // Supervisor row
+      staffBody.innerHTML += `
+        <tr style="background:#FBFBFD;">
+          <td><b style="color:#1D1D1F;">${sup.name}</b></td>
+          <td><span style="background:#E8DEF8;color:#4A4458;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">Supervisor</span></td>
+          <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-weight:600;">${sup.country}</span></td>
+          <td style="color:#86868B;">All Regional Branches</td>
+        </tr>
+      `;
+      // Promoters
+      promoters.forEach(pr => {
+        const assignedStore = stores[pr.storeIndex]?.name || `Store #${pr.storeIndex + 1}`;
+        staffBody.innerHTML += `
+          <tr>
+            <td><b style="color:#1D1D1F;">${pr.name}</b></td>
+            <td><span style="background:#EBF4FF;color:#0071E3;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">Promoter</span></td>
+            <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-weight:600;">${pr.country}</span></td>
+            <td>${assignedStore}</td>
+          </tr>
+        `;
+      });
+
+      // 4. Render Promos
+      const promoBody = document.getElementById('draftPromosTableBody');
+      promoBody.innerHTML = '';
+      promos.forEach(pm => {
+        promoBody.innerHTML += `
+          <tr>
+            <td><b style="color:#1D1D1F;">${pm.title}</b></td>
+            <td style="color:#86868B;font-size:11.5px;">${pm.description}</td>
+            <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 6px;border-radius:4px;">${pm.discountPct}% OFF</span></td>
+            <td style="color:#1B5E20;font-weight:600;">+${pm.bonusCommission}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function resetDemoDraft() {
+      document.getElementById('demoFormSection').style.display = 'flex';
+      document.getElementById('demoLoadingState').style.display = 'none';
+      document.getElementById('demoDraftSection').style.display = 'none';
+      activeDraft = null;
+    }
+
+    async function generateDemoDraft() {
+      const companyName = document.getElementById('demoCompanyName').value.trim();
+      if (!companyName) return alert('Please enter a company name');
+
+      const industry = document.getElementById('demoIndustry').value;
+      const mustIncludeProducts = document.getElementById('demoMustInclude').value.trim();
+      const storeCount = parseInt(document.getElementById('demoStoreCount').value) || 3;
+      const promoterCount = parseInt(document.getElementById('demoPromoterCount').value) || 4;
+
+      document.getElementById('demoFormSection').style.display = 'none';
+      document.getElementById('demoLoadingState').style.display = 'flex';
+
+      try {
+        const res = await fetch('/api/admin/demo/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyName,
+            industry,
+            markets: selectedMarkets,
+            storeCount,
+            promoterCount,
+            mustIncludeProducts,
+          }),
+        });
+
+        const draft = await res.json();
+        activeDraft = draft;
+
+        document.getElementById('demoLoadingState').style.display = 'none';
+        document.getElementById('demoDraftSection').style.display = 'flex';
+        renderDraftDetails(activeDraft);
+        switchDraftTab('stores');
+      } catch (err) {
+        alert('Failed to generate draft: ' + err.message);
+        resetDemoDraft();
+      }
+    }
+
+    async function refineCurrentDraft() {
+      if (!activeDraft) return;
+      const input = document.getElementById('draftRefineInput');
+      const instruction = input.value.trim();
+      if (!instruction) return alert('Please enter what you want to add or correct from the generated data');
+
+      const btn = document.getElementById('btnRefineDraft');
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<span class="ms-icon sm" style="animation:spin 0.8s linear infinite;">sync</span> Refining...';
+      btn.disabled = true;
+
+      const statusBox = document.getElementById('draftRefineStatus');
+      if (statusBox) statusBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/demo/refine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ draft: activeDraft, instruction }),
+        });
+        const updated = await res.json();
+        if (updated.error) throw new Error(updated.error);
+
+        activeDraft = updated;
+        renderDraftDetails(activeDraft);
+        input.value = '';
+
+        if (statusBox) {
+          statusBox.style.display = 'flex';
+          document.getElementById('draftRefineStatusText').innerText = `Refined with Gemini: "${instruction}"`;
+        }
+      } catch (err) {
+        alert('Refinement failed: ' + err.message);
+      } finally {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    }
+
+    async function commitDemoDraft() {
+      if (!activeDraft) return;
+      const btn = document.getElementById('btnCommitDemo');
+      btn.innerText = 'Provisioning Workspace in Turso...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/admin/demo/commit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(activeDraft),
+        });
+        const result = await res.json();
+
+        closeDemoGeneratorModal();
+        currentWorkspaceId = result.workspaceId;
+        await initWorkspaces();
+        setViewMode('phone');
+      } catch (err) {
+        alert('Failed to commit demo: ' + err.message);
+      } finally {
+        btn.innerHTML = '<span class="ms-icon sm">rocket_launch</span> Deploy Workspace to Turso & Launch';
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteCurrentDemoWorkspace() {
+      if (!confirm('Are you sure you want to delete this AI demo workspace? All associated stores, products, and shifts will be purged.')) return;
+      try {
+        await fetch(`/api/admin/demo/${currentWorkspaceId}`, { method: 'DELETE' });
+        currentWorkspaceId = 'ws-japac-retail';
+        await initWorkspaces();
+        setViewMode('phone');
+      } catch (err) {
+        alert('Failed to delete demo: ' + err.message);
+      }
+    }
+
+    // ============================================================
+    // INITIALIZATION ON PAGE LOAD
+    // ============================================================
+    initWorkspaces();
   </script>
 </body>
 </html>

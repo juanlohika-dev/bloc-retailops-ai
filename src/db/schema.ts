@@ -231,3 +231,106 @@ export const apiKeys = sqliteTable('api_keys', {
   active: integer('active', { mode: 'boolean' }).default(true),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
+
+// ==========================================
+// 15. AI AGENT REGISTRY
+// ==========================================
+export const agentRegistry = sqliteTable('agent_registry', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  name: text('name').notNull(),                                 // e.g. "Pax", "Vera", "Nexus"
+  role: text('role').notNull(),                                 // "Frontline Conversational Copilot", "Computer Vision Auditor"
+  avatar: text('avatar').default('smart_toy'),
+  model: text('model').notNull().default('gemini-2.5-flash'),    // 'gemini-2.5-flash' | 'gemini-2.5-pro'
+  systemPrompt: text('system_prompt'),
+  status: text('status').notNull().default('active'),           // 'active' | 'idle' | 'busy'
+  active: integer('active', { mode: 'boolean' }).default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 16. AGENT SKILLS CATALOG & CONFIGURATION
+// ==========================================
+export const agentSkills = sqliteTable('agent_skills', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  agentId: text('agent_id').notNull().references(() => agentRegistry.id),
+  name: text('name').notNull(),                                 // "Planogram Compliance & Shelf Alignment"
+  code: text('code').notNull(),                                 // "planogram_audit", "stockout_alert", "shift_pacing"
+  description: text('description').notNull(),
+  triggerType: text('trigger_type').notNull().default('scheduled'), // 'scheduled' | 'event_driven' | 'on_demand'
+  config: text('config', { mode: 'json' }),                     // Custom tolerance, prompts, parameters
+  enabled: integer('enabled', { mode: 'boolean' }).default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 17. AUTONOMOUS FIELD TASKS (Proactive Dispatch)
+// ==========================================
+export const agentTasks = sqliteTable('agent_tasks', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  agentId: text('agent_id').notNull().references(() => agentRegistry.id),
+  skillId: text('skill_id').references(() => agentSkills.id),
+  title: text('title').notNull(),                               // "11:00 AM Shelf #4 Endcap Audit"
+  description: text('description'),
+  targetScope: text('target_scope').notNull().default('all_stores'), // 'all_stores' | 'chain' | 'promoters'
+  targetFilter: text('target_filter'),                          // e.g. "SM Supermalls"
+  scheduleCron: text('schedule_cron'),                          // e.g. "0 11 * * *"
+  followUpIntervalMins: integer('follow_up_interval_mins').default(30),
+  escalationThresholdMins: integer('escalation_threshold_mins').default(60),
+  status: text('status').notNull().default('active'),           // 'active' | 'paused' | 'completed'
+  createdBy: text('created_by'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 18. AGENT FIELD CONTACT LOGS & COMPLIANCE
+// ==========================================
+export const agentFieldContacts = sqliteTable('agent_field_contacts', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  taskId: text('task_id').notNull().references(() => agentTasks.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  storeId: text('store_id').notNull().references(() => stores.id),
+  status: text('status').notNull().default('dispatched'),       // 'dispatched' | 'reminded' | 'submitted' | 'compliant' | 'non_compliant' | 'escalated'
+  promptSent: text('prompt_sent').notNull(),
+  responseReceived: text('response_received'),
+  complianceScore: real('compliance_score'),
+  auditImageId: text('audit_image_id'),
+  escalated: integer('escalated', { mode: 'boolean' }).default(false),
+  escalatedToUserId: text('escalated_to_user_id').references(() => users.id),
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 19. EXECUTIVE REPORTS & ANOMALY DIGESTS
+// ==========================================
+export const executiveReports = sqliteTable('executive_reports', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  title: text('title').notNull(),                               // "Weekly Planogram Compliance & OSA Digest"
+  reportType: text('report_type').notNull(),                    // 'planogram_compliance' | 'stockout_risk' | 'sellout_performance'
+  period: text('period').notNull(),                             // "Week 41, 2026"
+  summary: text('summary').notNull(),                           // Executive synopsis written by Gemini
+  keyFindings: text('key_findings', { mode: 'json' }),          // Array of bullet highlights
+  metrics: text('metrics', { mode: 'json' }),                   // Numerical summary data
+  generatedByAgentId: text('generated_by_agent_id').references(() => agentRegistry.id),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 20. CORPORATE ORG CHART TOPOLOGY
+// ==========================================
+export const orgNodes = sqliteTable('org_nodes', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  parentId: text('parent_id'),
+  title: text('title').notNull(),                               // e.g. "JAPAC HQ", "Philippines Territory", "Metro Manila Operations"
+  nodeType: text('node_type').notNull().default('area'),        // 'hq' | 'region' | 'area' | 'store'
+  leaderUserId: text('leader_user_id').references(() => users.id),
+  memberCount: integer('member_count').default(0),
+  metadata: text('metadata', { mode: 'json' }),
+  displayOrder: integer('display_order').default(0),
+});
+

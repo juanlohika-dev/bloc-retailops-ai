@@ -7,14 +7,15 @@ import { PaxAgent } from '../agents/pax/index.js';
 import { VeraAgent } from '../agents/vera/index.js';
 import { NexusAgent } from '../agents/nexus/index.js';
 import { db } from '../db/client.js';
-import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions } from '../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
+import { adminRouter } from './admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
@@ -23,22 +24,36 @@ app.use(express.json({ limit: '15mb' }));
 const webDir = path.join(__dirname, '..', 'web');
 app.use(express.static(webDir));
 
+// Admin, workspaces & demo generator
+app.use('/api', adminRouter);
+
+// Resolve a user's store + workspace supervisor (shared by state & chats)
+async function resolveUserContext(userId: string) {
+  const user = (await db.select().from(users).where(eq(users.id, userId)))[0];
+  if (!user) return null;
+  const assignment = (await db.select().from(storeAssignments).where(
+    and(eq(storeAssignments.userId, user.id), eq(storeAssignments.active, true))
+  ))[0];
+  const store = assignment
+    ? (await db.select().from(stores).where(eq(stores.id, assignment.storeId)))[0]
+    : (await db.select().from(stores).where(eq(stores.workspaceId, user.workspaceId)))[0];
+  const wsUsers = await db.select().from(users).where(eq(users.workspaceId, user.workspaceId));
+  const supervisor = wsUsers.find(u => u.role === 'supervisor') || null;
+  const workspace = (await db.select().from(workspaces).where(eq(workspaces.id, user.workspaceId)))[0];
+  const storeAssigns = store ? await db.select().from(storeAssignments).where(and(eq(storeAssignments.storeId, store.id), eq(storeAssignments.active, true))) : [];
+  const peers = wsUsers.filter(u => u.id !== user.id && storeAssigns.some(a => a.userId === u.id));
+  return { user, store, supervisor, workspace, wsUsers, peers };
+}
+
 // ----------------------------------------------------
 // 1. GET USER & SHIFT STATE
 // ----------------------------------------------------
 app.get('/api/user/:userId/state', async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = (await db.select().from(users).where(eq(users.id, userId)))[0];
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    const assignment = (await db.select().from(storeAssignments).where(
-      and(eq(storeAssignments.userId, user.id), eq(storeAssignments.active, true))
-    ))[0];
-
-    const store = assignment
-      ? (await db.select().from(stores).where(eq(stores.id, assignment.storeId)))[0]
-      : (await db.select().from(stores).where(eq(stores.workspaceId, user.workspaceId)))[0];
+    const ctx = await resolveUserContext(userId);
+    if (!ctx) return res.status(404).json({ error: 'User not found' });
+    const { user, store, supervisor, workspace } = ctx;
 
     const allFocusProducts = await db.select().from(products).where(
       and(eq(products.workspaceId, user.workspaceId), eq(products.isFocusPromo, true))
@@ -62,6 +77,8 @@ app.get('/api/user/:userId/state', async (req, res) => {
     res.json({
       user,
       store,
+      supervisor,
+      workspace: workspace ? { id: workspace.id, name: workspace.name } : null,
       shift,
       focusProducts,
       currentShiftTotal,
@@ -131,9 +148,11 @@ app.post('/api/audit/shelf', async (req, res) => {
 // ----------------------------------------------------
 app.get('/api/products', async (req, res) => {
   try {
-    const { q, currency } = req.query as { q?: string; currency?: string };
-    const allProducts = await db.select().from(products);
-    let filtered = allProducts;
+    const { q, currency, ws } = req.query as { q?: string; currency?: string; ws?: string };
+    const allProducts = ws
+      ? await db.select().from(products).where(eq(products.workspaceId, ws))
+      : await db.select().from(products);
+    let filtered = allProducts.filter(p => p.active !== false);
     if (currency) {
       filtered = filtered.filter(p => p.currency === currency);
     }
@@ -189,8 +208,10 @@ const threadMessages: Record<string, Array<{ id: string; sender: string; name: s
 app.get('/api/chats/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const isSarah = userId === 'usr-sarah-sg';
-    const storeName = isSarah ? 'FairPrice VivoCity' : 'SM Megamall';
+    const ctx = await resolveUserContext(userId);
+    const storeName = ctx?.store?.name || 'Retail Branch';
+    const supervisorName = ctx?.supervisor?.name || 'Regional Supervisor';
+    const workspaceName = ctx?.workspace?.name || 'Retail Operations';
 
     const threads: ChatThread[] = [
       {
@@ -208,7 +229,7 @@ app.get('/api/chats/:userId', async (req, res) => {
       {
         id: 'chat-lester',
         type: 'direct',
-        title: 'Lester Alarcon',
+        title: supervisorName,
         subtitle: 'Regional Retail Supervisor · Online',
         avatar: '👨‍💼',
         badge: 'Supervisor',
@@ -220,24 +241,24 @@ app.get('/api/chats/:userId', async (req, res) => {
         id: 'chat-gc-store',
         type: 'group_org_chart',
         title: `# ${storeName} Floor Ops`,
-        subtitle: 'Auto-synced via Company Org Chart (6 members)',
+        subtitle: `Auto-synced via Company Org Chart (${(ctx?.peers?.length || 2) + 2} members)`,
         avatar: '🏬',
         badge: 'Org-Chart GC',
         isOrgManaged: true,
         unreadCount: 2,
-        lastMessage: 'Sarah: Cheering for the team! Let us beat yesterday’s numbers!',
+        lastMessage: 'Team: Let us beat today’s quota! Focus on the promo bundles.',
         lastTime: '09:05 AM',
       },
       {
         id: 'chat-gc-region',
         type: 'group_org_chart',
-        title: '# JAPAC Retail Operations',
-        subtitle: 'Enterprise HQ & Regional Promoters (24 members)',
+        title: `# ${workspaceName}`,
+        subtitle: `Enterprise HQ & Regional Promoters (${(ctx?.wsUsers?.length || 8) + 10} members)`,
         avatar: '🌏',
         badge: 'Org-Chart GC',
         isOrgManaged: true,
         unreadCount: 0,
-        lastMessage: 'Nexus: JAPAC Regional Morning Briefing synced.',
+        lastMessage: 'Nexus: Regional sell-through telemetry active & synced.',
         lastTime: '08:00 AM',
       },
     ];
@@ -248,8 +269,31 @@ app.get('/api/chats/:userId', async (req, res) => {
   }
 });
 
-app.get('/api/chats/:chatId/messages', (req, res) => {
+app.get('/api/pax/messages', async (req, res) => {
+  try {
+    const userId = (req.query.userId as string) || 'usr-liza-ph';
+    const dbMsgs = await db.select().from(chatMessages)
+      .where(eq(chatMessages.userId, userId))
+      .orderBy(chatMessages.timestamp);
+    res.json(dbMsgs);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/chats/:chatId/messages', async (req, res) => {
   const { chatId } = req.params;
+  const userId = (req.query.userId as string) || 'usr-liza-ph';
+  if (chatId === 'chat-pax') {
+    try {
+      const dbMsgs = await db.select().from(chatMessages)
+        .where(eq(chatMessages.userId, userId))
+        .orderBy(chatMessages.timestamp);
+      return res.json(dbMsgs);
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
   const list = threadMessages[chatId] || [];
   res.json(list);
 });
@@ -277,7 +321,8 @@ app.post('/api/chats/:chatId/messages', (req, res) => {
 // ----------------------------------------------------
 app.get('/api/supervisor/dashboard', async (req, res) => {
   try {
-    const result = await NexusAgent.getSupervisorDashboard();
+    const ws = (req.query.ws as string) || 'ws-japac-retail';
+    const result = await NexusAgent.getSupervisorDashboard(ws);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

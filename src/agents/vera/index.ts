@@ -1,6 +1,6 @@
 import { ai, MODELS } from '../../integrations/google/gemini.js';
 import { db } from '../../db/client.js';
-import { shelfAudits, shifts, users } from '../../db/schema.js';
+import { shelfAudits, shifts, users, agentFieldContacts } from '../../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 
 export interface AuditResult {
@@ -90,7 +90,26 @@ Respond ONLY with valid JSON in this exact structure:
       detectedIssues: auditData.detectedIssues,
       geminiVerdict: auditData.verdict,
       timestamp: new Date(),
-    });
+    } as any);
+
+    // Update any active or dispatched agent field contacts for this user & store
+    try {
+      const contacts = await db.select().from(agentFieldContacts).where(
+        and(eq(agentFieldContacts.userId, userId), eq(agentFieldContacts.storeId, storeId))
+      );
+      for (const c of contacts) {
+        if (c.status === 'dispatched' || c.status === 'submitted' || c.status === 'reminded') {
+          await db.update(agentFieldContacts).set({
+            status: auditData.complianceScore >= 80 ? 'compliant' : 'non_compliant',
+            complianceScore: auditData.complianceScore,
+            responseReceived: `Optical Vera Audit: ${auditData.verdict}`,
+            auditImageId: auditId,
+          } as any).where(eq(agentFieldContacts.id, c.id));
+        }
+      }
+    } catch (contactErr) {
+      console.warn('Vera agent contact update skipped:', contactErr);
+    }
 
     return auditData;
   }

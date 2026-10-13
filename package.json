@@ -7,7 +7,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts",
-    "dev": "tsx src/api/server.ts"
+    "dev": "tsx src/api/server.ts",
+    "start": "tsx src/api/server.ts"
   },
   "dependencies": {
     "@google-cloud/vertexai": "^1.12.0",

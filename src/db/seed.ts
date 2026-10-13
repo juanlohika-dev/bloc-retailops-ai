@@ -1,5 +1,5 @@
-import { db } from './client';
-import { workspaces, users, stores, storeAssignments, products, shifts, shelfAudits, blocks } from './schema';
+import { db } from './client.js';
+import { workspaces, users, stores, storeAssignments, products, shifts, shelfAudits } from './schema.js';
 
 export async function seedDatabase() {
   console.log('🌱 Seeding Project BLOC Turso Database...');
@@ -14,7 +14,7 @@ export async function seedDatabase() {
     driveFolderId: 'drive-folder-bloc-media-vault',
     sheetSyncId: 'sheets-japac-ops-sync-id',
     createdAt: new Date(),
-  }).onConflictDoNothing();
+  } as any).onConflictDoNothing();
 
   // 2. Users (Promoters & Supervisors)
   await db.insert(users).values([
@@ -51,7 +51,7 @@ export async function seedDatabase() {
       timezone: 'Asia/Manila',
       createdAt: new Date(),
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   // 3. Stores
   await db.insert(stores).values([
@@ -83,7 +83,7 @@ export async function seedDatabase() {
       dailyTargetDefault: 25000,
       currency: 'PHP',
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   // 4. Products (Focus Promo SKUs + Catalog Items)
   await db.insert(products).values([
@@ -139,7 +139,7 @@ export async function seedDatabase() {
       isFocusPromo: true,
       displayOrder: 2,
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   // 5. Store Assignments (Roster)
   await db.insert(storeAssignments).values([
@@ -159,7 +159,7 @@ export async function seedDatabase() {
       assignedTarget: 25000,
       active: true,
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   // 6. Active Shifts
   const todayDate = new Date().toISOString().split('T')[0];
@@ -186,7 +186,7 @@ export async function seedDatabase() {
       currency: 'PHP',
       status: 'active',
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   // 7. Initial Seed Shelf Audits
   await db.insert(shelfAudits).values([
@@ -214,7 +214,7 @@ export async function seedDatabase() {
       geminiVerdict: 'Compliant display; recommend placing promo wobbler on row 1.',
       timestamp: new Date(Date.now() - 3600000 * 4),
     },
-  ]).onConflictDoNothing();
+  ] as any).onConflictDoNothing();
 
   console.log('✅ Database seeded successfully with demo stores, promoters, focus SKUs, and audits!');
 }

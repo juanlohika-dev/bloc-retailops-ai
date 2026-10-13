@@ -51,7 +51,7 @@ export class PaxAgent {
         targetAmount: store.dailyTargetDefault || 15000,
         currency: store.currency,
         status: 'active',
-      });
+      } as any);
       shift = (await db.select().from(shifts).where(eq(shifts.id, shiftId)))[0];
     }
 
@@ -84,7 +84,7 @@ Keep it punchy, warm, and zero fluff.`;
       message: briefingText,
       originalLanguage: user.preferredLanguage || 'en',
       timestamp: new Date(),
-    });
+    } as any);
 
     return {
       user,
@@ -140,7 +140,7 @@ Keep it punchy, warm, and zero fluff.`;
         captureMode: 'stepper',
         syncedToErp: true,
         timestamp: new Date(),
-      });
+      } as any);
 
       recordedItems.push({
         productName: product.name,
@@ -184,7 +184,7 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       interactiveCardType: 'fast_sale_card',
       metadata: { recordedItems, currentShiftTotal, progressPct },
       timestamp: new Date(),
-    });
+    } as any);
 
     return {
       success: true,
@@ -219,7 +219,7 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       message: userMessage,
       originalLanguage: user.preferredLanguage || 'en',
       timestamp: new Date(),
-    });
+    } as any);
 
     const prompt = `You are Pax, the frontline AI operations orchestrator for Project BLOC.
 Promoter: ${user.name}
@@ -248,7 +248,7 @@ Guidelines:
       message: reply,
       originalLanguage: user.preferredLanguage || 'en',
       timestamp: new Date(),
-    });
+    } as any);
 
     return { reply };
   }

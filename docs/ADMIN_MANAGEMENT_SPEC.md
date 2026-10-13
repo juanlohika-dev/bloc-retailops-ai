@@ -1,97 +1,119 @@
-# Enterprise Admin & Operations Console Specification
+# Enterprise Admin & Operations Console Specification (v3.0)
 
-**System**: Project BLOC Management Portal  
-**Target Roles**: Company Admin, Operations Director, Field Supervisors  
+**System**: Project BLOC Management Portal & Operations Command Center  
+**Target Roles**: Company Admin, Operations Director, Area Supervisors, Field Leads  
 **Access URL**: `/admin` (or `/console/[tenant_slug]`)  
 
 ---
 
-## 1. Overview & Architecture
+## 1. Overview & Left-Hand Navigation Architecture
 
-Project BLOC operates with a **dual-interface model**:
-1. **Frontline Mobile PWA**: A focused, low-bandwidth, conversational micro-app for field promoters (Pax Copilot, 3-Second Fast-Sale Stepper, Vera Camera Shelf Audit).
-2. **Enterprise Admin Console**: A responsive web portal for Operations Managers and Brand Executives to manage **Stores, Products, Promos, Staff, and System Settings**.
+Project BLOC provides an enterprise operations console equipped with a persistent **Left-Hand Navigation Menu** and a **Dual-Horizon Architecture**:
+1. **Frontline Mobile PWA**: Low-bandwidth conversational micro-app for field promoters (Pax Copilot, 3-Second Fast-Sale Stepper, Vera Camera Shelf Audit).
+2. **Enterprise Operations Command Portal**: Desktop/tablet control center for operations directors and field supervisors with deep drill-down analytics and agent orchestration.
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│               PROJECT BLOC · OPERATIONS COMMAND CENTER                 │
-│                                                                        │
-│  [ 🏢 Workspace: Unilever PH ]   [ 👤 Lester Alarcon (Company Admin) ] │
-├────────────────────────────────────────────────────────────────────────┤
-│  NAV:                                                                  │
-│  [ 📊 Overview ]  [ 🏬 Stores ]  [ 📦 Products ]  [ 🏷️ Promos ]         │
-│  [ 👥 Staff & Routes ]  [ 📋 Shifts & Targets ]  [ ⚙️ Settings ]       │
-└────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        PROJECT BLOC · OPERATIONS COMMAND CENTER                        │
+│                                                                                        │
+│  [🏢 Unilever JAPAC ▼]                     [Search stores, SKUs...]  [👤 Lester Alarcon]│
+├──────────────────────┬─────────────────────────────────────────────────────────────────┤
+│  LEFT NAVIGATION     │  MAIN WORKSPACE VIEW AREA                                       │
+│                      │                                                                 │
+│  📊 Executive BI     │  1. Executive Overview & Gemini AI Situational Briefing        │
+│  🤖 Agent Registry   │  2. AI Agent Registry & Skill Configuration Studio              │
+│  🎯 Autonomous Tasks │  3. Autonomous Field Tasks & Compliance Engine (Reminders/Esc)  │
+│  🏬 Stores (360°)    │  4. Retail Branch Network & 360° Store Inspection Drawer        │
+│  📦 Product Catalog  │  5. Product Catalog & 1-Tap Fast-Sale Stepper Pins              │
+│  👥 Staff & Org Chart│  6. Corporate Organizational Chart & Staff Scheduling           │
+│  📑 Executive Reports│  7. AI-Generated Compliance & Sell-Through Reports              │
+│  ⚙️ Cloud Settings   │  8. Google Cloud Vault (5TB Drive) & Sheets Bidirectional Sync  │
+└──────────────────────┴─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. The 6 Core Management Modules
+## 2. The 8 Core Management Modules
 
-### Module 1: Store & Route Management (`/admin/stores`)
-Allows operations managers to manage retail branches across multiple chains:
-- **Store Code & Name**: e.g., `SM-MEGA-01` (SM Megamall Cyberzone), `FP-VIVO-02` (FairPrice VivoCity).
-- **Retail Chain**: Modern trade chain (e.g., SM Supermalls, Robinsons, FairPrice, Watsons).
-- **Geofence Coordinates**: Latitude, Longitude, and Radius (150m default) used by Pax for automated GPS clock-in verification.
-- **Daily Target Default**: Benchmark daily sales quota for the branch (e.g., ₱25,000 or SGD $1,200).
-- **Active Roster**: Displays which promoters are currently clocked into this branch.
-
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│  🏬 STORE MANAGEMENT                                 [ + Add Store ]   │
-├────────────────────────────────────────────────────────────────────────┤
-│  Code        Name               Chain       City      Target   Status  │
-│  SM-MEGA-01  SM Megamall        SM Malls    Manila    ₱25,000  Active  │
-│  FP-VIVO-01  FairPrice VivoCity FairPrice   SG        $1,200   Active  │
-│  ROB-GAL-01  Robinsons Galleria Robinsons   Manila    ₱18,000  Active  │
-└────────────────────────────────────────────────────────────────────────┘
-```
+### Module 1: Executive Overview & AI Decision Briefing (`/admin/overview`)
+- **Top-Level KPI Cards**: Regional Sell-Through (normalized to USD/SGD), Planogram Compliance %, Geofenced Attendance Ratio, Open Operational Exceptions.
+- **Gemini Autonomous Situational Briefing**: AI analyzes active shifts, stores, and audits to synthesize actionable highlights:
+  - *Identifies top and bottom performing branches*.
+  - *Flags overdue audits and non-compliant planograms*.
+  - *Suggests immediate inventory replenishment interventions*.
+- **Interactive Drill-Down**: Clicking any KPI card filters and displays the exact stores, promoters, and transactions contributing to that metric.
 
 ---
 
-### Module 2: Product Catalog & Barcode Registry (`/admin/products`)
-Maintains the SKU catalog and configures camera scanning:
-- **SKU Code & Name**: e.g., `OLED-55-B4` (55" 4K OLED TV).
-- **Barcode / QR String**: EAN-13, UPC, or QR string used by the in-chat camera barcode scanner for instant 0.5s auto-fill.
-- **Unit Price & Currency**: Local pricing (e.g., ₱45,990 PHP or SGD $1,299).
-- **Promoter Commission**: Direct incentive per unit sold (e.g., ₱150/unit) to motivate accurate reporting.
-- **"Focus Promo" Pin Toggle (`isFocusPromo`)**:
-  - When toggled **ON**, this SKU appears directly on the promoter's **1-Tap Fast-Sale Stepper card in Pax chat**!
-  - When OFF, it remains searchable via barcode scan or catalog search.
+### Module 2: AI Agent Registry & Skill Configuration Studio (`/admin/agents`)
+Empowers operations teams to view, configure, and register autonomous agents:
+- **Registered Agents**:
+  - **Pax**: Frontline Conversational Copilot (Gemini 2.5 Flash) — handles attendance check-ins, sales logging, and multilingual translation.
+  - **Vera**: Computer Vision Shelf Auditor (Gemini 2.5 Pro) — verifies planograms, computes Share of Shelf (SoS), and flags missing tags.
+  - **Nexus**: Regional Orchestrator (Gemini 2.5 Flash) — synchronizes with Google Sheets and routes supervisor alerts.
+- **Skill Authoring & Attachment**:
+  - Add or toggle skills per agent: `Planogram Compliance`, `Out-of-Stock Sentinel`, `Shift Check-in Follow-up`, `Competitor Intelligence`, `End-of-Day Reconciliation`.
+  - Configure skill parameters: reference planogram image folder, compliance tolerance threshold (e.g. 85%), target response window.
 
 ---
 
-### Module 3: Promotional Campaign Builder (`/admin/promos`)
-Configures daily focus promotions, flash sales, and product bundles:
-- **Campaign Name & Code**: e.g., `WEEKEND-BUNDLE-A`, `SUMMER-FLASH-10`.
-- **Bundle Items**: Combine multiple SKUs into a package (e.g., 1x 55" OLED + 1x Soundbar).
-- **Discount Structure**: Percentage discount, fixed amount off, or promotional package pricing.
-- **Promoter Incentive Bonus**: Extra commission credit for promoters who successfully push the promotional bundle during the campaign window.
-- **Start / End Dates**: Automated activation and deactivation.
+### Module 3: Autonomous Task Dispatch & Compliance Engine (`/admin/tasks`)
+Allows management to assign active tasks to agents that proactively contact the field force:
+- **Task Builder**:
+  - **Task Title**: e.g. *"11:00 AM Shelf #4 Endcap Audit"*, *"Post-Lunch Target Pacing Check"*.
+  - **Assigned Agent**: Vera, Pax, or Nexus.
+  - **Target Scope**: All Stores, Specific Chain (e.g. SM Supermalls), or Selected Promoters.
+  - **Cadence / Schedule**: Immediate (1-tap dispatch) or Scheduled Cron.
+  - **Follow-up SLA**: Time before agent sends gentle reminder in chat (e.g. 30 minutes).
+  - **Escalation Threshold**: Time before agent escalates to Area Supervisor (e.g. 60 minutes).
+- **Live Compliance Tracker**:
+  - Visual status of every contacted promoter: `Dispatched` ➔ `Prompt Sent` ➔ `Photo Received` ➔ `Compliant` / `Non-Compliant` / `Escalated`.
+  - Direct drill-down to review the exact photo submitted and Gemini's optical audit feedback.
 
 ---
 
-### Module 4: Staff & Promoter Administration (`/admin/users`)
-Manages field staff, roles, and communication preferences:
-- **Name, Email, Phone**: Staff identity.
-- **Role Assignment**: `promoter`, `supervisor`, `company_admin`, `super_admin`.
-- **Preferred Language**: Tagalog (`tl-PH`), Singlish/English (`en-SG`), Malay (`ms-MY`), Japanese (`ja-JP`).
-  - *Pax dynamically speaks this language to the promoter, while logging structured data in corporate English.*
-- **Supervisor Assignment**: Groups promoters under regional team leads for exception routing.
+### Module 4: Retail Store Network & 360° Store Drawer (`/admin/stores`)
+Manages retail branches across chains with deep inspection:
+- **Store Code & Chain**: `SM-MEGA-01` (SM Megamall), `FP-VIVO-01` (FairPrice VivoCity), `ROB-GAL-01` (Robinsons Galleria).
+- **Geofence Parameters**: Latitude, Longitude, and 150m radius for automated GPS clock-in verification.
+- **Store 360° Inspection Drawer**: Clicking any store opens a dedicated slide-out panel with:
+  - Today's live promoters on duty with clock-in timestamps.
+  - Actual sell-through vs daily quota with pacing thermometer.
+  - Live shelf audit gallery with bounding box overlays.
+  - Pending and completed agent tasks for this store.
 
 ---
 
-### Module 5: Roster & Store Scheduling (`/admin/shifts`)
-Maps promoters to specific store locations and dates:
-- **Weekly Schedule**: Assign Sarah to FairPrice VivoCity on Mon–Wed, and Orchard on Thu–Fri.
-- **Custom Shift Targets**: Set specialized quotas based on weekend foot traffic vs. weekday norms.
-- **Live Attendance Status**: Real-time indicator showing who has clocked in via GPS, who is late, and who is absent.
+### Module 5: Product Catalog & Fast-Sale Stepper Pins (`/admin/products`)
+Maintains SKUs and frontline sales capture speed:
+- **SKU Code, Barcode & Category**: EAN-13 barcodes mapped to consumer SKUs.
+- **Unit Pricing & Commissions**: Base price + promoter incentive (+₱250/unit) to motivate zero-latency reporting.
+- **1-Tap Focus Promo Pin (`isFocusPromo`)**:
+  - Toggling ON pins the product directly to the promoter's **1-Tap Fast-Sale Quick Stepper** in the mobile app.
+  - Unpinned items remain searchable via camera barcode scan or catalog drawer.
 
 ---
 
-### Module 6: Workspace & Tri-Pillar Settings (`/admin/settings`)
+### Module 6: Corporate Org Chart, Staff & Roster (`/admin/org-chart`)
+Visualizes and enforces the corporate command lineage:
+- **Visual Org Chart**: Tree view illustrating Country GM ➔ Area Operations ➔ Store Supervisors ➔ Field Promoters.
+- **Staff Roster**: Member profile, role (`company_admin`, `supervisor`, `promoter`), assigned branch, and preferred conversation language (Tagalog, Singlish, Malay, Japanese).
+- **Shift Scheduling**: Weekly branch assignments and customized daily targets.
+
+---
+
+### Module 7: Executive Reports & Audit Governance (`/admin/reports`)
+- **AI-Generated Executive Reports**: One-click synthesis of weekly and daily operations:
+  - *Planogram & Merchandising Compliance Report*.
+  - *On-Shelf Availability (OSA) & Stock-Out Report*.
+  - *Regional Sell-Through & Commission Payout Summary*.
+- **Audit Trails**: Immutable log recording all configuration updates, role modifications, and task dispatches.
+
+---
+
+### Module 8: Company & Cloud Settings (`/admin/settings`)
 Configures enterprise-wide cloud connections:
 - **Base Reporting Currency**: SGD, PHP, USD, MYR, JPY.
-- **Google Drive 5TB Media Vault Folder ID**: Points to the client company's dedicated Drive folder for shelf photos and video audits.
-- **Bidirectional Google Sheets ID**: The live spreadsheet URL/ID for 2-way synchronization with executive dashboards.
+- **Google Drive 5TB Media Vault**: Service account credentials and root folder ID for shelf media ingestion.
+- **Google Sheets Bidirectional Link**: Live spreadsheet ID for WSS two-way data sync.
 - **Operating Hours & SLA**: Shift cutoff times and automated End-of-Day Nexus digest dispatch times.

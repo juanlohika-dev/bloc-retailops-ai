@@ -1,0 +1,9 @@
+node_modules
+.git
+.gitignore
+*.log
+.env
+.system_generated
+*.pptx
+*.docx
+*.bak
