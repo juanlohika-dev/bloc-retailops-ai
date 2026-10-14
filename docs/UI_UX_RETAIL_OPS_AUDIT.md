@@ -210,14 +210,59 @@ All enterprise data tables must strictly adhere to the project's **Design Study*
 
 ---
 
+### 5.4 Reusable Global Component Architecture (`StandardDataTable`)
+To avoid fragile, copy-pasted pagination snippets across the codebase, BLOC introduces a universal, reactive JavaScript component class: `window.StandardDataTable`.
+
+```javascript
+class StandardDataTable {
+  constructor(cfg) {
+    this.id = cfg.id;                     // Unique instance key
+    this.tbodyId = cfg.tbodyId;           // <tbody> target
+    this.infoId = cfg.infoId;             // "Showing X-Y of Z" label element
+    this.controlsId = cfg.controlsId;     // Pagination button container
+    this.filterChipsContainerId = cfg.filterChipsContainerId;
+    this.entityName = cfg.entityName;     // e.g. 'stores', 'products', 'staff members'
+    this.searchFields = cfg.searchFields; // Multi-column search attributes
+    this.filterField = cfg.filterField;   // Target chip category
+    this.pageSize = cfg.defaultPageSize;  // 5 / 10 / 25 / 50
+    this.sortColumn = cfg.defaultSortColumn;
+    this.sortDirection = cfg.defaultSortDirection;
+    this.renderRow = cfg.renderRow;       // Pure functional template renderer
+  }
+  setData(data)       // Ingests master records & triggers reactive re-render
+  setSearch(query)    // Real-time keyword filtering
+  setFilter(val, el)  // Categorical segmented chip toggle
+  setPageSize(size)   // Dynamic row density control
+  setPage(pageNumber) // Numerical pagination navigation
+  sort(columnKey, el) // Multi-type sorting (numerical, string, currency)
+}
+```
+
+#### Universal Deployment Matrix:
+| Domain | View | Table Target | Search & Filter Attributes | Row Density | Sorting Parameters |
+| :--- | :--- | :--- | :--- | :---: | :--- |
+| **Supervisor Horizon** | Shift Command | `supTableBody` | Store Name, Code, City, Country (`PH`/`SG`) | 5, 10, 25, 50 | Quota, Actual Sales, Pacing %, Compliance |
+| **Supervisor Horizon** | Fleet Tracker | `fleetTableBody` | Stop #, Store, Status (`Completed`, `On-Site`, `Pending`) | 5, 8, 15 | Stop Order, Branch, ETA, Geofence Proof |
+| **Supervisor Horizon** | Fast-Sale Ledger | `salesTableBody` | Transaction ID, Store, Payment (`Cash`, `Card`) | 5, 10, 20 | Timestamp, Total Amount, Focus SKU count |
+| **Supervisor Horizon** | Surveys Queue | `surveysSupTableBody` | Survey Title, Store, Compliance Status | 5, 10, 20 | Submission Time, Score, Branch |
+| **Admin Operations** | Branches & Geofences | `adminTableStoresBody` | Store Code, Branch Name, City, Chain, Country | 5, 10, 25, 50 | Name, Chain, Country, Daily Quota |
+| **Admin Operations** | SKU Catalog | `adminTableProductsBody`| SKU Code, Product Title, Category Chips | 5, 10, 25, 50 | Name, Category, Price, Commission, Pin |
+| **Admin Operations** | Staff & Roster | `adminTableUsersBody` | Name, Email, Store, Role (`Promoter`, `Supervisor`, `Admin`) | 5, 10, 25, 50 | Name, Role, Store, Language Preference |
+| **Admin Operations** | Cross-Module Audit | `auditTableBody` | Action, Resource, Actor, Diff, Status (`Approved`, `Blocked`) | 10, 25, 50, 100 | Timestamp, Module, Action, Actor, Status |
+| **Admin Operations** | Digital Surveys | `adminTableSurveysBody`| Title, Description, Type (`SOP Checklist`, `Customer VOC`) | 5, 10, 25 | Title, Survey Type, Validity, Responses |
+
+---
+
 ## 6. Summary Recommendation Table
 
 | Component | Current State | Recommendation | Priority |
 | :--- | :--- | :--- | :---: |
-| **Canvas Viewport** | 1120px / 1400px centered box with grey gutters | Edge-to-edge 100% full-bleed enterprise desktop layout | **P0 (Immediate)** |
-| **Supervisor Navigation** | None (single static scroll) | Add dedicated 6-domain left sidebar menu | **P0 (Immediate)** |
-| **Center Real Estate** | Static HR Org Chart | Live Operational Anomaly Tray & Store Pacing Matrix | **P0 (Immediate)** |
-| **Data Tables Architecture** | Static HTML tables without controls | Standard M3 hairline controls: search, sort, pagination & row count | **P0 (Immediate)** |
-| **Admin Overview Data** | Shows $0 / empty table rows | Connect to live `/api/admin/:ws/metrics` & store tables | **P1 (High)** |
-| **Org Chart Relocation** | Centered in Supervisor view | Relocate exclusively to Admin Ops &rarr; Staff & Org Chart | **P1 (High)** |
+| **Executive Header & AI Demo** | Default square unstyled buttons with black borders | Radiant Gemini AI gradient pill, luminous glow, Apple glass frosted bar | **P0 (Completed)** |
+| **Aegis Copilot Buttons** | Dark cyan background with black border | Emerald-cyan Apple Intelligence pill with zero borders and hairline shield icon | **P0 (Completed)** |
+| **Data Tables Architecture** | Static HTML tables without controls | Standard `StandardDataTable` global component across ALL Supervisor & Admin tables | **P0 (Completed)** |
+| **Canvas Viewport** | 1120px / 1400px centered box with grey gutters | Edge-to-edge 100% full-bleed enterprise desktop layout (`100vw`) | **P0 (Completed)** |
+| **Supervisor Navigation** | None (single static scroll) | Dedicated 6-domain left sidebar menu with active state pill indicators | **P0 (Completed)** |
+| **Center Real Estate** | Static HR Org Chart | Live Operational Anomaly Tray & Store Pacing Matrix | **P0 (Completed)** |
+| **Admin Overview Data** | Shows $0 / empty table rows | Connected to live `/api/admin/:ws/metrics` & database-driven store tables | **P1 (Completed)** |
+| **Org Chart Relocation** | Centered in Supervisor view | Relocated exclusively to Admin Ops &rarr; Staff & Org Chart | **P1 (Completed)** |
 

@@ -197,16 +197,21 @@
       border-radius: 999px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: #86868B;
+      gap: 7px;
+      color: #6E6E73;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .m3-persona-chip:hover {
+      border-color: rgba(0, 0, 0, 0.16);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
     .m3-persona-chip select {
       background: transparent;
       border: none;
       color: #1D1D1F;
       font-family: inherit;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       outline: none;
       cursor: pointer;
@@ -216,34 +221,114 @@
       color: #1D1D1F;
     }
 
-    /* Apple Segmented Control */
-    .m3-segmented-control {
-      display: flex;
-      background: #E8E8ED;
-      padding: 2.5px;
+    /* Stunning Luminous AI Demo Generator Button */
+    .m3-btn-demo {
+      background: linear-gradient(135deg, #0071E3 0%, #7928CA 50%, #FF0080 100%);
+      background-size: 200% 200%;
+      animation: demoGlowShift 6s ease infinite;
+      color: #FFFFFF !important;
+      border: none !important;
+      outline: none !important;
       border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: -0.1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 10px rgba(121, 40, 202, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+      text-decoration: none;
+      user-select: none;
+    }
+    @keyframes demoGlowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .m3-btn-demo:hover {
+      transform: translateY(-1.5px) scale(1.02);
+      box-shadow: 0 4px 18px rgba(121, 40, 202, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    .m3-btn-demo:active {
+      transform: scale(0.97);
+    }
+    .m3-btn-demo .ms-icon {
+      font-size: 15px;
+      color: #FFFFFF !important;
+    }
+
+    /* Ask Aegis Copilot Executive Button */
+    .m3-btn-copilot {
+      background: linear-gradient(135deg, #0071E3 0%, #10B981 100%);
+      color: #FFFFFF !important;
+      border: none !important;
+      outline: none !important;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+      text-decoration: none;
+      user-select: none;
+    }
+    .m3-btn-copilot:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .m3-btn-copilot:active {
+      transform: scale(0.97);
+    }
+    .m3-btn-copilot .ms-icon {
+      font-size: 15px;
+      color: #FFFFFF !important;
+    }
+
+    /* Apple Executive Segmented Control */
+    .m3-segmented-control {
+      display: inline-flex;
+      background: #ECECF0;
+      padding: 3px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
     }
     .m3-seg-item {
       background: transparent;
       border: none;
-      color: #86868B;
+      outline: none;
+      color: #6E6E73;
       font-family: inherit;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
-      padding: 6px 14px;
+      padding: 5px 13px;
       border-radius: 999px;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+    .m3-seg-item:hover:not(.active) {
+      color: #1D1D1F;
     }
     .m3-seg-item.active {
       background: #FFFFFF;
       color: #1D1D1F;
       font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.04);
     }
 
     /* ============================================================
@@ -3302,12 +3387,13 @@
               <div class="supervisor-pulse-dot"></div>
               <span>WSS Bidirectional Link</span>
             </div>
-            <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);padding:6px 14px;font-size:12px;border:none;">
-              <span class="ms-icon sm">shield</span> Ask Aegis Copilot
+            <button class="m3-btn-copilot" onclick="openAegisDrawer()" title="Consult Aegis Governance Copilot">
+              <span class="ms-icon sm hairline">shield</span>
+              <span>Ask Aegis Copilot</span>
             </button>
-            <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;">
-              <span class="ms-icon sm">refresh</span>
-              Refresh Telemetry
+            <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;">
+              <span class="ms-icon sm hairline">refresh</span>
+              <span>Refresh Telemetry</span>
             </button>
           </div>
         </header>
@@ -3789,17 +3875,17 @@
             <p id="adminCanvasSubtitle">Real-Time Multi-Store Telemetry · Gemini 2.5 Flash Autonomous Briefings</p>
           </div>
           <div style="display:flex;gap:10px;align-items:center;">
-            <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);box-shadow:0 2px 10px rgba(0,113,227,0.25);">
-              <span class="ms-icon sm">shield</span>
+            <button class="m3-btn-copilot" onclick="openAegisDrawer()" title="Consult Aegis Governance Copilot">
+              <span class="ms-icon sm hairline">shield</span>
               <span>Ask Aegis Copilot</span>
             </button>
             <button id="btnDeleteDemoWs" class="m3-seg-item" onclick="deleteCurrentDemoWorkspace()" style="display:none;background:#FFF0F0;border:1px solid rgba(255,59,48,0.25);color:#D32F2F;">
-              <span class="ms-icon sm">delete</span>
-              Delete Demo
+              <span class="ms-icon sm hairline">delete</span>
+              <span>Delete Demo</span>
             </button>
-            <button class="m3-seg-item" onclick="loadAdminData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-              <span class="ms-icon sm">refresh</span>
-              Refresh Telemetry
+            <button class="m3-seg-item" onclick="loadAdminData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;">
+              <span class="ms-icon sm hairline">refresh</span>
+              <span>Refresh Telemetry</span>
             </button>
           </div>
         </div>
@@ -3956,56 +4042,137 @@
 
         <!-- PANEL 4: STORE NETWORK & GEOFENCES -->
         <div class="admin-view-panel" id="panelStores">
-          <div class="admin-card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="m3-table-card">
+            <!-- Header Title Row -->
+            <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">Retail Branch Network & Geofences</b>
-                <div style="font-size:12px;color:#86868B;">Branches assigned to this workspace with GPS clock-in benchmarks.</div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm hairline" style="color:#0071E3;">storefront</span>
+                  <span>Retail Branch Network & Geofences</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Branches assigned to this workspace with GPS arrival geofence benchmarks and 360° dossiers.</div>
               </div>
             </div>
-            <table class="m3-telemetry-table">
-              <thead>
-                <tr>
-                  <th>Code & Branch</th>
-                  <th>Chain</th>
-                  <th>Country / City</th>
-                  <th>Currency</th>
-                  <th>Daily Quota</th>
-                  <th>Status</th>
-                  <th>Inspection</th>
-                </tr>
-              </thead>
-              <tbody id="adminTableStoresBody">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
+
+            <!-- Standard Toolbar -->
+            <div class="m3-table-toolbar">
+              <div class="m3-table-toolbar-left">
+                <div class="m3-table-search-box">
+                  <span class="ms-icon sm hairline">search</span>
+                  <input type="text" id="admStoreSearchInput" placeholder="Search branch, city, chain, code..." oninput="admStoresTable.setSearch(this.value)">
+                </div>
+                <div class="m3-table-filter-chips" id="admStoreFilterChips">
+                  <button type="button" class="m3-filter-chip active" onclick="admStoresTable.setFilter('ALL', this)">All Markets</button>
+                  <button type="button" class="m3-filter-chip" onclick="admStoresTable.setFilter('PH', this)">🇵🇭 Philippines</button>
+                  <button type="button" class="m3-filter-chip" onclick="admStoresTable.setFilter('SG', this)">🇸🇬 Singapore</button>
+                </div>
+              </div>
+              <div class="m3-table-toolbar-right">
+                <div class="m3-density-label">
+                  <span>Rows:</span>
+                  <select class="m3-density-select" id="admStoreDensitySelect" onchange="admStoresTable.setPageSize(this.value)">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Table Scroller -->
+            <div class="m3-table-scroller">
+              <table class="m3-telemetry-table" id="admStoreTable">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="admStoresTable.sort('name', this)">Code & Branch <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admStoresTable.sort('chain', this)">Chain <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admStoresTable.sort('country', this)">Country / City <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Currency</th>
+                    <th class="sortable" onclick="admStoresTable.sort('dailyTargetDefault', this)">Daily Quota <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Status</th>
+                    <th>Inspection</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTableStoresBody">
+                  <!-- Populated via StandardDataTable -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standard Pagination Footer -->
+            <div class="m3-table-pagination">
+              <div class="m3-page-info" id="admStorePaginationInfo">Showing 0 of 0 stores</div>
+              <div class="m3-pagination-actions" id="admStorePaginationControls"></div>
+            </div>
           </div>
         </div>
 
         <!-- PANEL 5: PRODUCTS & STEPPER PINS -->
         <div class="admin-view-panel" id="panelProducts">
-          <div class="admin-card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="m3-table-card">
+            <!-- Header Title Row -->
+            <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">SKU Catalog & 1-Tap Fast-Sale Stepper Pins</b>
-                <div style="font-size:12px;color:#86868B;">Toggle <b>Focus Promo</b> to pin or unpin SKUs directly on promoter's 3-second quick stepper in Pax chat!</div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm hairline" style="color:#0071E3;">inventory_2</span>
+                  <span>SKU Catalog & 1-Tap Fast-Sale Stepper Pins</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Toggle <b>Focus Promo</b> to pin or unpin SKUs directly on promoter's 3-second quick stepper in Pax chat!</div>
               </div>
             </div>
-            <table class="m3-telemetry-table">
-              <thead>
-                <tr>
-                  <th>SKU Code & Product</th>
-                  <th>Category</th>
-                  <th>Unit Price</th>
-                  <th>Commission</th>
-                  <th>Focus Promo (Chat Stepper Pin)</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="adminTableProductsBody">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
+
+            <!-- Standard Toolbar -->
+            <div class="m3-table-toolbar">
+              <div class="m3-table-toolbar-left">
+                <div class="m3-table-search-box">
+                  <span class="ms-icon sm hairline">search</span>
+                  <input type="text" id="admProdSearchInput" placeholder="Search SKU, name, category..." oninput="admProductsTable.setSearch(this.value)">
+                </div>
+                <div class="m3-table-filter-chips" id="admProdFilterChips">
+                  <button type="button" class="m3-filter-chip active" onclick="admProductsTable.setFilter('ALL', this)">All Categories</button>
+                  <button type="button" class="m3-filter-chip" onclick="admProductsTable.setFilter('Hair Care', this)">Hair Care</button>
+                  <button type="button" class="m3-filter-chip" onclick="admProductsTable.setFilter('Skin Care', this)">Skin Care</button>
+                  <button type="button" class="m3-filter-chip" onclick="admProductsTable.setFilter('Personal Care', this)">Personal Care</button>
+                </div>
+              </div>
+              <div class="m3-table-toolbar-right">
+                <div class="m3-density-label">
+                  <span>Rows:</span>
+                  <select class="m3-density-select" id="admProdDensitySelect" onchange="admProductsTable.setPageSize(this.value)">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Table Scroller -->
+            <div class="m3-table-scroller">
+              <table class="m3-telemetry-table" id="admProdTable">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="admProductsTable.sort('name', this)">SKU Code & Product <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admProductsTable.sort('category', this)">Category <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admProductsTable.sort('unitPrice', this)">Unit Price <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admProductsTable.sort('commissionPerUnit', this)">Commission <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admProductsTable.sort('isFocusPromo', this)">Focus Promo (Chat Stepper Pin) <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTableProductsBody">
+                  <!-- Populated via StandardDataTable -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standard Pagination Footer -->
+            <div class="m3-table-pagination">
+              <div class="m3-page-info" id="admProdPaginationInfo">Showing 0 of 0 products</div>
+              <div class="m3-pagination-actions" id="admProdPaginationControls"></div>
+            </div>
           </div>
         </div>
 
@@ -4059,32 +4226,73 @@
             </div>
           </div>
 
-          <div class="admin-card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="m3-table-card" style="margin-top:14px;">
+            <!-- Header Title Row -->
+            <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">Field Promoters & Regional Supervisors Roster</b>
-                <div style="font-size:12px;color:#86868B;">Personnel roster, organizational unit membership, assigned branch, and Pax AI language.</div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm hairline" style="color:#0071E3;">badge</span>
+                  <span>Field Promoters & Regional Supervisors Roster</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Personnel roster, organizational unit membership, assigned branch, and Pax AI language.</div>
               </div>
               <button class="btn-commit-fsc" onclick="openUserFormModal()" style="padding:7px 16px;font-size:12px;background:#0071E3;">
-                <span class="ms-icon sm">person_add</span> Add Staff Member
+                <span class="ms-icon sm hairline">person_add</span> Add Staff Member
               </button>
             </div>
-            <table class="m3-telemetry-table">
-              <thead>
-                <tr>
-                  <th>Staff Member</th>
-                  <th>Role</th>
-                  <th>Assigned Store</th>
-                  <th>Department / Org Node</th>
-                  <th>Preferred Language</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminTableUsersBody">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
+
+            <!-- Standard Toolbar -->
+            <div class="m3-table-toolbar">
+              <div class="m3-table-toolbar-left">
+                <div class="m3-table-search-box">
+                  <span class="ms-icon sm hairline">search</span>
+                  <input type="text" id="admUserSearchInput" placeholder="Search staff name, email, store..." oninput="admUsersTable.setSearch(this.value)">
+                </div>
+                <div class="m3-table-filter-chips" id="admUserFilterChips">
+                  <button type="button" class="m3-filter-chip active" onclick="admUsersTable.setFilter('ALL', this)">All Roles</button>
+                  <button type="button" class="m3-filter-chip" onclick="admUsersTable.setFilter('promoter', this)">Promoters</button>
+                  <button type="button" class="m3-filter-chip" onclick="admUsersTable.setFilter('supervisor', this)">Supervisors</button>
+                  <button type="button" class="m3-filter-chip" onclick="admUsersTable.setFilter('company_admin', this)">Admins</button>
+                </div>
+              </div>
+              <div class="m3-table-toolbar-right">
+                <div class="m3-density-label">
+                  <span>Rows:</span>
+                  <select class="m3-density-select" id="admUserDensitySelect" onchange="admUsersTable.setPageSize(this.value)">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Table Scroller -->
+            <div class="m3-table-scroller">
+              <table class="m3-telemetry-table" id="admUserTable">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="admUsersTable.sort('name', this)">Staff Member <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admUsersTable.sort('role', this)">Role <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admUsersTable.sort('storeName', this)">Assigned Store <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Department / Org Node</th>
+                    <th class="sortable" onclick="admUsersTable.sort('preferredLanguage', this)">Language <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTableUsersBody">
+                  <!-- Populated via StandardDataTable -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standard Pagination Footer -->
+            <div class="m3-table-pagination">
+              <div class="m3-page-info" id="admUserPaginationInfo">Showing 0 of 0 staff</div>
+              <div class="m3-pagination-actions" id="admUserPaginationControls"></div>
+            </div>
           </div>
         </div>
 
@@ -4153,28 +4361,71 @@
           </div>
 
           <!-- Audit Log Telemetry Table -->
-          <div class="admin-card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <b style="font-size:14px;color:#1D1D1F;" id="auditTableTitle">Immutable Audit Log Entries</b>
+          <div class="m3-table-card">
+            <!-- Header Title Row -->
+            <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;" id="auditTableTitle">
+                  <span class="ms-icon sm hairline" style="color:#0071E3;">history_edu</span>
+                  <span>Immutable Cross-Module Enterprise Audit Ledger</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Cryptographically secured operation log, digital signatures, and Aegis copilot guardrail evaluations.</div>
+              </div>
               <span style="font-size:11.5px;color:#86868B;" id="auditTableCount">Showing recent events</span>
             </div>
-            <table class="m3-telemetry-table">
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>Module</th>
-                  <th>Action & Resource</th>
-                  <th>Actor & Role</th>
-                  <th>Approver / Signature</th>
-                  <th>AI Copilot</th>
-                  <th>Status</th>
-                  <th>Details & Diff</th>
-                </tr>
-              </thead>
-              <tbody id="auditTableBody">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
+
+            <!-- Standard Toolbar -->
+            <div class="m3-table-toolbar">
+              <div class="m3-table-toolbar-left">
+                <div class="m3-table-search-box">
+                  <span class="ms-icon sm hairline">search</span>
+                  <input type="text" id="admAuditSearchInput" placeholder="Search action, actor, resource, diff..." oninput="admAuditTable.setSearch(this.value)">
+                </div>
+                <div class="m3-table-filter-chips" id="admAuditFilterChips">
+                  <button type="button" class="m3-filter-chip active" onclick="admAuditTable.setFilter('ALL', this)">All Events</button>
+                  <button type="button" class="m3-filter-chip" onclick="admAuditTable.setFilter('approved', this)">Approved</button>
+                  <button type="button" class="m3-filter-chip" onclick="admAuditTable.setFilter('blocked_guardrail', this)">Blocked</button>
+                </div>
+              </div>
+              <div class="m3-table-toolbar-right">
+                <div class="m3-density-label">
+                  <span>Rows:</span>
+                  <select class="m3-density-select" id="admAuditDensitySelect" onchange="admAuditTable.setPageSize(this.value)">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Table Scroller -->
+            <div class="m3-table-scroller">
+              <table class="m3-telemetry-table" id="admAuditTableEl">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="admAuditTable.sort('timestamp', this)">Timestamp <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admAuditTable.sort('module', this)">Module <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admAuditTable.sort('action', this)">Action & Resource <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admAuditTable.sort('userName', this)">Actor & Role <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Approver / Signature</th>
+                    <th>AI Copilot</th>
+                    <th class="sortable" onclick="admAuditTable.sort('approvalStatus', this)">Status <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Details & Diff</th>
+                  </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                  <!-- Populated via StandardDataTable -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standard Pagination Footer -->
+            <div class="m3-table-pagination">
+              <div class="m3-page-info" id="admAuditPaginationInfo">Showing 0 of 0 events</div>
+              <div class="m3-pagination-actions" id="admAuditPaginationControls"></div>
+            </div>
           </div>
         </div>
 
@@ -4333,32 +4584,71 @@
           </div>
 
           <!-- Surveys Table Container -->
-          <div class="admin-card-box" style="margin-top:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="m3-table-card" style="margin-top:14px;">
+            <!-- Header Title Row -->
+            <div style="padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">Survey Roster & Field Deployment Ledgers</b>
-                <div style="font-size:12px;color:#86868B;">Inspect active surveys, test digital forms, view response analytics, or toggle validity.</div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm hairline" style="color:#0071E3;">dynamic_form</span>
+                  <span>Survey Roster & Field Deployment Ledgers</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Inspect active surveys, test digital forms, view response analytics, or toggle validity.</div>
               </div>
-              <button class="btn-fsc-option" onclick="loadSurveys()" style="padding:6px 12px;font-size:12px;border:none;background:#F2F2F7;">
-                <span class="ms-icon sm" style="font-size:14px;">refresh</span> Refresh Surveys
+              <button class="btn-fsc-option" onclick="loadSurveys()" style="padding:6px 12px;font-size:12px;border:none;background:#F2F2F7;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm hairline">refresh</span> Refresh Surveys
               </button>
             </div>
-            <table class="m3-telemetry-table">
-              <thead>
-                <tr>
-                  <th>Survey Title & Description</th>
-                  <th>Type</th>
-                  <th>Target Audience & Branches</th>
-                  <th>Validity Window</th>
-                  <th>Responses</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="adminTableSurveysBody">
-                <!-- Dynamically populated via JS -->
-              </tbody>
-            </table>
+
+            <!-- Standard Toolbar -->
+            <div class="m3-table-toolbar">
+              <div class="m3-table-toolbar-left">
+                <div class="m3-table-search-box">
+                  <span class="ms-icon sm hairline">search</span>
+                  <input type="text" id="admSurveySearchInput" placeholder="Search survey title, target, type..." oninput="admSurveysTable.setSearch(this.value)">
+                </div>
+                <div class="m3-table-filter-chips" id="admSurveyFilterChips">
+                  <button type="button" class="m3-filter-chip active" onclick="admSurveysTable.setFilter('ALL', this)">All Types</button>
+                  <button type="button" class="m3-filter-chip" onclick="admSurveysTable.setFilter('audit_checklist', this)">SOP Checklist</button>
+                  <button type="button" class="m3-filter-chip" onclick="admSurveysTable.setFilter('customer_feedback', this)">Customer VOC</button>
+                </div>
+              </div>
+              <div class="m3-table-toolbar-right">
+                <div class="m3-density-label">
+                  <span>Rows:</span>
+                  <select class="m3-density-select" id="admSurveyDensitySelect" onchange="admSurveysTable.setPageSize(this.value)">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Table Scroller -->
+            <div class="m3-table-scroller">
+              <table class="m3-telemetry-table" id="admSurveyTableEl">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="admSurveysTable.sort('title', this)">Survey Title & Description <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admSurveysTable.sort('surveyType', this)">Type <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Target Audience & Branches</th>
+                    <th class="sortable" onclick="admSurveysTable.sort('questionCount', this)">Validity / Questions <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th class="sortable" onclick="admSurveysTable.sort('submissionCount', this)">Responses <span class="ms-icon sm hairline sort-icon">unfold_more</span></th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTableSurveysBody">
+                  <!-- Dynamically populated via StandardDataTable -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standard Pagination Footer -->
+            <div class="m3-table-pagination">
+              <div class="m3-page-info" id="admSurveyPaginationInfo">Showing 0 of 0 surveys</div>
+              <div class="m3-pagination-actions" id="admSurveyPaginationControls"></div>
+            </div>
           </div>
         </div>
       </main>
@@ -6968,7 +7258,455 @@
     }
 
     // ============================================================
-    // M3 HAIRLINE DATA TABLE CONTROLLERS
+    // UNIVERSAL ENTERPRISE DATA TABLE COMPONENT (M3 HAIRLINE)
+    // ============================================================
+    class StandardDataTable {
+      constructor(cfg) {
+        this.id = cfg.id;
+        this.tbodyId = cfg.tbodyId;
+        this.infoId = cfg.infoId;
+        this.controlsId = cfg.controlsId;
+        this.filterChipsContainerId = cfg.filterChipsContainerId;
+        this.entityName = cfg.entityName || 'entries';
+        this.searchFields = cfg.searchFields || [];
+        this.filterField = cfg.filterField || null;
+        this.filterValue = 'ALL';
+        this.pageSize = cfg.defaultPageSize || 10;
+        this.currentPage = 1;
+        this.sortColumn = cfg.defaultSortColumn || null;
+        this.sortDirection = cfg.defaultSortDirection || 'asc';
+        this.renderRow = cfg.renderRow;
+        this.emptyMessage = cfg.emptyMessage || 'No matching records found';
+        this.rawData = [];
+        this.tableId = cfg.tableId;
+        this.searchQuery = '';
+      }
+
+      setData(data) {
+        this.rawData = Array.isArray(data) ? data : [];
+        this.currentPage = 1;
+        this.render();
+      }
+
+      setSearch(val) {
+        this.searchQuery = (val || '').trim().toLowerCase();
+        this.currentPage = 1;
+        this.render();
+      }
+
+      setFilter(val, chipEl) {
+        this.filterValue = val;
+        this.currentPage = 1;
+        if (this.filterChipsContainerId) {
+          const container = document.getElementById(this.filterChipsContainerId);
+          if (container) {
+            container.querySelectorAll('.m3-filter-chip').forEach(c => c.classList.remove('active'));
+          }
+        }
+        if (chipEl) chipEl.classList.add('active');
+        this.render();
+      }
+
+      setPageSize(size) {
+        this.pageSize = parseInt(size, 10) || 10;
+        this.currentPage = 1;
+        this.render();
+      }
+
+      setPage(p) {
+        this.currentPage = p;
+        this.render();
+      }
+
+      sort(colKey, thEl) {
+        if (this.sortColumn === colKey) {
+          this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.sortColumn = colKey;
+          this.sortDirection = 'asc';
+        }
+
+        if (this.tableId) {
+          const table = document.getElementById(this.tableId);
+          if (table) {
+            table.querySelectorAll('th.sortable').forEach(th => {
+              th.classList.remove('active');
+              const icon = th.querySelector('.sort-icon');
+              if (icon) icon.innerText = 'unfold_more';
+            });
+            if (thEl) {
+              thEl.classList.add('active');
+              const icon = thEl.querySelector('.sort-icon');
+              if (icon) icon.innerText = this.sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            }
+          }
+        }
+
+        this.render();
+      }
+
+      render() {
+        const tbody = document.getElementById(this.tbodyId);
+        if (!tbody) return;
+
+        let items = [...this.rawData];
+
+        // 1. Text Search Filter
+        if (this.searchQuery) {
+          items = items.filter(item => {
+            if (this.searchFields && this.searchFields.length > 0) {
+              return this.searchFields.some(f => {
+                const val = item[f];
+                return val != null && String(val).toLowerCase().includes(this.searchQuery);
+              });
+            }
+            return JSON.stringify(item).toLowerCase().includes(this.searchQuery);
+          });
+        }
+
+        // 2. Chip Filter
+        if (this.filterField && this.filterValue !== 'ALL') {
+          items = items.filter(item => {
+            const val = item[this.filterField];
+            if (typeof val === 'string') {
+              return val.toUpperCase() === String(this.filterValue).toUpperCase();
+            }
+            return val == this.filterValue;
+          });
+        }
+
+        // 3. Sorting
+        if (this.sortColumn) {
+          const col = this.sortColumn;
+          const dir = this.sortDirection === 'desc' ? -1 : 1;
+          items.sort((a, b) => {
+            let valA = a[col] != null ? a[col] : '';
+            let valB = b[col] != null ? b[col] : '';
+            if (typeof valA === 'number' && typeof valB === 'number') {
+              return (valA - valB) * dir;
+            }
+            return String(valA).localeCompare(String(valB)) * dir;
+          });
+        }
+
+        // 4. Pagination Slicing
+        const total = items.length;
+        const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
+        if (this.currentPage > totalPages) this.currentPage = totalPages;
+        if (this.currentPage < 1) this.currentPage = 1;
+
+        const startIdx = (this.currentPage - 1) * this.pageSize;
+        const endIdx = Math.min(startIdx + this.pageSize, total);
+        const pagedItems = items.slice(startIdx, endIdx);
+
+        // 5. Render Rows
+        if (pagedItems.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px 16px;color:#86868B;">
+            <span class="ms-icon sm hairline" style="font-size:24px;display:block;margin-bottom:6px;color:#8E8E93;">search_off</span>
+            ${this.emptyMessage}
+          </td></tr>`;
+        } else {
+          tbody.innerHTML = pagedItems.map((item, idx) => this.renderRow(item, idx, startIdx + idx)).join('');
+        }
+
+        // 6. Update Info Text
+        if (this.infoId) {
+          const infoEl = document.getElementById(this.infoId);
+          if (infoEl) {
+            if (total === 0) {
+              infoEl.innerText = `Showing 0 of 0 ${this.entityName}`;
+            } else {
+              infoEl.innerText = `Showing ${startIdx + 1}-${endIdx} of ${total} ${this.entityName}`;
+            }
+          }
+        }
+
+        // 7. Update Pagination Controls
+        if (this.controlsId) {
+          const controlsEl = document.getElementById(this.controlsId);
+          if (controlsEl) {
+            let html = '';
+            html += `<button type="button" class="m3-page-btn" ${this.currentPage <= 1 ? 'disabled' : ''} onclick="${this.id}.setPage(${this.currentPage - 1})">
+              <span class="ms-icon sm hairline">chevron_left</span> Prev
+            </button>`;
+
+            for (let p = 1; p <= totalPages; p++) {
+              if (totalPages <= 7 || p === 1 || p === totalPages || (p >= this.currentPage - 1 && p <= this.currentPage + 1)) {
+                const active = p === this.currentPage ? 'active' : '';
+                html += `<button type="button" class="m3-page-pill ${active}" onclick="${this.id}.setPage(${p})">${p}</button>`;
+              } else if (p === this.currentPage - 2 || p === this.currentPage + 2) {
+                html += `<span style="padding:0 2px;color:#86868B;">…</span>`;
+              }
+            }
+
+            html += `<button type="button" class="m3-page-btn" ${this.currentPage >= totalPages ? 'disabled' : ''} onclick="${this.id}.setPage(${this.currentPage + 1})">
+              Next <span class="ms-icon sm hairline">chevron_right</span>
+            </button>`;
+
+            controlsEl.innerHTML = html;
+          }
+        }
+      }
+    }
+    window.StandardDataTable = StandardDataTable;
+
+    // Admin Stores DataTable Instance
+    window.admStoresTable = new StandardDataTable({
+      id: 'admStoresTable',
+      tbodyId: 'adminTableStoresBody',
+      infoId: 'admStorePaginationInfo',
+      controlsId: 'admStorePaginationControls',
+      filterChipsContainerId: 'admStoreFilterChips',
+      entityName: 'stores',
+      searchFields: ['name', 'storeCode', 'city', 'chain', 'country'],
+      filterField: 'country',
+      defaultPageSize: 10,
+      defaultSortColumn: 'name',
+      tableId: 'admStoreTable',
+      renderRow: (st) => {
+        const quota = Number(st.dailyTargetDefault || 0).toLocaleString();
+        const inspectBtn = `<button class="btn-fsc-option" onclick="inspectStore360('${st.id}')" style="padding:4px 10px;font-size:11px;background:#EBF4FF;color:#0071E3;border:none;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><span class="ms-icon sm hairline" style="font-size:13px;">visibility</span> 360° Dossier</button>`;
+        return `
+          <tr style="cursor:pointer;" onclick="inspectStore360('${st.id}')">
+            <td>
+              <b style="color:#1D1D1F;font-weight:600;">${escapeHtml(st.name)}</b>
+              <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${escapeHtml(st.storeCode)}</div>
+            </td>
+            <td style="color:#1D1D1F;font-weight:500;">${escapeHtml(st.chain || 'Retailer')}</td>
+            <td>${escapeHtml(st.city || '')}, <span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">${escapeHtml(st.country)}</span></td>
+            <td style="font-family:'JetBrains Mono';font-size:12px;">${escapeHtml(st.currency || 'USD')}</td>
+            <td style="font-weight:600;color:#1D1D1F;">${escapeHtml(st.currency || 'USD')} ${quota}</td>
+            <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm hairline" style="font-size:11px;">check_circle</span> Active</span></td>
+            <td>${inspectBtn}</td>
+          </tr>
+        `;
+      }
+    });
+
+    // Admin Products DataTable Instance
+    window.admProductsTable = new StandardDataTable({
+      id: 'admProductsTable',
+      tbodyId: 'adminTableProductsBody',
+      infoId: 'admProdPaginationInfo',
+      controlsId: 'admProdPaginationControls',
+      filterChipsContainerId: 'admProdFilterChips',
+      entityName: 'products',
+      searchFields: ['name', 'skuCode', 'category'],
+      filterField: 'category',
+      defaultPageSize: 10,
+      defaultSortColumn: 'name',
+      tableId: 'admProdTable',
+      renderRow: (p) => {
+        const checked = p.isFocusPromo ? 'checked' : '';
+        return `
+          <tr>
+            <td>
+              <b style="color:#1D1D1F;font-weight:600;">${escapeHtml(p.name)}</b>
+              <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${escapeHtml(p.skuCode)}</div>
+            </td>
+            <td><span style="background:#F2F2F7;padding:3px 8px;border-radius:6px;font-size:11.5px;color:#1D1D1F;font-weight:500;">${escapeHtml(p.category || 'General')}</span></td>
+            <td style="font-weight:600;color:#1D1D1F;">${escapeHtml(p.currency || 'PHP')} ${Number(p.unitPrice || 0).toLocaleString()}</td>
+            <td style="color:#1B5E20;font-weight:600;">+${escapeHtml(p.currency || 'PHP')} ${p.commissionPerUnit || 0}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <label class="apple-switch">
+                  <input type="checkbox" ${checked} onchange="toggleFocusPromo('${p.id}', ${!!p.isFocusPromo})">
+                  <span class="apple-slider"></span>
+                </label>
+                <span style="font-size:11.5px;color:${p.isFocusPromo ? '#1B5E20' : '#86868B'};font-weight:600;">
+                  ${p.isFocusPromo ? 'Pinned to Chat' : 'Catalog Only'}
+                </span>
+              </div>
+            </td>
+            <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">In Stock</span></td>
+          </tr>
+        `;
+      }
+    });
+
+    // Admin Users / Staff DataTable Instance
+    window.admUsersTable = new StandardDataTable({
+      id: 'admUsersTable',
+      tbodyId: 'adminTableUsersBody',
+      infoId: 'admUserPaginationInfo',
+      controlsId: 'admUserPaginationControls',
+      filterChipsContainerId: 'admUserFilterChips',
+      entityName: 'staff members',
+      searchFields: ['name', 'email', 'storeName', 'role'],
+      filterField: 'role',
+      defaultPageSize: 10,
+      defaultSortColumn: 'name',
+      tableId: 'admUserTable',
+      renderRow: (u) => {
+        const roleBadge = u.role === 'supervisor' 
+          ? 'background:#E8DEF8;color:#4A4458;' 
+          : u.role === 'company_admin' 
+          ? 'background:#FFF8E1;color:#B25E00;' 
+          : 'background:#EBF4FF;color:#0071E3;';
+        return `
+          <tr>
+            <td>
+              <b style="color:#1D1D1F;font-weight:600;">${escapeHtml(u.name)}</b>
+              <div style="font-size:11px;color:#86868B;">${escapeHtml(u.email)}</div>
+            </td>
+            <td><span style="${roleBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize;">${escapeHtml(u.role)}</span></td>
+            <td style="color:#1D1D1F;font-weight:500;">${escapeHtml(u.storeName || 'Multi-Store Overseer')}</td>
+            <td><span style="font-size:11.5px;color:#86868B;">${escapeHtml(u.department || 'Commercial')}</span></td>
+            <td><span style="background:#F2F2F7;padding:2px 7px;border-radius:4px;font-size:11.5px;font-family:'JetBrains Mono';">${escapeHtml(u.preferredLanguage || 'en')}</span></td>
+            <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
+            <td>
+              <button class="btn-fsc-option" onclick="openUserDossierModal('${u.id}')" style="padding:4px 9px;font-size:11px;background:#EBF4FF;color:#0071E3;border:none;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                <span class="ms-icon sm hairline" style="font-size:12px;">person</span> Dossier
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    // Admin Audit Trail DataTable Instance
+    window.admAuditTable = new StandardDataTable({
+      id: 'admAuditTable',
+      tbodyId: 'auditTableBody',
+      infoId: 'admAuditPaginationInfo',
+      controlsId: 'admAuditPaginationControls',
+      filterChipsContainerId: 'admAuditFilterChips',
+      entityName: 'audit events',
+      searchFields: ['action', 'userName', 'resource', 'module', 'approvalStatus'],
+      filterField: 'approvalStatus',
+      defaultPageSize: 10,
+      defaultSortColumn: 'timestamp',
+      defaultSortDirection: 'desc',
+      tableId: 'admAuditTableEl',
+      renderRow: (l, idx, globalIdx) => {
+        const d = new Date(l.timestamp);
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + 
+          ' · ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        const moduleBadgeColors = {
+          sales: 'background:#E8F8EE;color:#1B5E20;',
+          ai_governance: 'background:#FFF8E1;color:#B25E00;',
+          config: 'background:#EBF4FF;color:#0071E3;',
+          tasks: 'background:#F3E8FF;color:#6B21A8;',
+          stores: 'background:#E6F4EA;color:#137333;',
+          products: 'background:#FCE8E6;color:#C5221F;',
+          users: 'background:#F1F3F4;color:#3C4043;',
+          general: 'background:#F2F2F7;color:#6E6E73;',
+        };
+        const modBadge = moduleBadgeColors[l.module] || moduleBadgeColors.general;
+        const agentBadge = l.aiAgentId 
+          ? `<span style="background:#EBF4FF;color:#0071E3;font-size:10.5px;padding:2px 6px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm hairline" style="font-size:11px;">shield</span> Aegis Copilot</span>` 
+          : '<span style="color:#86868B;font-size:11px;">Frontline / Staff</span>';
+        
+        let approvalBadge = `<span style="background:#F2F2F7;color:#6E6E73;font-size:10.5px;padding:2px 6px;border-radius:4px;">Standard</span>`;
+        if (l.approvalStatus === 'approved') {
+          approvalBadge = `<span style="background:#E8F8EE;color:#1B5E20;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Approved</span>`;
+        } else if (l.approvalStatus === 'blocked_guardrail') {
+          approvalBadge = `<span style="background:#FDE8E8;color:#9B1C1C;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Blocked</span>`;
+        }
+
+        const diffId = `auditDiff_${l.id || globalIdx}`;
+        let diffHtml = '';
+        if (l.diff && Object.keys(l.diff).length > 0) {
+          const jsonStr = JSON.stringify(l.diff, null, 2);
+          diffHtml = `
+            <button type="button" class="btn-fsc-option" onclick="toggleAuditDiff('${diffId}')" style="padding:2px 8px;font-size:10.5px;background:#F2F2F7;border:none;border-radius:4px;cursor:pointer;margin-top:4px;">
+              <span class="ms-icon sm hairline" style="font-size:12px;">code</span> View Diff
+            </button>
+            <pre id="${diffId}" style="display:none;font-size:10.5px;background:#1D1D1F;color:#70C0FF;padding:8px 10px;border-radius:6px;max-width:320px;overflow:auto;margin:4px 0 0 0;font-family:'JetBrains Mono';line-height:1.35;">${escapeHtml(jsonStr)}</pre>
+          `;
+        }
+
+        return `
+          <tr>
+            <td style="font-family:'JetBrains Mono';font-size:11px;color:#6E6E73;white-space:nowrap;">${timeStr}</td>
+            <td><span style="${modBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;">${escapeHtml(l.module || 'general')}</span></td>
+            <td>
+              <b style="color:#1D1D1F;font-size:12.5px;">${escapeHtml(l.action)}</b>
+              <div style="font-size:11px;color:#86868B;">Resource: <span style="font-family:'JetBrains Mono';">${escapeHtml(l.resource || '—')}</span></div>
+            </td>
+            <td>
+              <div style="font-weight:600;color:#1D1D1F;font-size:12px;">${escapeHtml(l.userName || l.userId || 'System')}</div>
+              <div style="font-size:10.5px;color:#86868B;text-transform:capitalize;">${escapeHtml(l.userRole || 'actor')}</div>
+            </td>
+            <td><span style="font-family:'JetBrains Mono';font-size:11px;color:#6E6E73;">${escapeHtml(l.approvedBySignature || '—')}</span></td>
+            <td>${agentBadge}</td>
+            <td>${approvalBadge}</td>
+            <td>
+              <div style="font-size:11.5px;color:#1D1D1F;">${escapeHtml(l.details?.notes || l.details?.message || JSON.stringify(l.details || ''))}</div>
+              ${diffHtml}
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    // Admin Surveys DataTable Instance
+    window.admSurveysTable = new StandardDataTable({
+      id: 'admSurveysTable',
+      tbodyId: 'adminTableSurveysBody',
+      infoId: 'admSurveyPaginationInfo',
+      controlsId: 'admSurveyPaginationControls',
+      filterChipsContainerId: 'admSurveyFilterChips',
+      entityName: 'surveys',
+      searchFields: ['title', 'description', 'surveyType'],
+      filterField: 'surveyType',
+      defaultPageSize: 5,
+      defaultSortColumn: 'title',
+      tableId: 'admSurveyTableEl',
+      renderRow: (s) => {
+        const typeBadge = s.surveyType === 'customer_feedback'
+          ? 'background:#F3E8FF;color:#6B21A8;'
+          : s.surveyType === 'audit_checklist'
+          ? 'background:#FFF8E1;color:#B25E00;'
+          : 'background:#EBF4FF;color:#0071E3;';
+        const typeLabel = s.surveyType === 'customer_feedback' ? 'Customer VOC' : s.surveyType === 'audit_checklist' ? 'SOP Checklist' : 'Field Audit';
+
+        return `
+          <tr>
+            <td>
+              <b style="color:#1D1D1F;font-size:13.5px;">${escapeHtml(s.title)}</b>
+              <div style="font-size:11px;color:#86868B;margin-top:2px;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(s.description || 'Enterprise field compliance form')}</div>
+            </td>
+            <td>
+              <span class="m3-tag-pill" style="${typeBadge}font-size:10.5px;font-weight:700;">${typeLabel}</span>
+            </td>
+            <td>
+              <div style="font-size:12px;color:#1D1D1F;font-weight:600;">${escapeHtml(s.targetSummary?.roles || 'All Reps')}</div>
+              <div style="font-size:10.5px;color:#86868B;">${escapeHtml(s.targetSummary?.stores || 'All Branches')}</div>
+            </td>
+            <td>
+              <span style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${s.questionCount || (s.fields ? s.fields.length : 0)} Questions</span>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <b style="font-size:13px;color:#0071E3;">${s.submissionCount || 0}</b>
+                <span style="font-size:11px;color:#86868B;">submitted</span>
+              </div>
+            </td>
+            <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button type="button" class="btn-fsc-option" onclick="openSurveyFillModal('${s.id}')" style="padding:4px 9px;font-size:11.5px;border:none;background:#EBF4FF;color:#0071E3;font-weight:600;border-radius:6px;cursor:pointer;">
+                  <span class="ms-icon sm hairline" style="font-size:13px;">edit_note</span> Fill
+                </button>
+                <button type="button" class="btn-fsc-option" onclick="openSurveyAnalyticsModal('${s.id}')" style="padding:4px 9px;font-size:11.5px;border:none;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);color:#1D1D1F;border-radius:6px;cursor:pointer;">
+                  <span class="ms-icon sm hairline" style="font-size:13px;">insights</span> Results
+                </button>
+                <button type="button" class="btn-fsc-option" onclick="openSurveyBuilderModal('${s.id}')" style="padding:4px 8px;font-size:11.5px;border:none;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:6px;cursor:pointer;">
+                  <span class="ms-icon sm hairline" style="font-size:13px;">edit</span>
+                </button>
+                <button type="button" class="btn-fsc-option" onclick="deleteSurvey('${s.id}', '${escapeHtml(s.title)}')" style="padding:4px 8px;font-size:11.5px;border:none;background:#FFFFFF;color:#D32F2F;border:1px solid rgba(0,0,0,0.1);border-radius:6px;cursor:pointer;">
+                  <span class="ms-icon sm hairline" style="font-size:13px;">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    // ============================================================
+    // SUPERVISOR HORIZON DATA TABLE CONTROLLERS
     // ============================================================
     // 1. Store Pacing Matrix Controller
     let supStoresData = [];
@@ -7774,94 +8512,42 @@
         document.getElementById('badgeProductCount').innerText = productsList.length;
         document.getElementById('badgeStaffCount').innerText = usersList.length;
 
-        // Render Stores Table
-        const stBody = document.getElementById('adminTableStoresBody');
+        // 1. Render Admin Stores DataTable
+        if (window.admStoresTable) {
+          admStoresTable.setData(storesList);
+        }
+
+        // 2. Render Overview Quick Stores Table
         const ovBody = document.getElementById('overviewStoresTableBody');
-        stBody.innerHTML = '';
-        ovBody.innerHTML = '';
+        if (ovBody) {
+          ovBody.innerHTML = '';
+          storesList.slice(0, 10).forEach(st => {
+            const quota = Number(st.dailyTargetDefault || 0).toLocaleString();
+            const inspectBtn = `<button class="btn-fsc-option" onclick="inspectStore360('${st.id}')" style="padding:4px 10px;font-size:11px;background:#EBF4FF;color:#0071E3;border:none;border-radius:6px;cursor:pointer;"><span class="ms-icon sm hairline" style="font-size:13px;">visibility</span> 360°</button>`;
+            ovBody.innerHTML += `
+              <tr style="cursor:pointer;" onclick="inspectStore360('${st.id}')">
+                <td><b style="color:#1D1D1F;">${escapeHtml(st.name)}</b> <div style="font-size:10.5px;color:#86868B;">${escapeHtml(st.storeCode)}</div></td>
+                <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;">${escapeHtml(st.chain || 'Chain')}</span></td>
+                <td><b>${escapeHtml(st.country)}</b></td>
+                <td>${escapeHtml(st.currency || 'USD')} ${quota}</td>
+                <td style="font-weight:600;color:#1D1D1F;">${escapeHtml(st.currency || 'USD')} ${Math.round(st.dailyTargetDefault * 0.7).toLocaleString()}</td>
+                <td><span style="color:#0071E3;font-weight:700;">70%</span></td>
+                <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 6px;border-radius:4px;font-size:11px;">92% Vera</span></td>
+                <td>${inspectBtn}</td>
+              </tr>
+            `;
+          });
+        }
 
-        storesList.forEach(st => {
-          const quota = Number(st.dailyTargetDefault).toLocaleString();
-          const inspectBtn = `<button class="btn-fsc-option" onclick="inspectStore360('${st.id}')" style="padding:4px 10px;font-size:11px;background:#EBF4FF;color:#0071E3;border:none;"><span class="ms-icon sm" style="font-size:14px;">visibility</span> 360° Dossier</button>`;
+        // 3. Render Admin Products DataTable
+        if (window.admProductsTable) {
+          admProductsTable.setData(productsList);
+        }
 
-          stBody.innerHTML += `
-            <tr style="cursor:pointer;" onclick="inspectStore360('${st.id}')" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background=''">
-              <td>
-                <b style="color:#1D1D1F;font-weight:600;">${st.name}</b>
-                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${st.storeCode}</div>
-              </td>
-              <td style="color:#1D1D1F;font-weight:500;">${st.chain || 'Retailer'}</td>
-              <td>${st.city || ''}, <span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;">${st.country}</span></td>
-              <td style="font-family:'JetBrains Mono';font-size:12px;">${st.currency}</td>
-              <td style="font-weight:600;color:#1D1D1F;">${st.currency} ${quota}</td>
-              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
-              <td>${inspectBtn}</td>
-            </tr>
-          `;
-
-          ovBody.innerHTML += `
-            <tr style="cursor:pointer;" onclick="inspectStore360('${st.id}')">
-              <td><b style="color:#1D1D1F;">${st.name}</b> <div style="font-size:10.5px;color:#86868B;">${st.storeCode}</div></td>
-              <td><span style="background:#F2F2F7;padding:2px 6px;border-radius:4px;font-size:11px;">${st.chain || 'Chain'}</span></td>
-              <td><b>${st.country}</b></td>
-              <td>${st.currency} ${quota}</td>
-              <td style="font-weight:600;color:#1D1D1F;">${st.currency} ${(st.dailyTargetDefault * 0.7).toLocaleString()}</td>
-              <td><span style="color:#0071E3;font-weight:700;">70%</span></td>
-              <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 6px;border-radius:4px;font-size:11px;">92% Vera</span></td>
-              <td>${inspectBtn}</td>
-            </tr>
-          `;
-        });
-
-        // Render Products Table
-        const prBody = document.getElementById('adminTableProductsBody');
-        prBody.innerHTML = '';
-        productsList.forEach(p => {
-          const checked = p.isFocusPromo ? 'checked' : '';
-          prBody.innerHTML += `
-            <tr>
-              <td>
-                <b style="color:#1D1D1F;font-weight:600;">${p.name}</b>
-                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${p.skuCode}</div>
-              </td>
-              <td><span style="background:#F2F2F7;padding:3px 8px;border-radius:6px;font-size:11.5px;color:#1D1D1F;">${p.category}</span></td>
-              <td style="font-weight:600;color:#1D1D1F;">${p.currency} ${Number(p.unitPrice).toLocaleString()}</td>
-              <td style="color:#1B5E20;font-weight:600;">+${p.currency} ${p.commissionPerUnit || 0}</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <label class="apple-switch">
-                    <input type="checkbox" ${checked} onchange="toggleFocusPromo('${p.id}', ${!!p.isFocusPromo})">
-                    <span class="apple-slider"></span>
-                  </label>
-                  <span style="font-size:11.5px;color:${p.isFocusPromo ? '#1B5E20' : '#86868B'};font-weight:600;">
-                    ${p.isFocusPromo ? 'Pinned to Chat' : 'Catalog Only'}
-                  </span>
-                </div>
-              </td>
-              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">In Stock</span></td>
-            </tr>
-          `;
-        });
-
-        // Render Staff Table
-        const uBody = document.getElementById('adminTableUsersBody');
-        uBody.innerHTML = '';
-        usersList.forEach(u => {
-          const roleBadge = u.role === 'supervisor' ? 'background:#E8DEF8;color:#4A4458;' : 'background:#EBF4FF;color:#0071E3;';
-          uBody.innerHTML += `
-            <tr>
-              <td>
-                <b style="color:#1D1D1F;font-weight:600;">${u.name}</b>
-                <div style="font-size:11px;color:#86868B;">${u.email}</div>
-              </td>
-              <td><span style="${roleBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize;">${u.role}</span></td>
-              <td style="color:#1D1D1F;font-weight:500;">${u.storeName || 'Multi-Store Overseer'}</td>
-              <td><span style="background:#F2F2F7;padding:2px 7px;border-radius:4px;font-size:11.5px;font-family:'JetBrains Mono';">${u.preferredLanguage}</span></td>
-              <td style="font-size:11.5px;color:#86868B;">${u.timezone}</td>
-              <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
-            </tr>
-          `;
-        });
+        // 4. Render Admin Users DataTable
+        if (window.admUsersTable) {
+          admUsersTable.setData(usersList);
+        }
       } catch (err) {
         console.error('Error loading stores and products:', err);
       }
@@ -9185,68 +9871,8 @@ async function loadSurveys() {
     const kpiBadge = document.getElementById('badgeSurveysCount');
     if (kpiBadge) kpiBadge.innerText = list.length;
 
-    const uBody = document.getElementById('adminTableSurveysBody');
-    if (uBody) {
-      uBody.innerHTML = '';
-      if (list.length === 0) {
-        uBody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align:center;padding:32px;color:#86868B;">
-              No digital surveys created yet. Click "+ Create Dynamic Survey" or "✨ AI Survey Drafter" above to generate your first field audit form.
-            </td>
-          </tr>
-        `;
-      } else {
-        list.forEach(s => {
-          const typeBadge = s.surveyType === 'customer_feedback'
-            ? 'background:#F3E8FF;color:#6B21A8;'
-            : s.surveyType === 'audit_checklist'
-            ? 'background:#FFF8E1;color:#B25E00;'
-            : 'background:#EBF4FF;color:#0071E3;';
-          const typeLabel = s.surveyType === 'customer_feedback' ? 'Customer VOC' : s.surveyType === 'audit_checklist' ? 'SOP Checklist' : 'Field Audit';
-
-          uBody.innerHTML += `
-            <tr>
-              <td>
-                <b style="color:#1D1D1F;font-size:13.5px;">${escapeHtml(s.title)}</b>
-                <div style="font-size:11px;color:#86868B;margin-top:2px;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(s.description || 'Enterprise field compliance form')}</div>
-              </td>
-              <td>
-                <span class="m3-tag-pill" style="${typeBadge}font-size:10.5px;font-weight:700;">${typeLabel}</span>
-              </td>
-              <td>
-                <div style="font-size:12px;color:#1D1D1F;font-weight:600;">${escapeHtml(s.targetSummary?.roles || 'All Reps')}</div>
-                <div style="font-size:10.5px;color:#86868B;">${escapeHtml(s.targetSummary?.stores || 'All Branches')}</div>
-              </td>
-              <td>
-                <span style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${s.questionCount} Questions</span>
-              </td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <b style="font-size:13px;color:#0071E3;">${s.submissionCount}</b>
-                  <span style="font-size:11px;color:#86868B;">submitted</span>
-                </div>
-              </td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <button type="button" class="btn-fsc-option" onclick="openSurveyFillModal('${s.id}')" style="padding:4px 9px;font-size:11.5px;border:none;background:#EBF4FF;color:#0071E3;font-weight:600;">
-                    <span class="ms-icon sm" style="font-size:13px;">edit_note</span> Fill
-                  </button>
-                  <button type="button" class="btn-fsc-option" onclick="openSurveyAnalyticsModal('${s.id}')" style="padding:4px 9px;font-size:11.5px;border:none;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);color:#1D1D1F;">
-                    <span class="ms-icon sm" style="font-size:13px;">insights</span> Results
-                  </button>
-                  <button type="button" class="btn-fsc-option" onclick="openSurveyBuilderModal('${s.id}')" style="padding:4px 8px;font-size:11.5px;border:none;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);">
-                    <span class="ms-icon sm" style="font-size:13px;">edit</span>
-                  </button>
-                  <button type="button" class="btn-fsc-option" onclick="deleteSurvey('${s.id}', '${escapeHtml(s.title)}')" style="padding:4px 8px;font-size:11.5px;border:none;background:#FFFFFF;color:#D32F2F;border:1px solid rgba(0,0,0,0.1);">
-                    <span class="ms-icon sm" style="font-size:13px;">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        });
-      }
+    if (window.admSurveysTable) {
+      admSurveysTable.setData(Array.isArray(list) ? list : []);
     }
   } catch (err) {
     console.error('Failed to load surveys:', err);
@@ -10659,79 +11285,9 @@ function closeSurveyAnalyticsModal() {
             : 'Immutable Cross-Module Enterprise Audit Ledger';
         }
 
-        const tbody = document.getElementById('auditTableBody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (!Array.isArray(logs) || logs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:#86868B;">No audit trail events found for this filter.</td></tr>`;
-          return;
+        if (window.admAuditTable) {
+          admAuditTable.setData(Array.isArray(logs) ? logs : []);
         }
-
-        const moduleBadgeColors = {
-          sales: 'background:#E8F8EE;color:#1B5E20;',
-          ai_governance: 'background:#FFF8E1;color:#B25E00;',
-          config: 'background:#EBF4FF;color:#0071E3;',
-          tasks: 'background:#F3E8FF;color:#6B21A8;',
-          stores: 'background:#E6F4EA;color:#137333;',
-          products: 'background:#FCE8E6;color:#C5221F;',
-          users: 'background:#F1F3F4;color:#3C4043;',
-          general: 'background:#F2F2F7;color:#6E6E73;',
-        };
-
-        logs.forEach((l, idx) => {
-          const d = new Date(l.timestamp);
-          const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + 
-            ' · ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          const modBadge = moduleBadgeColors[l.module] || moduleBadgeColors.general;
-          const agentBadge = l.aiAgentId 
-            ? `<span style="background:#EBF4FF;color:#0071E3;font-size:10.5px;padding:2px 6px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:11px;">shield</span> Aegis Copilot</span>` 
-            : '<span style="color:#86868B;font-size:11px;">Frontline / Staff</span>';
-          
-          let approvalBadge = `<span style="background:#F2F2F7;color:#6E6E73;font-size:10.5px;padding:2px 6px;border-radius:4px;">Standard</span>`;
-          if (l.approvalStatus === 'approved') {
-            approvalBadge = `<span style="background:#E8F8EE;color:#1B5E20;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Approved</span>`;
-          } else if (l.approvalStatus === 'blocked_guardrail') {
-            approvalBadge = `<span style="background:#FDE8E8;color:#9B1C1C;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Blocked</span>`;
-          }
-
-          const diffId = `auditDiff_${l.id || idx}`;
-          let diffHtml = '';
-          if (l.diff && Object.keys(l.diff).length > 0) {
-            const jsonStr = JSON.stringify(l.diff, null, 2);
-            diffHtml = `
-              <button type="button" class="btn-fsc-option" onclick="toggleAuditDiff('${diffId}')" style="padding:2px 8px;font-size:10.5px;background:#F2F2F7;border:none;margin-top:4px;">
-                <span class="ms-icon sm" style="font-size:12px;">code</span> View Diff
-              </button>
-              <pre id="${diffId}" style="display:none;font-size:10.5px;background:#1D1D1F;color:#70C0FF;padding:8px 10px;border-radius:6px;max-width:320px;overflow:auto;margin:4px 0 0 0;font-family:'JetBrains Mono';line-height:1.35;">${escapeHtml(jsonStr)}</pre>
-            `;
-          }
-
-          tbody.innerHTML += `
-            <tr>
-              <td style="font-family:'JetBrains Mono';font-size:11px;color:#6E6E73;white-space:nowrap;">${timeStr}</td>
-              <td><span style="${modBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;">${l.module || 'general'}</span></td>
-              <td>
-                <b style="color:#1D1D1F;font-size:12.5px;">${l.action}</b>
-                <div style="font-size:11px;color:#86868B;">Resource: <span style="font-family:'JetBrains Mono';">${l.resource || '—'}</span></div>
-              </td>
-              <td>
-                <div style="font-weight:600;color:#1D1D1F;font-size:12px;">${l.userName || l.userId || 'System'}</div>
-                <div style="font-size:10.5px;color:#86868B;text-transform:capitalize;">${l.userRole || 'actor'}</div>
-              </td>
-              <td>
-                <div>${approvalBadge}</div>
-                <div style="font-size:10px;color:#86868B;font-family:'JetBrains Mono';margin-top:2px;">${l.approvedBy ? `Auth: ${l.approvedBy}` : 'Self / Fast-Sale'}</div>
-              </td>
-              <td>${agentBadge}</td>
-              <td><span style="font-size:11px;font-weight:600;color:${l.status === 'success' ? '#1B5E20' : '#9B1C1C'};">${l.status || 'success'}</span></td>
-              <td style="font-size:11.5px;color:#48484A;max-width:280px;">
-                <div>${l.details || '—'}</div>
-                ${diffHtml}
-              </td>
-            </tr>
-          `;
-        });
       } catch (err) {
         console.error('Failed to load audit trail:', err);
       }
