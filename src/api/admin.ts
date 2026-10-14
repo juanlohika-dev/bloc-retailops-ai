@@ -2095,6 +2095,9 @@ adminRouter.post('/admin/:ws/aegis/chat', wrap(async (req, res) => {
   const transactions = await db.select().from(salesTransactions);
   const tasks = await db.select().from(agentTasks).where(eq(agentTasks.workspaceId, ws));
   const recentLogs = await db.select().from(auditLogs).where(eq(auditLogs.workspaceId, ws)).orderBy(desc(auditLogs.timestamp)).limit(10);
+  await ensureSeedSurveys(ws);
+  const surveyList = await db.select().from(surveys).where(eq(surveys.workspaceId, ws));
+  const surveySubmissionsList = await db.select().from(surveySubmissions).where(eq(surveySubmissions.workspaceId, ws));
 
   const totalSales = transactions.reduce((s, t) => s + (t.totalAmount || 0), 0);
   const paymentBreakdown: Record<string, number> = {};
@@ -2111,7 +2114,7 @@ adminRouter.post('/admin/:ws/aegis/chat', wrap(async (req, res) => {
   try {
     if (process.env.GEMINI_API_KEY) {
       const classPrompt = `You are the safety and intent router for Aegis, an enterprise retail operations copilot.
-Determine whether the user is attempting to CHANGE OR CONFIGURE SYSTEM SETTINGS (e.g. enable/disable/add payment methods, payment terms, update store quotas, modify AI guardrails, alter product pricing, adjust commission, modify org chart, OR ADD/CREATE NEW USERS/PERSONS/STAFF) or simply MAKING AN INQUIRY / ASKING A QUESTION (e.g. asking for sales telemetry, store health, payment breakdown, audit logs, advice).
+Determine whether the user is attempting to CHANGE OR CONFIGURE SYSTEM SETTINGS (e.g. enable/disable/add payment methods, payment terms, update store quotas, modify AI guardrails, alter product pricing, adjust commission, modify org chart, OR ADD/CREATE NEW USERS/PERSONS/STAFF, OR CREATE/LAUNCH/DRAFT DYNAMIC SURVEYS) or simply MAKING AN INQUIRY / ASKING A QUESTION (e.g. asking for sales telemetry, store health, payment breakdown, audit logs, advice, asking "can you create a survey?").
 
 If the user asks to add or create a user, promoter, supervisor, or staff member (e.g. "Add promoter Carlos Mendoza with email ..."), set:
 isConfigChange: true,
@@ -2120,13 +2123,20 @@ action: "create",
 targetEntity: <person full name>,
 targetValue: { email, phone, role, storeName, orgTitle }
 
+If the user asks about creating or managing surveys (e.g. "can you create a survey?", "create a survey for product pricing", "make a survey"), set:
+isConfigChange: false,
+configDomain: "surveys",
+action: "create",
+targetEntity: "surveys",
+explanation: "User requested survey creation assistance"
+
 User Message: "${message}"
 
 Output JSON only:
 {
   "isConfigChange": boolean,
-  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "org_chart" | "user_provisioning" | "user_language" | "ai_guardrails" | "product_pricing" | "none",
-  "action": "enable" | "disable" | "update" | "add" | "create" | "query",
+  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "org_chart" | "user_provisioning" | "user_language" | "ai_guardrails" | "product_pricing" | "surveys" | "none",
+  "action": "enable" | "disable" | "update" | "add" | "create" | "query" | "inquiry",
   "targetEntity": string,
   "targetValue": any,
   "explanation": string
@@ -2140,9 +2150,12 @@ Output JSON only:
     }
   } catch {}
 
-  // Heuristic / Regex Fallback for User Provisioning via Aegis
+  // Heuristic / Regex Fallback for User Provisioning & Survey Creation via Aegis
+  const lowerMsg = message.toLowerCase();
+  const isSurveyCreation = (lowerMsg.includes('create survey') || lowerMsg.includes('add survey') || lowerMsg.includes('new survey') || lowerMsg.includes('draft survey') || lowerMsg.includes('create audit') || lowerMsg.includes('make a survey') || lowerMsg.includes('can you create a survey') || lowerMsg.includes('can we create a survey'));
+  const isSurveyInquiry = (lowerMsg.includes('survey') || lowerMsg.includes('audit form') || lowerMsg.includes('checklist') || lowerMsg.includes('questionnaire') || lowerMsg.includes('voc') || lowerMsg.includes('nps'));
+
   if (!intentClassification.isConfigChange) {
-    const lowerMsg = message.toLowerCase();
     if (lowerMsg.includes('add user') || lowerMsg.includes('create user') || lowerMsg.includes('add promoter') || lowerMsg.includes('add staff') || lowerMsg.includes('add person') || lowerMsg.includes('create staff') || lowerMsg.includes('create promoter') || lowerMsg.includes('add supervisor')) {
       const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
       const phoneMatch = message.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\+?\d{10,14}/);
@@ -2178,27 +2191,46 @@ Output JSON only:
           targetValue: match[2].trim(),
         };
       }
+    } else if (isSurveyCreation) {
+      intentClassification = {
+        isConfigChange: false, // Collaborative survey workflow: supervisors & admins have survey dispatch permissions
+        configDomain: 'surveys',
+        action: 'create',
+        targetEntity: 'surveys',
+        explanation: 'User requested dynamic survey creation'
+      };
+    } else if (isSurveyInquiry) {
+      intentClassification = {
+        isConfigChange: false,
+        configDomain: 'surveys',
+        action: 'inquiry',
+        targetEntity: 'surveys',
+        explanation: 'User inquiring about dynamic surveys and field audits'
+      };
     }
   }
 
   // 5. Guardrail Check 2: Configuration Attempt by Unauthorized Role (e.g., Supervisor)
   if (intentClassification.isConfigChange && !roleRule.canConfigure) {
-    const reason = `Role "${userRole}" is restricted to read-only diagnostics and field task dispatch. System configuration changes and personnel provisioning require "company_admin" or "super_admin" authorization.`;
+    // If it's a survey action, supervisors are authorized field audit authors!
+    if (intentClassification.configDomain !== 'surveys') {
+      const reason = `Role "${userRole}" is restricted to read-only diagnostics and field task dispatch. System configuration changes and personnel provisioning require "company_admin" or "super_admin" authorization.`;
 
-    await log(ws, 'aegis.config_rejected', 'ai_governance', ws, {
-      attemptedMessage: message,
-      userRole,
-      userName,
-      userId,
-      intent: intentClassification,
-      reason,
-    }, 'ai_governance', userId, 'Aegis Guardrail Sentinel', `agent-aegis-${ws}`, 'rejected');
+      await log(ws, 'aegis.config_rejected', 'ai_governance', ws, {
+        attemptedMessage: message,
+        userRole,
+        userName,
+        userId,
+        intent: intentClassification,
+        reason,
+      }, 'ai_governance', userId, 'Aegis Guardrail Sentinel', `agent-aegis-${ws}`, 'rejected');
 
-    return res.json({
-      reply: `### ⚠️ Access Guardrail Policy Triggered\n\n**Action Blocked:** Modification of system configuration or personnel (${intentClassification.configDomain || 'System Policy'}).\n\n**Policy Notice:** As a **${userRole.toUpperCase()}**, you have full read-only diagnostic, store 360°, and task-dispatch permissions. However, modifying live payment terms, gateway rules, org topology, or provisioning staff requires **Company Admin** or **Super Admin** credentials.\n\n*This attempt has been logged into the enterprise audit trail (\`module: ai_governance\`, status: \`rejected\`).*`,
-      guardrailTriggered: true,
-      auditLogged: true,
-    });
+      return res.json({
+        reply: `### ⚠️ Access Guardrail Policy Triggered\n\n**Action Blocked:** Modification of system configuration or personnel (${intentClassification.configDomain || 'System Policy'}).\n\n**Policy Notice:** As a **${userRole.toUpperCase()}**, you have full read-only diagnostic, store 360°, and task-dispatch permissions. However, modifying live payment terms, gateway rules, org topology, or provisioning staff requires **Company Admin** or **Super Admin** credentials.\n\n*This attempt has been logged into the enterprise audit trail (\`module: ai_governance\`, status: \`rejected\`).*`,
+        guardrailTriggered: true,
+        auditLogged: true,
+      });
+    }
   }
 
   // 6. If it IS an authorized configuration change (Company Admin / Super Admin)
@@ -2422,6 +2454,8 @@ Here is the real-time operational context:
 - Payment Terms Breakdown: ${JSON.stringify(termsBreakdown)}
 - Active Stores: ${storeList.length} (${storeList.map(s => s.name).join(', ')})
 - Active Personnel: ${userList.length} staff
+- Configured Field Surveys: ${surveyList.length} surveys (${surveyList.filter(s => s.status === 'active').length} active)
+- Total Field Audit Submissions: ${surveySubmissionsList.length} submissions recorded
 - Configured Payment Channels: ${paymentConfig.paymentMethods.filter((m: any) => m.enabled).map((m: any) => m.label).join(', ')}
 - Configured Payment Terms: ${paymentConfig.paymentTerms.filter((t: any) => t.enabled).map((t: any) => t.label).join(', ')}
 - Active Tasks: ${tasks.map(t => t.title).join('; ')}
@@ -2429,7 +2463,10 @@ Here is the real-time operational context:
 
 User Query: "${message}"
 
-Provide a crisp, authoritative, executive-grade analysis and response. Include exact data points where appropriate (such as transaction volumes, payment mix, compliance, or audit trail integrity). Format with clean Markdown headers and bullet points.`;
+IMPORTANT DIRECTIVES:
+- If the user asks about creating or managing surveys, or asks "can you create a survey?", answer YES with absolute authority! Explain the 3 core survey archetypes (Internal Field Audit, Master Data Grid SKU/Store Matrix, Customer VOC/NPS), provide active survey telemetry (${surveyList.length} surveys, ${surveySubmissionsList.length} responses), and invite them to launch the Survey Studio.
+- If the user asks about stores, staff, or payment channels, give precise numbers matching the context.
+- Format with clean Markdown headers, bullet points, and high-impact executive prose.`;
 
       const aiRes = await ai.models.generateContent({
         model: MODELS.FLASH,
@@ -2438,7 +2475,76 @@ Provide a crisp, authoritative, executive-grade analysis and response. Include e
       aegisReply = aiRes.text || '';
     }
   } catch (err: any) {
-    aegisReply = `Aegis telemetry check completed. Current operational revenue is tracked at $${totalSales.toLocaleString()} across ${storeList.length} branches. Top payment channels: ${Object.entries(paymentBreakdown).map(([k, v]) => `${k.toUpperCase()}: $${v.toLocaleString()}`).join(', ') || 'Cash & Cards'}.`;
+    console.warn('Aegis Gemini generateContent failed, falling back to smart domain router:', err.message);
+  }
+
+  // Smart Domain-Aware Fallback (guarantees accurate alignment without generic revenue dump)
+  if (!aegisReply || !aegisReply.trim()) {
+    const isSurveyQuery = isSurveyCreation || isSurveyInquiry;
+    const isStoreQuery = lowerMsg.includes('store') || lowerMsg.includes('branch') || lowerMsg.includes('mall') || lowerMsg.includes('location');
+    const isStaffQuery = lowerMsg.includes('staff') || lowerMsg.includes('promoter') || lowerMsg.includes('supervisor') || lowerMsg.includes('personnel') || lowerMsg.includes('roster');
+    const isFinanceQuery = lowerMsg.includes('revenue') || lowerMsg.includes('sales') || lowerMsg.includes('payment') || lowerMsg.includes('channel') || lowerMsg.includes('quota') || lowerMsg.includes('turnover');
+
+    if (isSurveyQuery) {
+      const activeSurveys = surveyList.filter(s => s.status === 'active');
+      aegisReply = `### 📋 Dynamic Surveys & Operational Field Audits
+
+**Yes! As an enterprise retail copilot, I can autonomously draft, configure, and dispatch dynamic field surveys, checklists, and product audit matrices.**
+
+As an active **${userRole.toUpperCase()}**, you have full operational permissions to deploy:
+- **Internal Field & Planogram Audits**: Verify promotional displays, endcaps, and shelf cleanliness with optical photos.
+- **Master Data Grid Matrices**: Tabular item-by-item audits bound to your live **Products Catalog** or **Store Branches** (in-stock checks, shelf quantities, verified retail prices, planogram grades, notes).
+- **Customer VOC & NPS Touchpoints**: Capture customer delight, checkout ease, and installment feedback at checkout counters.
+
+#### 📊 Live Survey Telemetry:
+- **Configured Surveys:** **${surveyList.length}** (${activeSurveys.length} currently active)
+- **Field Submissions Audited:** **${surveySubmissionsList.length}** verified responses in audit trail
+- **Active Audits:** ${activeSurveys.slice(0, 3).map(s => `*${s.title}*`).join(', ') || 'Standard Field Audit'}
+
+You can launch the **Dynamic Survey & Form Studio** to configure your audit fields, or let Gemini synthesize a draft:
+
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+  <button onclick="openSurveyBuilderModal()" style="background:#0071E3;color:#FFF;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+    <span class="ms-icon sm">dynamic_form</span> Open Dynamic Survey Studio
+  </button>
+  <button onclick="openAiSurveyDraftModal()" style="background:#F2F8FF;color:#0071E3;border:1px solid rgba(0,113,227,0.3);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+    <span class="ms-icon sm">auto_awesome</span> Generate with Gemini
+  </button>
+</div>`;
+    } else if (isStoreQuery) {
+      aegisReply = `### 🏬 Retail Branch Network Telemetry
+Aegis real-time monitoring is active across **${storeList.length}** branches in **${workspace.name}**.
+
+- **Total Monitored Branches:** ${storeList.length}
+- **Active Store Locations:** ${storeList.map(s => `${s.name} (${s.storeCode})`).slice(0, 8).join(', ')}...
+- **Coverage:** Metro Manila & Regional Retail Flagships
+- **Live Sync:** Frontline fast-sale streams, optical shelf verification, and roving supervisor itineraries are active.`;
+    } else if (isStaffQuery) {
+      const promoters = userList.filter(u => u.role === 'promoter');
+      const supervisors = userList.filter(u => u.role === 'supervisor');
+      aegisReply = `### 👥 Enterprise Personnel & Frontline Roster
+- **Total Registered Staff:** **${userList.length}** personnel across ${workspace.name}
+- **Frontline Promoters:** ${promoters.length} deployed on retail floors
+- **Area Supervisors:** ${supervisors.length} conducting roving branch route checks
+- **Operational Compliance:** Shift clock-ins, biometric verifications, and Pax copilot dialect mirroring are active.`;
+    } else if (isFinanceQuery) {
+      aegisReply = `### 💳 Financial & Payment Channel Telemetry
+Aegis telemetry check completed. Current operational revenue is tracked at **$${totalSales.toLocaleString()}** across **${storeList.length}** branches.
+
+- **Total Sales Volume:** $${totalSales.toLocaleString()}
+- **Top Settlement Channels:** ${Object.entries(paymentBreakdown).map(([k, v]) => `${k.toUpperCase()}: $${(v as number).toLocaleString()}`).join(', ') || 'Cash & Cards'}
+- **Financing Terms:** Installment channels (Home Credit, Credit Card 0%) active across all retail counters.`;
+    } else {
+      aegisReply = `### 🛡️ Aegis Enterprise Copilot Briefing
+Aegis operational orchestration is active for **${workspace.name}**.
+
+- **Operational Revenue:** $${totalSales.toLocaleString()} across ${storeList.length} branches
+- **Active Personnel:** ${userList.length} staff (promoters & supervisors)
+- **Dynamic Field Surveys:** ${surveyList.length} configured (${surveySubmissionsList.length} field responses recorded)
+- **Primary Channels:** ${Object.entries(paymentBreakdown).slice(0, 3).map(([k, v]) => `${k.toUpperCase()}: $${(v as number).toLocaleString()}`).join(', ') || 'Cash & Cards'}
+
+You can ask me to draft field surveys, modify payment terms, audit planograms, or inspect branch performance.`;
+    }
   }
 
   // Log the AI inquiry for governance records
@@ -2656,12 +2762,77 @@ async function ensureSeedSurveys(ws: string) {
     createdAt: now,
   };
 
-  await db.insert(surveys).values([sampleSurvey1, sampleSurvey2] as any);
+  const productList = await db.select().from(products).where(eq(products.workspaceId, ws));
+
+  const sampleSurvey3 = {
+    id: `srv-${Date.now().toString(36)}-grid`,
+    workspaceId: ws,
+    title: 'Master SKU On-Shelf Availability & Pricing Audit (Table Grid)',
+    description: 'Weekly field audit evaluating core product catalog items in a tabular matrix: stock presence, shelf quantity, verified retail price, planogram grade, and field remarks.',
+    surveyType: 'internal_field',
+    status: 'active',
+    targetRoles: ['promoter', 'supervisor', 'merchandiser'],
+    targetStoreIds: storeList.map(s => s.id),
+    targetOrgNodeIds: [],
+    validFrom: now,
+    validUntil: nextMonth,
+    questions: [
+      {
+        id: 'q1_branch',
+        label: 'Select Store Branch Under Audit',
+        text: 'Select Store Branch Under Audit',
+        type: 'store_picker',
+        required: true,
+        masterDataSource: 'stores',
+      },
+      {
+        id: 'q2_master_sku_grid',
+        label: 'Master Product Inventory & Shelf Verification Matrix',
+        text: 'Master Product Inventory & Shelf Verification Matrix',
+        type: 'master_data_grid',
+        required: true,
+        entityType: 'products',
+        columns: [
+          { key: 'in_stock', label: 'In Stock', type: 'boolean' },
+          { key: 'shelf_qty', label: 'Shelf Count', type: 'number', placeholder: '0' },
+          { key: 'price_verified', label: 'Price Verified (₱)', type: 'currency', placeholder: '₱0.00' },
+          { key: 'planogram_grade', label: 'Display Grade', type: 'rating_5' },
+          { key: 'notes', label: 'Field Remarks', type: 'text', placeholder: 'Promo tag / condition...' }
+        ]
+      },
+      {
+        id: 'q3_shelf_photo',
+        label: 'Endcap Optical Shelf Photo Verification',
+        text: 'Endcap Optical Shelf Photo Verification',
+        type: 'photo_upload',
+        required: false,
+      },
+      {
+        id: 'q4_notes',
+        label: 'Field Merchandiser & Competitor Observations',
+        text: 'Field Merchandiser & Competitor Observations',
+        type: 'long_text',
+        required: false,
+      }
+    ],
+    createdByUserId: adminUser?.id || null,
+    aiAgentDispatched: true,
+    metadata: {
+      tags: ['master_data_grid', 'product_matrix', 'weekly_audit'],
+    },
+    createdAt: now,
+  };
+
+  await db.insert(surveys).values([sampleSurvey1, sampleSurvey2, sampleSurvey3] as any);
 
   // Seed initial responses for immediate analytics demonstration
   if (storeList.length > 0 && userList.length > 0) {
     const s1 = storeList[0];
     const u1 = userList.find(u => u.role === 'promoter') || userList[0];
+    const p0 = productList[0]?.id || 'prod-ultra';
+    const p1 = productList[1]?.id || 'prod-smart';
+    const p2 = productList[2]?.id || 'prod-tab';
+
     await db.insert(surveySubmissions).values([
       {
         id: `sub-${Date.now().toString(36)}-1`,
@@ -2701,6 +2872,27 @@ async function ensureSeedSurveys(ws: string) {
         },
         submittedAt: new Date(now.getTime() - 3600000),
       },
+      {
+        id: `sub-${Date.now().toString(36)}-3`,
+        surveyId: sampleSurvey3.id,
+        workspaceId: ws,
+        submittedByUserId: u1.id,
+        storeId: s1.id,
+        respondentType: 'field_staff',
+        respondentName: u1.name,
+        respondentContact: u1.email,
+        answers: {
+          q1_branch: s1.id,
+          q2_master_sku_grid: {
+            [p0]: { in_stock: true, shelf_qty: 14, price_verified: 29999, planogram_grade: 5, notes: 'Full stock on top eye-level shelf' },
+            [p1]: { in_stock: true, shelf_qty: 6, price_verified: 18999, planogram_grade: 4, notes: 'Shelf tag placed correctly, bundle active' },
+            [p2]: { in_stock: false, shelf_qty: 0, price_verified: 24999, planogram_grade: 2, notes: 'Out of stock, replenishment order pending' },
+          },
+          q3_shelf_photo: 'shelf_photo_verified.jpg',
+          q4_notes: 'Overall shelf compliance is strong. Promoter bundle tags verified against daily promo bulletin.',
+        },
+        submittedAt: new Date(now.getTime() - 1800000),
+      },
     ] as any);
   }
 }
@@ -2730,6 +2922,68 @@ adminRouter.get('/admin/:ws/surveys', wrap(async (req, res) => {
   });
 
   res.json(result);
+}));
+
+// 1.5 GET ALL SUBMISSIONS ACROSS WORKSPACE (FOR RECENT SUBMISSIONS FEED & GLOBAL AUDIT)
+adminRouter.get('/admin/:ws/surveys/submissions', wrap(async (req, res) => {
+  const ws = req.params.ws;
+  await ensureSeedSurveys(ws);
+  const submissionsList = await db.select().from(surveySubmissions).where(eq(surveySubmissions.workspaceId, ws)).orderBy(desc(surveySubmissions.submittedAt));
+  const surveyList = await db.select().from(surveys).where(eq(surveys.workspaceId, ws));
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const userList = await db.select().from(users).where(eq(users.workspaceId, ws));
+
+  const enriched = submissionsList.map(sub => {
+    const s = surveyList.find(x => x.id === sub.surveyId);
+    const store = storeList.find(x => x.id === sub.storeId);
+    const user = userList.find(x => x.id === sub.submittedByUserId);
+    return {
+      ...sub,
+      surveyTitle: s ? s.title : 'Field Survey',
+      surveyType: s ? s.surveyType : 'internal_field',
+      storeName: store ? store.name : (sub.storeId || 'Unspecified Branch'),
+      storeCode: store ? store.storeCode : '',
+      submittedByName: user ? user.name : (sub.respondentName || 'Field Staff'),
+      submittedByRole: user ? user.role : sub.respondentType,
+    };
+  });
+
+  res.json({ submissions: enriched, total: enriched.length });
+}));
+
+// 1.6 GET SINGLE SUBMISSION DETAILS WITH SURVEY SCHEMA & MASTER DATA
+adminRouter.get('/admin/:ws/surveys/submissions/:subId', wrap(async (req, res) => {
+  const { ws, subId } = req.params;
+  await ensureSeedSurveys(ws);
+  const [sub] = await db.select().from(surveySubmissions).where(and(eq(surveySubmissions.id, subId), eq(surveySubmissions.workspaceId, ws)));
+  if (!sub) return res.status(404).json({ error: 'Submission not found' });
+
+  const [survey] = await db.select().from(surveys).where(and(eq(surveys.id, sub.surveyId), eq(surveys.workspaceId, ws)));
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const userList = await db.select().from(users).where(eq(users.workspaceId, ws));
+  const productList = await db.select().from(products).where(eq(products.workspaceId, ws));
+
+  const store = storeList.find(s => s.id === sub.storeId);
+  const user = userList.find(u => u.id === sub.submittedByUserId);
+
+  res.json({
+    submission: {
+      ...sub,
+      surveyTitle: survey ? survey.title : 'Field Survey',
+      surveyType: survey ? survey.surveyType : 'internal_field',
+      storeName: store ? store.name : (sub.storeId || 'Unspecified Branch'),
+      storeCode: store ? store.storeCode : '',
+      storeAddress: store ? `${store.city || ''}, ${store.country || ''}` : '',
+      submittedByName: user ? user.name : (sub.respondentName || 'Field Staff'),
+      submittedByRole: user ? user.role : sub.respondentType,
+      submittedByEmail: user ? user.email : (sub.respondentContact || ''),
+    },
+    survey: survey || null,
+    masterData: {
+      products: productList.map(p => ({ id: p.id, name: p.name, skuCode: p.skuCode, category: p.category, unitPrice: p.unitPrice })),
+      stores: storeList.map(s => ({ id: s.id, name: s.name, code: s.storeCode, city: s.city })),
+    }
+  });
 }));
 
 // 2. GET SINGLE SURVEY DETAILS & LIVE MASTER DATA
