@@ -152,12 +152,72 @@ In Admin Ops Overview, metrics showed `$0` and empty store rows because the dash
 
 ---
 
-## 5. Summary Recommendation Table
+## 5. Standard Enterprise Data Table Design System: Row Control, Pagination, Sorting & Filtering
+
+### 5.1 The Table Usability Crisis in High-Volume Retail Telemetry
+In high-volume retail operations across 1,000+ branches and thousands of daily transactions, raw static HTML tables create severe cognitive bottlenecks:
+1. **Unbounded Vertical Bloat**: Displaying dozens of stores or lengthy roving stops in an unconstrained table forces supervisors to scroll endlessly, losing their KPI headers and operational context.
+2. **Inability to Locate Anomalies Rapidly**: Without real-time text search and status filters, a supervisor looking for a specific lagging branch (e.g. *“TriNoma”* or *“SM Megamall”*) must manually scan dozens of rows.
+3. **No Multi-Column Sorting**: Supervisors cannot sort by **Pacing %** (ascending) to instantly surface underperforming stores, or sort by **Arrival Stamp** to trace fleet delays.
+4. **Missing Pagination & Density Controls**: Enterprise users require selectable viewport density (`Rows: 5 / 10 / 25 / 50`) and crisp pagination (`Showing 1 to 10 of 48 records`).
+
+---
+
+### 5.2 Architectural Alignment: M3 Hairline Optical Precision & Apple Minimalist Heritage
+All enterprise data tables must strictly adhere to the project's **Design Study**:
+- **Google Material 3 Hairline Precision**:
+  - Optical icons configured with `font-variation-settings: 'FILL' 0, 'wght' 150, 'GRAD' -25, 'opsz' 20` (`.ms-icon.hairline`).
+  - Ultra-thin column dividers and card borders: `border: 1px solid rgba(0, 0, 0, 0.06)`.
+  - Subtle interactive hover states (`background: rgba(0, 113, 227, 0.03)`).
+- **Apple Minimalist Heritage (Dieter Rams / Jony Ive Philosophy)**:
+  - Clean inset-grouped card containers (`border-radius: 16px; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.02)`).
+  - High-readability typography hierarchy: `-apple-system, BlinkMacSystemFont, 'Google Sans Flex', sans-serif` for labels and headers; `JetBrains Mono` for tabular numerals, timestamps, and currency amounts.
+  - Subdued neutral toolbar controls (`#F2F2F7` pill inputs, subtle hairline border `rgba(0,0,0,0.08)`).
+
+---
+
+### 5.3 Universal Data Table Component Anatomy
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TABLE TOOLBAR (HAIRLINE PRECISION)                                                               │
+│ [ 🔍 Filter branch, promoter, or SKU... ]  [ Country: All ▾ ]  [ Status: All ▾ ]  [ Rows: 10 ▾ ]│
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ TABLE HEADER (INTERACTIVE CLICK-TO-SORT WITH M3 HAIRLINE INDICATORS)                            │
+│ Branch Code & Store ⇅ │ Country ⇅ │ Target Quota ⇅ │ Actual Sales ⇅ │ Pacing % ⇅ │ Status ⇅      │
+├───────────────────────┼───────────┼────────────────┼────────────────┼────────────┼───────────────┤
+│ FairPrice Xtra Vivo   │ SG        │ SGD 1,200      │ SGD 3,097      │ 100%       │ 🟢 Quota Met  │
+│ SM Megamall Cyberzone │ PH        │ PHP 25,000     │ PHP 17,984     │ 72%        │ 🟡 On Track   │
+│ Robinsons Galleria    │ PH        │ PHP 18,000     │ PHP 6,210      │ 35%        │ 🔴 Lagging    │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ TABLE PAGINATION FOOTER (APPLE INSET CAPSULES)                                                   │
+│ Showing 1 to 3 of 9 branches                              [ < Prev ]  [ 1 ]  ( 2 )  [ Next > ]   │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Specification of Controls:
+1. **Search & Filter Bar (`.m3-table-toolbar`)**:
+   - Real-time debounced search input filtering across all visible text columns.
+   - Quick-filter select capsules for categorical segmentation (e.g., Country: `All`, `PH`, `SG`; Verification Status: `All`, `Completed`, `Active`, `Scheduled`).
+   - Row density dropdown: `5`, `10`, `25`, `50`, `All`.
+2. **Interactive Column Headers (`.m3-table-sort-th`)**:
+   - Columns are click-sortable with 3 states: `Neutral (unfold_more)` &rarr; `Ascending (arrow_upward)` &rarr; `Descending (arrow_downward)`.
+   - Number/currency aware: numerical parsing ensures `PHP 25,000` sorts after `PHP 6,210`, rather than alphabetical sorting.
+3. **Pagination Footer (`.m3-table-pagination`)**:
+   - Range tracker: `Showing 1–10 of 48 entries`.
+   - Disabled state on `Prev` when on page 1; disabled on `Next` when on last page.
+   - Active page highlighted with Apple Blue hairline capsule (`background: #0071E3; color: #FFFFFF;`).
+
+---
+
+## 6. Summary Recommendation Table
 
 | Component | Current State | Recommendation | Priority |
 | :--- | :--- | :--- | :---: |
 | **Canvas Viewport** | 1120px / 1400px centered box with grey gutters | Edge-to-edge 100% full-bleed enterprise desktop layout | **P0 (Immediate)** |
 | **Supervisor Navigation** | None (single static scroll) | Add dedicated 6-domain left sidebar menu | **P0 (Immediate)** |
 | **Center Real Estate** | Static HR Org Chart | Live Operational Anomaly Tray & Store Pacing Matrix | **P0 (Immediate)** |
+| **Data Tables Architecture** | Static HTML tables without controls | Standard M3 hairline controls: search, sort, pagination & row count | **P0 (Immediate)** |
 | **Admin Overview Data** | Shows $0 / empty table rows | Connect to live `/api/admin/:ws/metrics` & store tables | **P1 (High)** |
 | **Org Chart Relocation** | Centered in Supervisor view | Relocate exclusively to Admin Ops &rarr; Staff & Org Chart | **P1 (High)** |
+

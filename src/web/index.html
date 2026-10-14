@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Official Google Material Symbols Outlined (Variable Font: Hairline wght 100..700, fill 0) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
 
   <style>
     /* ============================================================
@@ -37,7 +37,7 @@
     }
 
     /* M3 Material Symbols Hairline Configuration (Google Material 3 Precision) */
-    .ms-icon {
+    .ms-icon, .material-symbols-outlined {
       font-family: 'Material Symbols Outlined' !important;
       font-weight: 200 !important;
       font-style: normal;
@@ -49,7 +49,10 @@
       white-space: nowrap;
       word-wrap: normal;
       direction: ltr;
+      text-transform: none !important;
+      letter-spacing: normal !important;
       -webkit-font-feature-settings: 'liga';
+      font-feature-settings: 'liga';
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
@@ -57,17 +60,17 @@
       flex-shrink: 0;
       user-select: none;
     }
-    .ms-icon.sm {
+    .ms-icon.sm, .material-symbols-outlined.sm {
       font-size: 16px;
       font-weight: 200 !important;
       font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 16;
     }
-    .ms-icon.lg {
+    .ms-icon.lg, .material-symbols-outlined.lg {
       font-size: 24px;
       font-weight: 200 !important;
       font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
     }
-    .ms-icon.hairline {
+    .ms-icon.hairline, .material-symbols-outlined.hairline {
       font-weight: 150 !important;
       font-variation-settings: 'FILL' 0, 'wght' 150, 'GRAD' -25, 'opsz' 20;
     }
@@ -256,12 +259,16 @@
       z-index: 10;
     }
     main.workspace-canvas.canvas-fullbleed {
-      align-items: stretch;
-      justify-content: stretch;
-      padding: 0;
-      margin: 0;
-      width: 100%;
-      height: calc(100vh - 56px);
+      align-items: stretch !important;
+      justify-content: stretch !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      height: calc(100vh - 56px) !important;
+      background: #F8F9FA !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
     }
 
     /* ============================================================
@@ -1834,26 +1841,220 @@
       gap: 4px;
     }
 
+    /* ============================================================
+       M3 HAIRLINE & APPLE MINIMALIST DATA TABLE DESIGN SYSTEM
+       ============================================================ */
+    .m3-table-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .m3-table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #FAFAFC;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .m3-table-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .m3-table-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .m3-table-search-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 5px 10px;
+      width: 250px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .m3-table-search-box:focus-within {
+      border-color: #0071E3;
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+    }
+    .m3-table-search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      color: #1D1D1F;
+      width: 100%;
+      font-family: inherit;
+    }
+    .m3-table-filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .m3-filter-chip {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 550;
+      color: #6E6E73;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .m3-filter-chip:hover {
+      background: #F2F2F7;
+      color: #1D1D1F;
+    }
+    .m3-filter-chip.active {
+      background: #0071E3;
+      color: #FFFFFF;
+      border-color: #0071E3;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 113, 227, 0.25);
+    }
+    .m3-density-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: #86868B;
+      font-weight: 500;
+    }
+    .m3-density-select {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      color: #1D1D1F;
+      font-weight: 550;
+      outline: none;
+      cursor: pointer;
+    }
     .m3-telemetry-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12.5px;
       color: #1D1D1F;
     }
     .m3-telemetry-table th {
       text-align: left;
       padding: 10px 14px;
-      background: #F5F5F7;
+      background: #F8F9FA;
       color: #86868B;
-      font-weight: 600;
+      font-weight: 650;
       border-bottom: 1px solid rgba(0, 0, 0, 0.06);
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    .m3-telemetry-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .m3-telemetry-table th.sortable:hover {
+      background: #EFEFF4;
+      color: #1D1D1F;
+    }
+    .m3-telemetry-table th .sort-icon {
+      font-size: 14px;
+      margin-left: 3px;
+      vertical-align: middle;
+      color: #8E8E93;
+      transition: color 0.15s ease;
+    }
+    .m3-telemetry-table th.sortable.active .sort-icon {
+      color: #0071E3;
+      font-weight: 700;
+    }
+    .m3-telemetry-table tbody tr {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      transition: background 0.12s ease;
+    }
+    .m3-telemetry-table tbody tr:hover {
+      background: rgba(0, 113, 227, 0.025);
     }
     .m3-telemetry-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 11px 14px;
+      vertical-align: middle;
+    }
+    .m3-table-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #FAFAFC;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 12px;
+      color: #86868B;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .m3-pagination-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .m3-page-btn {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 550;
+      color: #1D1D1F;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .m3-page-btn:hover:not(:disabled) {
+      background: #F2F2F7;
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+    .m3-page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .m3-page-pill {
+      min-width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 550;
+      color: #1D1D1F;
+      border: 1px solid transparent;
+      cursor: pointer;
+      padding: 0 6px;
+      transition: all 0.15s ease;
+    }
+    .m3-page-pill:hover:not(.active) {
+      background: #F2F2F7;
+    }
+    .m3-page-pill.active {
+      background: #0071E3;
+      color: #FFFFFF;
+      font-weight: 600;
     }
 
     /* Full-Bleed Enterprise Admin Console */
@@ -3194,63 +3395,164 @@
               </div>
             </div>
 
-            <!-- Real-Time Store Sell-Through & Pacing Matrix -->
-            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <!-- Real-Time Store Sell-Through & Pacing Matrix (M3 Hairline Standard Table) -->
+            <div class="m3-table-card">
+              <div style="padding:16px 18px 12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.05);">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span class="ms-icon" style="color:#0071E3;font-size:20px;">storefront</span>
+                  <span class="ms-icon hairline" style="color:#0071E3;font-size:20px;">storefront</span>
                   <b style="font-size:14px;color:#1D1D1F;">Real-Time Store Pacing & Sell-Through Matrix</b>
                 </div>
-                <span style="font-size:11px;color:#86868B;">Live Multi-Branch Telemetry Feed</span>
+                <span style="font-size:11px;color:#86868B;display:flex;align-items:center;gap:4px;">
+                  <span class="supervisor-pulse-dot" style="width:5px;height:5px;"></span> Live Multi-Branch Telemetry Feed
+                </span>
               </div>
 
+              <!-- Table Toolbar: Search, Filters, Density -->
+              <div class="m3-table-toolbar">
+                <div class="m3-table-toolbar-left">
+                  <div class="m3-table-search-box">
+                    <span class="ms-icon sm hairline">search</span>
+                    <input type="text" id="supStoreSearchInput" placeholder="Filter store, code, or city..." oninput="onSupStoreSearch(this.value)">
+                  </div>
+                  <div class="m3-table-filter-chips">
+                    <button type="button" class="m3-filter-chip active" id="chipStoreCountryAll" onclick="setSupStoreCountryFilter('ALL', this)">All</button>
+                    <button type="button" class="m3-filter-chip" id="chipStoreCountryPH" onclick="setSupStoreCountryFilter('PH', this)">PH</button>
+                    <button type="button" class="m3-filter-chip" id="chipStoreCountrySG" onclick="setSupStoreCountryFilter('SG', this)">SG</button>
+                  </div>
+                </div>
+                <div class="m3-table-toolbar-right">
+                  <label class="m3-density-label">
+                    <span>Rows:</span>
+                    <select class="m3-density-select" id="supStorePageSize" onchange="setSupStorePageSize(this.value)">
+                      <option value="5" selected>5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Interactive Telemetry Table -->
               <table class="m3-telemetry-table">
                 <thead>
                   <tr>
-                    <th>Branch Code & Store</th>
-                    <th>Country</th>
-                    <th>Target Quota</th>
-                    <th>Actual Sell-Through</th>
-                    <th>Pacing %</th>
-                    <th>Shelf Compliance</th>
-                    <th>Status</th>
+                    <th class="sortable" onclick="sortSupStores('name')">
+                      <span>Branch Code & Store</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_name">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('country')">
+                      <span>Country</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_country">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('target')">
+                      <span>Target Quota</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_target">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('actualSales')">
+                      <span>Actual Sell-Through</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_actualSales">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('pctAchieved')">
+                      <span>Pacing %</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_pctAchieved">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('compliance')">
+                      <span>Shelf Compliance</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_compliance">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupStores('pctAchieved')">
+                      <span>Status</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sup_status">unfold_more</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody id="supTableBody">
                   <!-- Populated dynamically via JS -->
                 </tbody>
               </table>
+
+              <!-- Minimalist Hairline Pagination Footer -->
+              <div class="m3-table-pagination">
+                <span class="m3-pagination-info" id="supStorePaginationInfo">Showing 1 to 5 of 9 stores</span>
+                <div class="m3-pagination-actions" id="supStorePaginationControls"></div>
+              </div>
             </div>
           </section>
 
           <!-- PANEL 2: FLEET & ROVING ROUTES -->
           <section class="supervisor-panel" id="supPanelFleet">
-            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="m3-table-card">
+              <div style="padding:16px 18px 12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.05);">
                 <div>
                   <b style="font-size:14.5px;color:#1D1D1F;display:block;">Metro Manila Roving Corridor · 8-Stop Scheduled Fleet</b>
-                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">GPS Geofenced Itinerary · Arrival Proof & Dwell Times</p>
+                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">GPS Geofenced Itinerary · Verified Arrival Proof & Dwell Times</p>
                 </div>
                 <button type="button" onclick="loadSupervisorConsoleData()" style="background:#EBF4FF;color:#0071E3;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
-                  <span class="ms-icon sm">refresh</span> Sync Fleet
+                  <span class="ms-icon sm hairline">refresh</span> Sync Fleet
                 </button>
               </div>
 
+              <!-- Table Toolbar -->
+              <div class="m3-table-toolbar">
+                <div class="m3-table-toolbar-left">
+                  <div class="m3-table-search-box">
+                    <span class="ms-icon sm hairline">search</span>
+                    <input type="text" id="supFleetSearchInput" placeholder="Filter stop, branch, or notes..." oninput="onSupFleetSearch(this.value)">
+                  </div>
+                  <div class="m3-table-filter-chips">
+                    <button type="button" class="m3-filter-chip active" id="chipFleetStatusAll" onclick="setSupFleetFilter('ALL', this)">All</button>
+                    <button type="button" class="m3-filter-chip" id="chipFleetStatusCompleted" onclick="setSupFleetFilter('completed', this)">Completed</button>
+                    <button type="button" class="m3-filter-chip" id="chipFleetStatusCheckedIn" onclick="setSupFleetFilter('checked_in', this)">On-Site</button>
+                    <button type="button" class="m3-filter-chip" id="chipFleetStatusPending" onclick="setSupFleetFilter('pending', this)">Pending</button>
+                  </div>
+                </div>
+                <div class="m3-table-toolbar-right">
+                  <label class="m3-density-label">
+                    <span>Rows:</span>
+                    <select class="m3-density-select" id="supFleetPageSize" onchange="setSupFleetPageSize(this.value)">
+                      <option value="5">5</option>
+                      <option value="8" selected>8</option>
+                      <option value="15">15</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Table -->
               <table class="m3-telemetry-table">
                 <thead>
                   <tr>
-                    <th>Seq</th>
-                    <th>Retail Branch & Address</th>
+                    <th class="sortable" onclick="sortSupFleet('sequenceOrder')">
+                      <span>Seq</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_fleet_seq">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupFleet('storeName')">
+                      <span>Retail Branch & Address</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_fleet_name">unfold_more</span>
+                    </th>
                     <th>Scheduled Window</th>
-                    <th>Arrival Stamp</th>
+                    <th class="sortable" onclick="sortSupFleet('checkInTime')">
+                      <span>Arrival Stamp</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_fleet_arrival">unfold_more</span>
+                    </th>
                     <th>GPS Geofence Status</th>
-                    <th>Audit Status</th>
+                    <th class="sortable" onclick="sortSupFleet('status')">
+                      <span>Audit Status</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_fleet_status">unfold_more</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody id="fleetTableBody">
-                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                  <!-- Populated dynamically via JS -->
                 </tbody>
               </table>
+
+              <!-- Pagination Footer -->
+              <div class="m3-table-pagination">
+                <span class="m3-pagination-info" id="supFleetPaginationInfo">Showing 1 to 8 of 8 stops</span>
+                <div class="m3-pagination-actions" id="supFleetPaginationControls"></div>
+              </div>
             </div>
           </section>
 
@@ -3273,8 +3575,8 @@
 
           <!-- PANEL 4: FAST-SALE LIVE TRANSACTION LEDGER -->
           <section class="supervisor-panel" id="supPanelSales">
-            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="m3-table-card">
+              <div style="padding:16px 18px 12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.05);">
                 <div>
                   <b style="font-size:14.5px;color:#1D1D1F;display:block;">Live Fast-Sale Transaction Ledger & Settlement Mix</b>
                   <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">Zero-Typing 1-Tap Sell-Out Stream across Singapore & Philippines</p>
@@ -3282,30 +3584,71 @@
                 <span style="font-size:11px;font-weight:700;background:#EBF4FF;color:#0071E3;padding:4px 10px;border-radius:999px;">WSS Stream Active</span>
               </div>
 
+              <!-- Table Toolbar -->
+              <div class="m3-table-toolbar">
+                <div class="m3-table-toolbar-left">
+                  <div class="m3-table-search-box">
+                    <span class="ms-icon sm hairline">search</span>
+                    <input type="text" id="supSalesSearchInput" placeholder="Filter transaction, SKU, or user..." oninput="onSupSalesSearch(this.value)">
+                  </div>
+                  <div class="m3-table-filter-chips">
+                    <button type="button" class="m3-filter-chip active" id="chipSalesMethodAll" onclick="setSupSalesFilter('ALL', this)">All</button>
+                    <button type="button" class="m3-filter-chip" id="chipSalesMethodCash" onclick="setSupSalesFilter('cash', this)">Cash</button>
+                    <button type="button" class="m3-filter-chip" id="chipSalesMethodCredit" onclick="setSupSalesFilter('credit_card', this)">Card</button>
+                  </div>
+                </div>
+                <div class="m3-table-toolbar-right">
+                  <label class="m3-density-label">
+                    <span>Rows:</span>
+                    <select class="m3-density-select" id="supSalesPageSize" onchange="setSupSalesPageSize(this.value)">
+                      <option value="5" selected>5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Table -->
               <table class="m3-telemetry-table">
                 <thead>
                   <tr>
-                    <th>Timestamp</th>
+                    <th class="sortable" onclick="sortSupSales('timestamp')">
+                      <span>Timestamp</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sales_time">unfold_more</span>
+                    </th>
                     <th>Branch</th>
                     <th>Promoter</th>
                     <th>SKU & Item</th>
-                    <th>Qty</th>
-                    <th>Total Amount</th>
+                    <th class="sortable" onclick="sortSupSales('quantity')">
+                      <span>Qty</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sales_qty">unfold_more</span>
+                    </th>
+                    <th class="sortable" onclick="sortSupSales('totalAmount')">
+                      <span>Total Amount</span>
+                      <span class="ms-icon sm hairline sort-icon" id="sortIcon_sales_amt">unfold_more</span>
+                    </th>
                     <th>Payment Channel</th>
                     <th>Terms</th>
                   </tr>
                 </thead>
                 <tbody id="salesTableBody">
-                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                  <!-- Populated dynamically via JS -->
                 </tbody>
               </table>
+
+              <!-- Pagination Footer -->
+              <div class="m3-table-pagination">
+                <span class="m3-pagination-info" id="supSalesPaginationInfo">Showing 1 to 5 of 8 transactions</span>
+                <div class="m3-pagination-actions" id="supSalesPaginationControls"></div>
+              </div>
             </div>
           </section>
 
           <!-- PANEL 5: SURVEYS & AUDIT QUEUE -->
           <section class="supervisor-panel" id="supPanelSurveys">
-            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="m3-table-card">
+              <div style="padding:16px 18px 12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.05);">
                 <div>
                   <b style="font-size:14.5px;color:#1D1D1F;display:block;">Frontline Field Audits & Digital Survey Review Queue</b>
                   <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">Competitor Price Checks, Customer VOC NPS & Store Readiness Sign-Offs</p>
@@ -3313,21 +3656,47 @@
                 <span style="font-size:11px;font-weight:700;background:#E8F8EE;color:#1B5E20;padding:4px 10px;border-radius:999px;">DB Verified</span>
               </div>
 
+              <!-- Table Toolbar -->
+              <div class="m3-table-toolbar">
+                <div class="m3-table-toolbar-left">
+                  <div class="m3-table-search-box">
+                    <span class="ms-icon sm hairline">search</span>
+                    <input type="text" id="supSurveysSearchInput" placeholder="Filter survey title or form..." oninput="onSupSurveysSearch(this.value)">
+                  </div>
+                </div>
+                <div class="m3-table-toolbar-right">
+                  <label class="m3-density-label">
+                    <span>Rows:</span>
+                    <select class="m3-density-select" id="supSurveysPageSize" onchange="setSupSurveysPageSize(this.value)">
+                      <option value="5" selected>5</option>
+                      <option value="10">10</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Table -->
               <table class="m3-telemetry-table">
                 <thead>
                   <tr>
                     <th>Submission Time</th>
                     <th>Survey Form</th>
                     <th>Branch</th>
-                    <th>Promoter</th>
+                    <th>Submissions</th>
                     <th>Verification Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody id="surveysSupTableBody">
-                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                  <!-- Populated dynamically via JS -->
                 </tbody>
               </table>
+
+              <!-- Pagination Footer -->
+              <div class="m3-table-pagination">
+                <span class="m3-pagination-info" id="supSurveysPaginationInfo">Showing 1 to 2 of 2 surveys</span>
+                <div class="m3-pagination-actions" id="supSurveysPaginationControls"></div>
+              </div>
             </div>
           </section>
         </div>
@@ -6598,6 +6967,502 @@
       if (subEl) subEl.innerText = cfg.subtitle;
     }
 
+    // ============================================================
+    // M3 HAIRLINE DATA TABLE CONTROLLERS
+    // ============================================================
+    // 1. Store Pacing Matrix Controller
+    let supStoresData = [];
+    let supStoreSearchQuery = '';
+    let supStoreCountry = 'ALL';
+    let supStorePage = 1;
+    let supStorePageSize = 5;
+    let supStoreSortKey = 'name';
+    let supStoreSortDir = 'asc';
+
+    function onSupStoreSearch(val) {
+      supStoreSearchQuery = val || '';
+      supStorePage = 1;
+      renderSupStoresTable();
+    }
+
+    function setSupStoreCountryFilter(country, btn) {
+      supStoreCountry = country;
+      supStorePage = 1;
+      document.querySelectorAll('#supPanelShift .m3-filter-chip').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderSupStoresTable();
+    }
+
+    function setSupStorePageSize(size) {
+      supStorePageSize = parseInt(size, 10) || 5;
+      supStorePage = 1;
+      renderSupStoresTable();
+    }
+
+    function sortSupStores(key) {
+      if (supStoreSortKey === key) {
+        supStoreSortDir = supStoreSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        supStoreSortKey = key;
+        supStoreSortDir = 'asc';
+      }
+      renderSupStoresTable();
+    }
+
+    function setSupStorePage(page) {
+      supStorePage = page;
+      renderSupStoresTable();
+    }
+
+    function renderSupStoresTable() {
+      const tbody = document.getElementById('supTableBody');
+      const infoEl = document.getElementById('supStorePaginationInfo');
+      const controlsEl = document.getElementById('supStorePaginationControls');
+      if (!tbody) return;
+
+      let filtered = supStoresData.filter(s => {
+        const matchesCountry = supStoreCountry === 'ALL' || (s.country || '').toUpperCase() === supStoreCountry.toUpperCase();
+        const q = supStoreSearchQuery.toLowerCase().trim();
+        const matchesSearch = !q || (s.name || '').toLowerCase().includes(q) || (s.code || '').toLowerCase().includes(q) || (s.city || '').toLowerCase().includes(q);
+        return matchesCountry && matchesSearch;
+      });
+
+      filtered.sort((a, b) => {
+        let valA = a[supStoreSortKey];
+        let valB = b[supStoreSortKey];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return supStoreSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return supStoreSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      ['name', 'country', 'target', 'actualSales', 'pctAchieved', 'compliance'].forEach(k => {
+        const icon = document.getElementById(`sortIcon_sup_${k}`);
+        if (icon) {
+          if (supStoreSortKey === k) {
+            icon.innerText = supStoreSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            icon.style.color = '#0071E3';
+          } else {
+            icon.innerText = 'unfold_more';
+            icon.style.color = '#8E8E93';
+          }
+        }
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / supStorePageSize));
+      if (supStorePage > totalPages) supStorePage = totalPages;
+      const startIdx = (supStorePage - 1) * supStorePageSize;
+      const endIdx = Math.min(total, startIdx + supStorePageSize);
+      const pageItems = filtered.slice(startIdx, endIdx);
+
+      tbody.innerHTML = '';
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#86868B;padding:22px;">No matching store branches found</td></tr>`;
+      } else {
+        pageItems.forEach(s => {
+          const pct = s.pctAchieved || 0;
+          let badgeBg = '#FDE8E8';
+          let badgeColor = '#D32F2F';
+          let statusText = '🔴 Pacing Deficit';
+          if (pct >= 100) {
+            badgeBg = '#E8F8EE';
+            badgeColor = '#1B5E20';
+            statusText = '🟢 Quota Met';
+          } else if (pct >= 50) {
+            badgeBg = '#FFF3DC';
+            badgeColor = '#B25E00';
+            statusText = '🟡 On Track';
+          }
+
+          tbody.innerHTML += `
+            <tr>
+              <td>
+                <b style="color:#1D1D1F;font-weight:600;font-size:13px;">${s.name}</b>
+                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${s.code} · ${s.city || ''}</div>
+              </td>
+              <td><span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">${s.country}</span></td>
+              <td style="color:#86868B;font-family:'JetBrains Mono';font-size:12px;">${s.currency} ${s.target ? s.target.toLocaleString() : 'N/A'}</td>
+              <td style="color:#1D1D1F;font-weight:600;font-family:'JetBrains Mono';font-size:12.5px;">${s.currency} ${(s.actualSales || 0).toLocaleString()}</td>
+              <td>
+                <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-weight:600;font-size:11.5px;">
+                  ${pct}%
+                </span>
+              </td>
+              <td style="color:#1B5E20;font-weight:600;font-size:12px;">${s.compliance || 90}%</td>
+              <td>
+                <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">
+                  ${statusText}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      if (infoEl) infoEl.innerText = total > 0 ? `Showing ${startIdx + 1} to ${endIdx} of ${total} stores` : '0 stores found';
+      if (controlsEl) {
+        let html = `
+          <button type="button" class="m3-page-btn" ${supStorePage <= 1 ? 'disabled' : ''} onclick="setSupStorePage(${supStorePage - 1})">
+            <span class="ms-icon sm hairline">chevron_left</span> Prev
+          </button>
+        `;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button type="button" class="m3-page-pill ${i === supStorePage ? 'active' : ''}" onclick="setSupStorePage(${i})">${i}</button>`;
+        }
+        html += `
+          <button type="button" class="m3-page-btn" ${supStorePage >= totalPages ? 'disabled' : ''} onclick="setSupStorePage(${supStorePage + 1})">
+            Next <span class="ms-icon sm hairline">chevron_right</span>
+          </button>
+        `;
+        controlsEl.innerHTML = html;
+      }
+    }
+
+    // 2. Fleet Table Controller
+    let supFleetData = [];
+    let supFleetSearchQuery = '';
+    let supFleetStatus = 'ALL';
+    let supFleetPage = 1;
+    let supFleetPageSize = 8;
+    let supFleetSortKey = 'sequenceOrder';
+    let supFleetSortDir = 'asc';
+
+    function onSupFleetSearch(val) {
+      supFleetSearchQuery = val || '';
+      supFleetPage = 1;
+      renderSupFleetTable();
+    }
+
+    function setSupFleetFilter(status, btn) {
+      supFleetStatus = status;
+      supFleetPage = 1;
+      document.querySelectorAll('#supPanelFleet .m3-filter-chip').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderSupFleetTable();
+    }
+
+    function setSupFleetPageSize(size) {
+      supFleetPageSize = parseInt(size, 10) || 8;
+      supFleetPage = 1;
+      renderSupFleetTable();
+    }
+
+    function sortSupFleet(key) {
+      if (supFleetSortKey === key) {
+        supFleetSortDir = supFleetSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        supFleetSortKey = key;
+        supFleetSortDir = 'asc';
+      }
+      renderSupFleetTable();
+    }
+
+    function setSupFleetPage(page) {
+      supFleetPage = page;
+      renderSupFleetTable();
+    }
+
+    function renderSupFleetTable() {
+      const tbody = document.getElementById('fleetTableBody');
+      const infoEl = document.getElementById('supFleetPaginationInfo');
+      const controlsEl = document.getElementById('supFleetPaginationControls');
+      if (!tbody) return;
+
+      let filtered = supFleetData.filter(v => {
+        const matchesStatus = supFleetStatus === 'ALL' || v.status === supFleetStatus;
+        const q = supFleetSearchQuery.toLowerCase().trim();
+        const storeName = v.store ? v.store.name.toLowerCase() : '';
+        const storeCity = v.store ? v.store.city.toLowerCase() : '';
+        const notes = (v.notes || '').toLowerCase();
+        const matchesSearch = !q || storeName.includes(q) || storeCity.includes(q) || notes.includes(q) || String(v.sequenceOrder).includes(q);
+        return matchesStatus && matchesSearch;
+      });
+
+      filtered.sort((a, b) => {
+        let valA = a[supFleetSortKey];
+        let valB = b[supFleetSortKey];
+        if (supFleetSortKey === 'storeName') {
+          valA = a.store ? a.store.name.toLowerCase() : '';
+          valB = b.store ? b.store.name.toLowerCase() : '';
+        }
+        if (valA < valB) return supFleetSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return supFleetSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / supFleetPageSize));
+      if (supFleetPage > totalPages) supFleetPage = totalPages;
+      const startIdx = (supFleetPage - 1) * supFleetPageSize;
+      const endIdx = Math.min(total, startIdx + supFleetPageSize);
+      const pageItems = filtered.slice(startIdx, endIdx);
+
+      tbody.innerHTML = '';
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#86868B;padding:22px;">No matching route stops found</td></tr>`;
+      } else {
+        pageItems.forEach(v => {
+          const isDone = v.status === 'completed';
+          const isActive = v.status === 'checked_in';
+          
+          let statusBadge = '<span style="background:#F2F2F7;color:#86868B;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">Scheduled</span>';
+          if (isDone) {
+            statusBadge = '<span style="background:#E8F8EE;color:#1B5E20;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm hairline" style="font-size:12px;">check</span> Completed</span>';
+          } else if (isActive) {
+            statusBadge = '<span style="background:#EBF4FF;color:#0071E3;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm hairline" style="font-size:12px;">radio_button_checked</span> Active On-Site</span>';
+          }
+
+          let arrivalStamp = '<span style="color:#8E8E93;font-size:11px;">Pending arrival</span>';
+          if (v.checkInTime) {
+            const timeStr = new Date(v.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            arrivalStamp = `<b style="color:${isDone ? '#1B5E20' : '#0071E3'};font-size:11.5px;font-family:'JetBrains Mono';">${timeStr}</b>`;
+            if (v.checkOutTime) {
+              const outStr = new Date(v.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              arrivalStamp += ` <span style="font-size:10.5px;color:#86868B;">(Dept: ${outStr})</span>`;
+            }
+          }
+
+          const geofenceBadge = v.gpsVerified
+            ? `<span style="background:#E8F8EE;color:#1B5E20;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;gap:2px;"><span class="ms-icon sm hairline" style="font-size:11px;">verified</span> Geofence Verified (${v.checkInLat ? v.checkInLat.toFixed(4) : ''}, ${v.checkInLng ? v.checkInLng.toFixed(4) : ''})</span>`
+            : `<span style="background:#F2F2F7;color:#86868B;padding:2px 7px;border-radius:5px;font-size:10.5px;">Pending Check-In</span>`;
+
+          tbody.innerHTML += `
+            <tr>
+              <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">Stop #${v.sequenceOrder}</td>
+              <td>
+                <b style="color:#1D1D1F;font-size:13px;">${v.store ? v.store.name : 'Branch Stop'}</b>
+                <div style="font-size:11px;color:#86868B;">${v.store ? v.store.city : 'Metro Manila Corridor'} · ${v.notes || ''}</div>
+              </td>
+              <td style="font-family:'JetBrains Mono';font-size:11.5px;color:#1D1D1F;">${v.scheduledTime}</td>
+              <td>${arrivalStamp}</td>
+              <td>${geofenceBadge}</td>
+              <td>${statusBadge}</td>
+            </tr>
+          `;
+        });
+      }
+
+      if (infoEl) infoEl.innerText = total > 0 ? `Showing ${startIdx + 1} to ${endIdx} of ${total} stops` : '0 stops found';
+      if (controlsEl) {
+        let html = `
+          <button type="button" class="m3-page-btn" ${supFleetPage <= 1 ? 'disabled' : ''} onclick="setSupFleetPage(${supFleetPage - 1})">
+            <span class="ms-icon sm hairline">chevron_left</span> Prev
+          </button>
+        `;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button type="button" class="m3-page-pill ${i === supFleetPage ? 'active' : ''}" onclick="setSupFleetPage(${i})">${i}</button>`;
+        }
+        html += `
+          <button type="button" class="m3-page-btn" ${supFleetPage >= totalPages ? 'disabled' : ''} onclick="setSupFleetPage(${supFleetPage + 1})">
+            Next <span class="ms-icon sm hairline">chevron_right</span>
+          </button>
+        `;
+        controlsEl.innerHTML = html;
+      }
+    }
+
+    // 3. Fast-Sale Table Controller
+    let supSalesData = [];
+    let supSalesSearchQuery = '';
+    let supSalesMethod = 'ALL';
+    let supSalesPage = 1;
+    let supSalesPageSize = 5;
+    let supSalesSortKey = 'timestamp';
+    let supSalesSortDir = 'desc';
+
+    function onSupSalesSearch(val) {
+      supSalesSearchQuery = val || '';
+      supSalesPage = 1;
+      renderSupSalesTable();
+    }
+
+    function setSupSalesFilter(method, btn) {
+      supSalesMethod = method;
+      supSalesPage = 1;
+      document.querySelectorAll('#supPanelSales .m3-filter-chip').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderSupSalesTable();
+    }
+
+    function setSupSalesPageSize(size) {
+      supSalesPageSize = parseInt(size, 10) || 5;
+      supSalesPage = 1;
+      renderSupSalesTable();
+    }
+
+    function sortSupSales(key) {
+      if (supSalesSortKey === key) {
+        supSalesSortDir = supSalesSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        supSalesSortKey = key;
+        supSalesSortDir = 'asc';
+      }
+      renderSupSalesTable();
+    }
+
+    function setSupSalesPage(page) {
+      supSalesPage = page;
+      renderSupSalesTable();
+    }
+
+    function renderSupSalesTable() {
+      const tbody = document.getElementById('salesTableBody');
+      const infoEl = document.getElementById('supSalesPaginationInfo');
+      const controlsEl = document.getElementById('supSalesPaginationControls');
+      if (!tbody) return;
+
+      let filtered = supSalesData.filter(tx => {
+        const matchesMethod = supSalesMethod === 'ALL' || (tx.paymentMethod || '').toLowerCase() === supSalesMethod.toLowerCase();
+        const q = supSalesSearchQuery.toLowerCase().trim();
+        const matchesSearch = !q || (tx.id || '').toLowerCase().includes(q) || (tx.productId || '').toLowerCase().includes(q) || (tx.userId || '').toLowerCase().includes(q) || (tx.storeId || '').toLowerCase().includes(q);
+        return matchesMethod && matchesSearch;
+      });
+
+      filtered.sort((a, b) => {
+        let valA = a[supSalesSortKey];
+        let valB = b[supSalesSortKey];
+        if (valA < valB) return supSalesSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return supSalesSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / supSalesPageSize));
+      if (supSalesPage > totalPages) supSalesPage = totalPages;
+      const startIdx = (supSalesPage - 1) * supSalesPageSize;
+      const endIdx = Math.min(total, startIdx + supSalesPageSize);
+      const pageItems = filtered.slice(startIdx, endIdx);
+
+      tbody.innerHTML = '';
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#86868B;padding:22px;">No matching sales transactions found</td></tr>`;
+      } else {
+        pageItems.forEach(tx => {
+          const storeObj = (supStoresData && supStoresData.find(s => s.id === tx.storeId)) || { name: tx.storeId || 'Retail Branch' };
+          const timeStr = new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          tbody.innerHTML += `
+            <tr>
+              <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${timeStr}</td>
+              <td style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${storeObj.name}</td>
+              <td style="color:#0071E3;font-weight:500;font-size:12px;">${tx.userId}</td>
+              <td style="font-weight:600;font-family:'JetBrains Mono';font-size:11.5px;">${tx.productId}</td>
+              <td style="font-weight:600;color:#1D1D1F;">${tx.quantity}</td>
+              <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">${tx.currency} ${(tx.totalAmount || 0).toLocaleString()}</td>
+              <td><span style="background:#F2F2F7;color:#1D1D1F;text-transform:uppercase;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">${tx.paymentMethod || 'cash'}</span></td>
+              <td style="color:#86868B;font-size:11px;text-transform:capitalize;">${tx.paymentTerms || 'straight'}</td>
+            </tr>
+          `;
+        });
+      }
+
+      if (infoEl) infoEl.innerText = total > 0 ? `Showing ${startIdx + 1} to ${endIdx} of ${total} transactions` : '0 transactions found';
+      if (controlsEl) {
+        let html = `
+          <button type="button" class="m3-page-btn" ${supSalesPage <= 1 ? 'disabled' : ''} onclick="setSupSalesPage(${supSalesPage - 1})">
+            <span class="ms-icon sm hairline">chevron_left</span> Prev
+          </button>
+        `;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button type="button" class="m3-page-pill ${i === supSalesPage ? 'active' : ''}" onclick="setSupSalesPage(${i})">${i}</button>`;
+        }
+        html += `
+          <button type="button" class="m3-page-btn" ${supSalesPage >= totalPages ? 'disabled' : ''} onclick="setSupSalesPage(${supSalesPage + 1})">
+            Next <span class="ms-icon sm hairline">chevron_right</span>
+          </button>
+        `;
+        controlsEl.innerHTML = html;
+      }
+    }
+
+    // 4. Surveys Table Controller
+    let supSurveysData = [];
+    let supSurveysSearchQuery = '';
+    let supSurveysPage = 1;
+    let supSurveysPageSize = 5;
+
+    function onSupSurveysSearch(val) {
+      supSurveysSearchQuery = val || '';
+      supSurveysPage = 1;
+      renderSupSurveysTable();
+    }
+
+    function setSupSurveysPageSize(size) {
+      supSurveysPageSize = parseInt(size, 10) || 5;
+      supSurveysPage = 1;
+      renderSupSurveysTable();
+    }
+
+    function setSupSurveysPage(page) {
+      supSurveysPage = page;
+      renderSupSurveysTable();
+    }
+
+    function renderSupSurveysTable() {
+      const tbody = document.getElementById('surveysSupTableBody');
+      const infoEl = document.getElementById('supSurveysPaginationInfo');
+      const controlsEl = document.getElementById('supSurveysPaginationControls');
+      if (!tbody) return;
+
+      let filtered = supSurveysData.filter(srv => {
+        const q = supSurveysSearchQuery.toLowerCase().trim();
+        const title = (srv.title || '').toLowerCase();
+        const type = (srv.surveyType || '').toLowerCase();
+        return !q || title.includes(q) || type.includes(q);
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / supSurveysPageSize));
+      if (supSurveysPage > totalPages) supSurveysPage = totalPages;
+      const startIdx = (supSurveysPage - 1) * supSurveysPageSize;
+      const endIdx = Math.min(total, startIdx + supSurveysPageSize);
+      const pageItems = filtered.slice(startIdx, endIdx);
+
+      tbody.innerHTML = '';
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#86868B;padding:22px;">No matching surveys found</td></tr>`;
+      } else {
+        pageItems.forEach(srv => {
+          const subCount = srv.submissionsCount || 0;
+          const latestTime = srv.latestSubmissionAt ? new Date(srv.latestSubmissionAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Active Queue';
+          tbody.innerHTML += `
+            <tr>
+              <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${latestTime}</td>
+              <td>
+                <b style="color:#1D1D1F;font-size:12.5px;">${srv.title}</b>
+                <div style="font-size:11px;color:#86868B;">${srv.questionsCount || 5} Questions · ${srv.surveyType}</div>
+              </td>
+              <td style="font-size:11.5px;color:#1D1D1F;">All Active Branches (${(srv.targetStoreNames || []).length})</td>
+              <td><span style="background:#EBF4FF;color:#0071E3;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;">${subCount} Submitted</span></td>
+              <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm hairline" style="font-size:12px;">verified</span> DB Verified</span></td>
+              <td>
+                <button type="button" onclick="switchAdminNav('surveys');setViewMode('admin');" style="background:#F2F2F7;border:1px solid rgba(0,0,0,0.06);color:#1D1D1F;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;">Inspect</button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      if (infoEl) infoEl.innerText = total > 0 ? `Showing ${startIdx + 1} to ${endIdx} of ${total} surveys` : '0 surveys found';
+      if (controlsEl) {
+        let html = `
+          <button type="button" class="m3-page-btn" ${supSurveysPage <= 1 ? 'disabled' : ''} onclick="setSupSurveysPage(${supSurveysPage - 1})">
+            <span class="ms-icon sm hairline">chevron_left</span> Prev
+          </button>
+        `;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button type="button" class="m3-page-pill ${i === supSurveysPage ? 'active' : ''}" onclick="setSupSurveysPage(${i})">${i}</button>`;
+        }
+        html += `
+          <button type="button" class="m3-page-btn" ${supSurveysPage >= totalPages ? 'disabled' : ''} onclick="setSupSurveysPage(${supSurveysPage + 1})">
+            Next <span class="ms-icon sm hairline">chevron_right</span>
+          </button>
+        `;
+        controlsEl.innerHTML = html;
+      }
+    }
+
     async function loadSupervisorConsoleData() {
       try {
         const wsParam = currentWorkspaceId ? `?ws=${currentWorkspaceId}` : '';
@@ -6616,102 +7481,19 @@
           if (excEl) excEl.innerText = data.overview.openExceptionsCount || '0';
         }
 
-        // 2. Real-Time Store Pacing Matrix (Replaces static org chart)
-        const tbody = document.getElementById('supTableBody');
-        if (tbody && data.stores) {
-          tbody.innerHTML = '';
-          data.stores.forEach(s => {
-            const pct = s.pctAchieved || 0;
-            let badgeBg = '#FDE8E8';
-            let badgeColor = '#D32F2F';
-            let statusText = '🔴 Pacing Deficit';
-            if (pct >= 100) {
-              badgeBg = '#E8F8EE';
-              badgeColor = '#1B5E20';
-              statusText = '🟢 Quota Met';
-            } else if (pct >= 50) {
-              badgeBg = '#FFF3DC';
-              badgeColor = '#B25E00';
-              statusText = '🟡 On Track';
-            }
-
-            tbody.innerHTML += `
-              <tr>
-                <td>
-                  <b style="color:#1D1D1F;font-weight:600;font-size:13px;">${s.name}</b>
-                  <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${s.code} · ${s.city || ''}</div>
-                </td>
-                <td><span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">${s.country}</span></td>
-                <td style="color:#86868B;font-family:'JetBrains Mono';font-size:12px;">${s.currency} ${s.target ? s.target.toLocaleString() : 'N/A'}</td>
-                <td style="color:#1D1D1F;font-weight:600;font-family:'JetBrains Mono';font-size:12.5px;">${s.currency} ${(s.actualSales || 0).toLocaleString()}</td>
-                <td>
-                  <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-weight:600;font-size:11.5px;">
-                    ${pct}%
-                  </span>
-                </td>
-                <td style="color:#1B5E20;font-weight:600;font-size:12px;">${s.compliance || 90}%</td>
-                <td>
-                  <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">
-                    ${statusText}
-                  </span>
-                </td>
-              </tr>
-            `;
-          });
-        }
+        // 2. Real-Time Store Pacing Matrix (With M3 Hairline Controls)
+        supStoresData = data.stores || [];
+        renderSupStoresTable();
 
         // 3. Metro Manila 8-Stop Roving Corridor Fleet Tracker
-        const fleetTbody = document.getElementById('fleetTableBody');
-        if (fleetTbody) {
-          try {
-            const rovRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/roving-telemetry`);
-            const rovData = await rovRes.json();
-            const marco = (rovData.fleet && rovData.fleet.find(f => f.user && f.user.name && f.user.name.includes('Marco'))) || (rovData.fleet && rovData.fleet[0]);
-            if (marco && marco.visits) {
-              fleetTbody.innerHTML = '';
-              marco.visits.forEach(v => {
-                const isDone = v.status === 'completed';
-                const isActive = v.status === 'checked_in';
-                
-                let statusBadge = '<span style="background:#F2F2F7;color:#86868B;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">Scheduled</span>';
-                if (isDone) {
-                  statusBadge = '<span style="background:#E8F8EE;color:#1B5E20;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">check</span> Completed</span>';
-                } else if (isActive) {
-                  statusBadge = '<span style="background:#EBF4FF;color:#0071E3;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">radio_button_checked</span> Active On-Site</span>';
-                }
-
-                let arrivalStamp = '<span style="color:#8E8E93;font-size:11px;">Pending arrival</span>';
-                if (v.checkInTime) {
-                  const timeStr = new Date(v.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  arrivalStamp = `<b style="color:${isDone ? '#1B5E20' : '#0071E3'};font-size:11.5px;font-family:'JetBrains Mono';">${timeStr}</b>`;
-                  if (v.checkOutTime) {
-                    const outStr = new Date(v.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    arrivalStamp += ` <span style="font-size:10.5px;color:#86868B;">(Dept: ${outStr})</span>`;
-                  }
-                }
-
-                const geofenceBadge = v.gpsVerified
-                  ? `<span style="background:#E8F8EE;color:#1B5E20;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;gap:2px;"><span class="ms-icon sm" style="font-size:11px;">verified</span> Geofence Verified</span>`
-                  : `<span style="background:#F2F2F7;color:#86868B;padding:2px 7px;border-radius:5px;font-size:10.5px;">Pending Check-In</span>`;
-
-                fleetTbody.innerHTML += `
-                  <tr>
-                    <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">Stop #${v.sequenceOrder}</td>
-                    <td>
-                      <b style="color:#1D1D1F;font-size:13px;">${v.store ? v.store.name : 'Branch Stop'}</b>
-                      <div style="font-size:11px;color:#86868B;">${v.store ? v.store.city : 'Metro Manila Corridor'} · ${v.notes || ''}</div>
-                    </td>
-                    <td style="font-family:'JetBrains Mono';font-size:11.5px;color:#1D1D1F;">${v.scheduledTime}</td>
-                    <td>${arrivalStamp}</td>
-                    <td>${geofenceBadge}</td>
-                    <td>${statusBadge}</td>
-                  </tr>
-                `;
-              });
-            }
-          } catch (err) {
-            console.warn('Could not load fleet telemetry', err);
-          }
+        try {
+          const rovRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/roving-telemetry`);
+          const rovData = await rovRes.json();
+          const marco = (rovData.fleet && rovData.fleet.find(f => f.user && f.user.name && f.user.name.includes('Marco'))) || (rovData.fleet && rovData.fleet[0]);
+          supFleetData = (marco && marco.visits) || [];
+          renderSupFleetTable();
+        } catch (err) {
+          console.warn('Could not load fleet telemetry', err);
         }
 
         // 4. Vera Optical Shelf Audits Grid
@@ -6746,7 +7528,7 @@
 
           veraGrid.innerHTML = '';
           audits.forEach(a => {
-            const storeObj = (data.stores && data.stores.find(s => s.id === a.storeId)) || { name: a.storeId || 'Retail Branch', city: 'Metro Manila' };
+            const storeObj = (supStoresData && supStoresData.find(s => s.id === a.storeId)) || { name: a.storeId || 'Retail Branch', city: 'Metro Manila' };
             const scoreColor = a.complianceScore >= 90 ? '#1B5E20' : (a.complianceScore >= 75 ? '#B25E00' : '#D32F2F');
             const scoreBg = a.complianceScore >= 90 ? '#E8F8EE' : (a.complianceScore >= 75 ? '#FFF3DC' : '#FDE8E8');
             const issuesBadges = (a.detectedIssues || []).map(iss => `<span style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);color:#1D1D1F;font-size:10.5px;padding:2px 6px;border-radius:4px;">${iss}</span>`).join(' ');
@@ -6784,63 +7566,17 @@
         }
 
         // 5. Live Fast-Sale Transaction Ledger
-        const salesTbody = document.getElementById('salesTableBody');
-        if (salesTbody) {
-          salesTbody.innerHTML = '';
-          const txList = (data.recentTransactions && data.recentTransactions.length > 0) ? data.recentTransactions : [];
-          if (txList.length === 0) {
-            salesTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#86868B;padding:18px;">No transactions logged yet today</td></tr>`;
-          } else {
-            txList.forEach(tx => {
-              const storeObj = (data.stores && data.stores.find(s => s.id === tx.storeId)) || { name: tx.storeId || 'Retail Branch' };
-              const timeStr = new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-              salesTbody.innerHTML += `
-                <tr>
-                  <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${timeStr}</td>
-                  <td style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${storeObj.name}</td>
-                  <td style="color:#0071E3;font-weight:500;font-size:12px;">${tx.userId}</td>
-                  <td style="font-weight:600;font-family:'JetBrains Mono';font-size:11.5px;">${tx.productId}</td>
-                  <td style="font-weight:600;color:#1D1D1F;">${tx.quantity}</td>
-                  <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">${tx.currency} ${(tx.totalAmount || 0).toLocaleString()}</td>
-                  <td><span style="background:#F2F2F7;color:#1D1D1F;text-transform:uppercase;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">${tx.paymentMethod || 'cash'}</span></td>
-                  <td style="color:#86868B;font-size:11px;text-transform:capitalize;">${tx.paymentTerms || 'straight'}</td>
-                </tr>
-              `;
-            });
-          }
-        }
+        supSalesData = (data.recentTransactions && data.recentTransactions.length > 0) ? data.recentTransactions : [];
+        renderSupSalesTable();
 
         // 6. Surveys Review Queue
-        const surveysTbody = document.getElementById('surveysSupTableBody');
-        if (surveysTbody) {
-          try {
-            const srvRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/surveys`);
-            const srvList = await srvRes.json();
-            surveysTbody.innerHTML = '';
-            if (Array.isArray(srvList) && srvList.length > 0) {
-              srvList.forEach(srv => {
-                const subCount = srv.submissionsCount || 0;
-                const latestTime = srv.latestSubmissionAt ? new Date(srv.latestSubmissionAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Active Queue';
-                surveysTbody.innerHTML += `
-                  <tr>
-                    <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${latestTime}</td>
-                    <td>
-                      <b style="color:#1D1D1F;font-size:12.5px;">${srv.title}</b>
-                      <div style="font-size:11px;color:#86868B;">${srv.questionsCount || 5} Questions · ${srv.surveyType}</div>
-                    </td>
-                    <td style="font-size:11.5px;color:#1D1D1F;">All Active Branches (${(srv.targetStoreNames || []).length})</td>
-                    <td><span style="background:#EBF4FF;color:#0071E3;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;">${subCount} Submitted</span></td>
-                    <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">verified</span> DB Verified</span></td>
-                    <td>
-                      <button type="button" onclick="switchAdminNav('surveys');setViewMode('admin');" style="background:#F2F2F7;border:1px solid rgba(0,0,0,0.06);color:#1D1D1F;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;">Inspect</button>
-                    </td>
-                  </tr>
-                `;
-              });
-            }
-          } catch (err) {
-            console.warn('Could not load surveys queue', err);
-          }
+        try {
+          const srvRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/surveys`);
+          const srvList = await srvRes.json();
+          supSurveysData = Array.isArray(srvList) ? srvList : [];
+          renderSupSurveysTable();
+        } catch (err) {
+          console.warn('Could not load surveys queue', err);
         }
 
       } catch (err) {
