@@ -6666,6 +6666,35 @@
       }
     }
 
+    function formatNaturalChatMessage(raw) {
+      if (raw === null || raw === undefined) return '';
+      let text = String(raw).trim();
+
+      // 1. Remove redundant header prefixes if present in legacy/bot messages
+      text = text.replace(/^⚠️\s*(?:\*\*)?Shift Check-Out Intercepted[^\n]*\n*/i, '').trim();
+
+      // 2. Strip markdown bold and italic formatting asterisks and underscores
+      text = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+      text = text.replace(/\*([^*]+)\*/g, '$1');
+      text = text.replace(/__([^_]+)__/g, '$1');
+      text = text.replace(/\*\*/g, '');
+
+      // 3. Convert markdown list dashes/asterisks into clean bullet symbols
+      text = text.replace(/^\s*[\*\-]\s+/gm, '• ');
+
+      // 4. Check if string already contains HTML tags (e.g. icons, buttons)
+      const hasHtml = /<[a-z][\s\S]*>/i.test(text);
+      if (hasHtml) {
+        return text.replace(/\n\s*\n+/g, '<br><br>').replace(/\n/g, '<br>');
+      }
+
+      // 5. If plain text, HTML escape safely and preserve natural paragraphs
+      const div = document.createElement('div');
+      div.textContent = text;
+      const safe = div.innerHTML;
+      return safe.replace(/\n\s*\n+/g, '<br><br>').replace(/\n/g, '<br>');
+    }
+
     function appendPaxRouteInteractiveCard(replyText, meta, cardType) {
       const stream = document.getElementById('activeChatStream');
       const wrap = document.createElement('div');
@@ -6755,7 +6784,7 @@
       wrap.innerHTML = `
         <div class="msg-author-tag">Pax · Frontline Copilot</div>
         <div class="m3-bubble pax">
-          ${replyText}
+          ${formatNaturalChatMessage(replyText)}
           <div class="bubble-meta-time">${time}</div>
         </div>
         ${cardHtml}
@@ -6778,7 +6807,7 @@
           <div style="display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:4px;color:var(--apple-blue);font-size:12.5px;">
             <span class="ms-icon sm" style="font-size:16px;">notifications_active</span> Task Dispatch
           </div>
-          <div style="font-size:13px;color:#1D1D1F;line-height:1.4;">${m.message}</div>
+          <div style="font-size:13px;color:#1D1D1F;line-height:1.4;">${formatNaturalChatMessage(m.message)}</div>
           <div class="bubble-meta-time">${time}</div>
         </div>
         <div class="m3-inline-action-grid">
@@ -6833,7 +6862,7 @@
           <div style="display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:4px;color:#B25E00;font-size:12.5px;">
             <span class="ms-icon sm" style="font-size:16px;">lock_clock</span> Shift Check-Out Intercepted
           </div>
-          <div style="font-size:12.5px;color:#1D1D1F;line-height:1.45;">${escapeHtml(m.message).replace(/\\n/g, '<br>')}</div>
+          <div style="font-size:12.5px;color:#1D1D1F;line-height:1.45;">${formatNaturalChatMessage(m.message)}</div>
           ${tasksHtml}
           <div class="bubble-meta-time">${time}</div>
         </div>
@@ -6864,7 +6893,7 @@
       wrap.innerHTML = `
         <div class="msg-author-tag">${sender}</div>
         <div class="m3-bubble ${isUser ? 'user' : 'peer'}">
-          ${text}
+          ${formatNaturalChatMessage(text)}
           <div class="bubble-meta-time">${time}</div>
         </div>
       `;
@@ -6905,7 +6934,7 @@
       wrap.innerHTML = `
         <div class="msg-author-tag">Pax · Frontline Copilot</div>
         <div class="m3-bubble pax">
-          ${text}
+          ${formatNaturalChatMessage(text)}
           <div class="bubble-meta-time">${time}</div>
         </div>
         ${actionsHtml}
@@ -6978,7 +7007,7 @@
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       wrap.innerHTML = `
         <div class="m3-bubble user">
-          ${text}
+          ${formatNaturalChatMessage(text)}
           <div class="bubble-meta-time">${time}</div>
         </div>
       `;
@@ -13171,6 +13200,17 @@ async function exportAnalyticsCsv() {
       }
     }
 
+    function formatAegisMarkdown(raw) {
+      if (!raw) return '';
+      let text = String(raw).trim();
+      text = text.replace(/^###\s*(.*)$/gm, '<b style="display:block;font-size:13px;color:#1D1D1F;margin:4px 0;">$1</b>');
+      text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      text = text.replace(/\*([^*]+)\*/g, '<i>$1</i>');
+      text = text.replace(/`([^`]+)`/g, '<code style="background:#F2F2F7;padding:1px 4px;border-radius:4px;font-family:\'JetBrains Mono\';font-size:11px;">$1</code>');
+      text = text.replace(/^\s*[\*\-]\s+(.*)$/gm, '<div style="padding-left:10px;">• $1</div>');
+      return text.replace(/\n\s*\n+/g, '<br><br>').replace(/\n/g, '<br>');
+    }
+
     async function submitAegisMessage() {
       const inputEl = document.getElementById('aegisChatInput');
       const msg = inputEl ? inputEl.value.trim() : '';
@@ -13251,7 +13291,7 @@ async function exportAnalyticsCsv() {
         thread.innerHTML += `
           <div class="aegis-msg-bubble aegis">
             ${statusPill}
-            <div style="line-height:1.5;font-size:12.5px;color:#1D1D1F;white-space:pre-wrap;">${data.reply || data.error}</div>
+            <div style="line-height:1.5;font-size:12.5px;color:#1D1D1F;">${formatAegisMarkdown(data.reply || data.error)}</div>
             ${auditNotice}
           </div>
         `;

@@ -1221,9 +1221,41 @@ adminRouter.post('/admin/:ws/users/:id/clock-out', wrap(async (req, res) => {
   const { requiredTasks, incompleteTasks } = await getIncompleteRequiredTasksForUser(ws, id);
 
   if (incompleteTasks.length > 0 && !b.force) {
-    // 1. Proactive AI Agent Intervention Message (Pax Sentinel)
-    const taskBulletList = incompleteTasks.map((t, idx) => `${idx + 1}. **${t.title}** (${t.agentId?.includes('vera') ? 'Vera CV Vision' : 'Ops'})`).join('\n');
-    const warningText = `⚠️ **Shift Check-Out Intercepted by Pax**\n\nHey ${user.name.split(' ')[0]}, you attempted to clock out at **${storeName}**, but you still have **${incompleteTasks.length} mandatory task(s)** pending before departure:\n\n${taskBulletList}\n\nCompany policy requires all mandatory audits to be completed before clock-out so nothing is left behind! Tap below to finish them now.`;
+    // 1. Proactive AI Agent Intervention Message (Pax Sentinel in Warm Natural Language)
+    const userFirstName = user.name.split(' ')[0];
+    const taskCount = incompleteTasks.length;
+    const lang = user.preferredLanguage || 'en';
+    let warningText = '';
+
+    if (lang === 'fil') {
+      if (taskCount === 1) {
+        warningText = `Hey ${userFirstName}, bago ka mag-clock out sa ${storeName}, may mabilis na task pa tayong kailangang tapusin: ang ${incompleteTasks[0].title}.\n\nPaki-complete lang sa ibaba para plantsado at ma-sign off nang maayos ang shift mo today!`;
+      } else {
+        const taskNames = incompleteTasks.map(t => `• ${t.title}`).join('\n');
+        warningText = `Hey ${userFirstName}, bago ka mag-clock out sa ${storeName}, may ${taskCount} pang checklist tasks na kailangang tapusin:\n\n${taskNames}\n\nPaki-complete lang ang mga ito sa ibaba para ma-sign off nang maayos ang shift mo today!`;
+      }
+    } else if (lang === 'ms') {
+      if (taskCount === 1) {
+        warningText = `Hai ${userFirstName}, sebelum tamat syif di ${storeName}, ada satu tugasan pantas yang perlu diselesaikan: ${incompleteTasks[0].title}.\n\nSila selesaikan di bawah supaya syif anda lengkap hari ini!`;
+      } else {
+        const taskNames = incompleteTasks.map(t => `• ${t.title}`).join('\n');
+        warningText = `Hai ${userFirstName}, sebelum tamat syif di ${storeName}, anda mempunyai ${taskCount} tugasan yang masih perlu diselesaikan:\n\n${taskNames}\n\nSila lengkapkan tugasan di bawah sebelum mendaftar keluar!`;
+      }
+    } else if (lang === 'vi') {
+      if (taskCount === 1) {
+        warningText = `Chào ${userFirstName}, trước khi kết thúc ca làm tại ${storeName}, bạn còn một nhiệm vụ nhanh cần hoàn tất: ${incompleteTasks[0].title}.\n\nHãy thực hiện bên dưới để hoàn tất ca làm việc hôm nay nhé!`;
+      } else {
+        const taskNames = incompleteTasks.map(t => `• ${t.title}`).join('\n');
+        warningText = `Chào ${userFirstName}, trước khi kết thúc ca làm tại ${storeName}, bạn còn ${taskCount} nhiệm vụ cần hoàn tất:\n\n${taskNames}\n\nVui lòng hoàn thành bên dưới để ca làm việc được phê duyệt nhé!`;
+      }
+    } else {
+      if (taskCount === 1) {
+        warningText = `Hey ${userFirstName}, before you head out from ${storeName}, there is just one quick task left to finish: the ${incompleteTasks[0].title}.\n\nPlease complete it below so your shift is fully verified and signed off for today!`;
+      } else {
+        const taskNames = incompleteTasks.map(t => `• ${t.title}`).join('\n');
+        warningText = `Hey ${userFirstName}, before heading out from ${storeName}, we still have ${taskCount} quick tasks to wrap up:\n\n${taskNames}\n\nPlease finish them below so your shift is fully verified and signed off for today!`;
+      }
+    }
 
     await db.insert(chatMessages).values({
       id: newId('msg'),

@@ -826,6 +826,7 @@ Guidelines:
   * If active surveys exist: state the survey title and advise them to tap the Surveys tab at the bottom to complete it.
 - If asking about products or pricing: Give concise promotional guidance in ${lang.name}.
 - If asking about store operations: Keep answers practical and friendly in ${lang.name}.
+- Natural Language & Formatting: Speak in natural, human conversational tone. NEVER use markdown asterisks (no **bold**, no *italic*). Never output raw asterisks or asterisks bullets. Use plain, clean text.
 - Length: 2 sentences max. Zero fluff.`;
 
       let fallbackText = lang.morningGreeting(user.name, activeStoreName, shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()}` : 'daily target', 'Focus Promo');
@@ -833,11 +834,11 @@ Guidelines:
         if (activeLangCode === 'fil') {
           fallbackText = activeSurveys.length > 0
             ? `Kumusta, ${user.name}! May ${activeSurveys.length} active survey tayo ngayon: "${activeSurveys[0].title}". Buksan lang ang Surveys tab sa ibaba para sagutan!`
-            : `Kumusta, ${user.name}! Walang partikular na 'survey' na kailangan sagutan ngayon. Ang pangunahing checklist mo ay patakbuhin ang Vera Shelf Camera Audit para sa planogram compliance at mag-log ng focus promo sales gamit ang Fast-Sale bago mag-checkout!`;
+            : `Kumusta, ${user.name}! Walang partikular na survey na kailangan sagutan ngayon. Ang pangunahing checklist mo ay patakbuhin ang Vera Shelf Camera Audit para sa planogram compliance at mag-log ng focus promo sales gamit ang Fast-Sale bago mag-checkout!`;
         } else if (activeLangCode === 'ms') {
           fallbackText = activeSurveys.length > 0
             ? `Hai, ${user.name}! Terdapat borang tinjauan aktif hari ini: "${activeSurveys[0].title}". Sila buka tab Tinjauan di bahagian bawah untuk melengkapkannya.`
-            : `Hai, ${user.name}! Tiada 'survey' khusus dijadualkan hari ini. Keutamaan anda ialah menjalankan Audit Rak Kamera Vera dan merekod jualan promosi sebelum daftar keluar!`;
+            : `Hai, ${user.name}! Tiada survey khusus dijadualkan hari ini. Keutamaan anda ialah menjalankan Audit Rak Kamera Vera dan merekod jualan promosi sebelum daftar keluar!`;
         } else if (activeLangCode === 'vi') {
           fallbackText = activeSurveys.length > 0
             ? `Chào ${user.name}! Hôm nay có bài khảo sát đang hoạt động: "${activeSurveys[0].title}". Nhấn vào tab Khảo sát bên dưới để thực hiện!`
@@ -853,7 +854,9 @@ Guidelines:
           model: MODELS.FLASH,
           contents: prompt,
         });
-        if (aiRes.text) reply = aiRes.text;
+        if (aiRes.text) {
+          reply = aiRes.text.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+        }
       } catch (aiErr) {
         console.warn('[Pax] handleChat AI fallback:', aiErr);
       }
