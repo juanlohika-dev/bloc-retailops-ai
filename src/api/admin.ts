@@ -5,7 +5,7 @@ import {
   agentRegistry, agentSkills, agentTasks, agentFieldContacts,
   executiveReports, orgNodes, shifts, salesTransactions, shelfAudits, chatMessages,
   surveys, surveySubmissions, rovingStoreVisits,
-  paymentMethods, paymentTerms, aiGovernanceConfigs,
+  paymentMethods, paymentTerms, aiGovernanceConfigs, supportedLanguages,
 } from '../db/schema.js';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { DemoGenerator } from '../agents/demo/index.js';
@@ -1896,6 +1896,14 @@ adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
 }));
 
 // ============================================================
+// SUPPORTED ENTERPRISE LOCALES & LANGUAGES
+// ============================================================
+adminRouter.get('/admin/:ws/languages', wrap(async (_req, res) => {
+  const list = await db.select().from(supportedLanguages).where(eq(supportedLanguages.active, true)).orderBy(supportedLanguages.displayOrder);
+  res.json(list);
+}));
+
+// ============================================================
 // AI GOVERNANCE & ROLE-BASED COPILOT GUARDRAILS
 // ============================================================
 adminRouter.get('/admin/:ws/settings/governance', wrap(async (req, res) => {
@@ -2101,7 +2109,7 @@ User Message: "${message}"
 Output JSON only:
 {
   "isConfigChange": boolean,
-  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "org_chart" | "user_provisioning" | "ai_guardrails" | "product_pricing" | "none",
+  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "org_chart" | "user_provisioning" | "user_language" | "ai_guardrails" | "product_pricing" | "none",
   "action": "enable" | "disable" | "update" | "add" | "create" | "query",
   "targetEntity": string,
   "targetValue": any,
@@ -2143,6 +2151,17 @@ Output JSON only:
           role: roleMatch,
         }
       };
+    } else if (/(?:set|change|switch|update)\s+([a-zA-Z\s]+?)(?:'s)?\s+(?:preferred\s+)?language\s+(?:to\s+)?([a-zA-Z\s]+)/i.test(message)) {
+      const match = message.match(/(?:set|change|switch|update)\s+([a-zA-Z\s]+?)(?:'s)?\s+(?:preferred\s+)?language\s+(?:to\s+)?([a-zA-Z\s]+)/i);
+      if (match) {
+        intentClassification = {
+          isConfigChange: true,
+          configDomain: 'user_language',
+          action: 'update',
+          targetEntity: match[1].trim(),
+          targetValue: match[2].trim(),
+        };
+      }
     }
   }
 
@@ -2243,6 +2262,18 @@ Output JSON only:
           const newTarget = Number(intentClassification.targetValue) || oldTarget;
           await db.update(stores).set({ dailyTargetDefault: newTarget } as any).where(eq(stores.id, storeMatch.id));
           appliedDiff = { storeId: storeMatch.id, storeName: storeMatch.name, oldDailyTarget: oldTarget, newDailyTarget: newTarget };
+          configUpdated = true;
+        }
+      } else if (intentClassification.configDomain === 'user_language') {
+        // Update user preferred language via Aegis
+        const targetPerson = (intentClassification.targetEntity || '').toLowerCase();
+        const userMatch = userList.find(u => u.name.toLowerCase().includes(targetPerson) || u.email.toLowerCase().includes(targetPerson) || u.id === targetPerson);
+        if (userMatch) {
+          const rawLang = String(intentClassification.targetValue || message);
+          const normLang = PaxAgent.normalizeLanguageCode(rawLang);
+          const langMeta = PaxAgent.getLanguageConfig(normLang);
+          await PaxAgent.changeUserLanguage(userMatch.id, normLang);
+          appliedDiff = { userId: userMatch.id, userName: userMatch.name, previousLanguage: userMatch.preferredLanguage, newLanguage: normLang, languageName: langMeta.name };
           configUpdated = true;
         }
       } else if (intentClassification.configDomain === 'user_provisioning') {

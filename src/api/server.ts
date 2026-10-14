@@ -7,7 +7,7 @@ import { PaxAgent } from '../agents/pax/index.js';
 import { VeraAgent } from '../agents/vera/index.js';
 import { NexusAgent } from '../agents/nexus/index.js';
 import { db } from '../db/client.js';
-import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces, rovingStoreVisits } from '../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces, rovingStoreVisits, supportedLanguages } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { adminRouter, ensureRovingItinerary } from './admin.js';
 import { ensureTablesAndColumns } from '../db/ensure_schema.js';
@@ -126,6 +126,34 @@ app.post('/api/pax/briefing', async (req, res) => {
   try {
     const { userId } = req.body;
     const result = await PaxAgent.getMorningBriefing(userId);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----------------------------------------------------
+// 2B. GET DATABASE-DRIVEN SUPPORTED LANGUAGES
+// ----------------------------------------------------
+app.get('/api/languages', async (_req, res) => {
+  try {
+    const list = await db.select().from(supportedLanguages).where(eq(supportedLanguages.active, true)).orderBy(supportedLanguages.displayOrder);
+    res.json(list);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----------------------------------------------------
+// 2C. UPDATE USER PREFERRED LANGUAGE
+// ----------------------------------------------------
+app.patch('/api/user/:userId/language', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { language } = req.body;
+    if (!language) return res.status(400).json({ error: 'Language code is required' });
+
+    const result = await PaxAgent.changeUserLanguage(userId, language);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

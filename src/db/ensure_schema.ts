@@ -212,12 +212,70 @@ export async function ensureTablesAndColumns() {
       // Seed Roving Merchandiser user if missing
       await libSqlClient.execute({
         sql: `INSERT OR IGNORE INTO users (id, workspace_id, name, email, phone, role, preferred_language, timezone, active, employment_type, assigned_store_ids, created_at)
-              VALUES ('usr-marco-ph', ?, 'Marco Diaz', 'marco.diaz@retailops.ai', '+63 917 888 7766', 'promoter', 'tl-PH', 'Asia/Manila', 1, 'roving', ?, ?)`,
+              VALUES ('usr-marco-ph', ?, 'Marco Diaz', 'marco.diaz@retailops.ai', '+63 917 888 7766', 'promoter', 'fil', 'Asia/Manila', 1, 'roving', ?, ?)`,
         args: [wsId, JSON.stringify(manilaStores.map(s => s.id)), Date.now()],
+      });
+
+      // Seed Multi-Lingual Regional Personas (Malaysia, Vietnam, India)
+      await libSqlClient.execute({
+        sql: `INSERT OR IGNORE INTO users (id, workspace_id, name, email, phone, role, preferred_language, timezone, active, employment_type, assigned_store_ids, created_at)
+              VALUES ('usr-ahmad-my', ?, 'Ahmad Razak', 'ahmad.razak@retailops.ai', '+60 12 345 6789', 'promoter', 'ms', 'Asia/Kuala_Lumpur', 1, 'stationary', '[]', ?)`,
+        args: [wsId, Date.now()],
+      });
+      await libSqlClient.execute({
+        sql: `INSERT OR IGNORE INTO users (id, workspace_id, name, email, phone, role, preferred_language, timezone, active, employment_type, assigned_store_ids, created_at)
+              VALUES ('usr-nguyen-vn', ?, 'Nguyen Van Minh', 'nguyen.minh@retailops.ai', '+84 90 123 4567', 'promoter', 'vi', 'Asia/Ho_Chi_Minh', 1, 'stationary', '[]', ?)`,
+        args: [wsId, Date.now()],
+      });
+      await libSqlClient.execute({
+        sql: `INSERT OR IGNORE INTO users (id, workspace_id, name, email, phone, role, preferred_language, timezone, active, employment_type, assigned_store_ids, created_at)
+              VALUES ('usr-priya-in', ?, 'Priya Sharma', 'priya.sharma@retailops.ai', '+91 98 7654 3210', 'promoter', 'ur', 'Asia/Kolkata', 1, 'stationary', '[]', ?)`,
+        args: [wsId, Date.now()],
       });
     }
 
-    console.log('[DB Schema] Master Schema & Seeded Tables (Surveys, Payment Methods, Payment Terms, Governance, Stores) verified in DB.');
+    // 6. Supported Languages Table (Database-Driven Master Taxonomy)
+    await libSqlClient.execute(`
+      CREATE TABLE IF NOT EXISTS supported_languages (
+        code TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        native_name TEXT NOT NULL,
+        region TEXT NOT NULL,
+        flag_emoji TEXT NOT NULL,
+        is_default INTEGER DEFAULT 0,
+        active INTEGER DEFAULT 1,
+        display_order INTEGER DEFAULT 1,
+        created_at INTEGER NOT NULL
+      );
+    `);
+
+    // Seed Supported Languages (English, Filipino, Bahasa Melayu, Tiếng Việt, Urdu, Hindi)
+    const masterLanguages = [
+      { code: 'en', name: 'English', nativeName: 'English', region: 'Global', flagEmoji: '🌐', isDefault: 1, order: 1 },
+      { code: 'fil', name: 'Filipino', nativeName: 'Wikang Filipino', region: 'Philippines', flagEmoji: '🇵🇭', isDefault: 0, order: 2 },
+      { code: 'ms', name: 'Bahasa Melayu', nativeName: 'Bahasa Melayu', region: 'Malaysia', flagEmoji: '🇲🇾', isDefault: 0, order: 3 },
+      { code: 'vi', name: 'Tiếng Việt', nativeName: 'Tiếng Việt', region: 'Vietnam', flagEmoji: '🇻🇳', isDefault: 0, order: 4 },
+      { code: 'ur', name: 'Urdu', nativeName: 'اردو', region: 'South Asia / India', flagEmoji: '🇵🇰 / 🇮🇳', isDefault: 0, order: 5 },
+      { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', region: 'India', flagEmoji: '🇮🇳', isDefault: 0, order: 6 },
+    ];
+
+    for (const lang of masterLanguages) {
+      await libSqlClient.execute({
+        sql: `INSERT OR IGNORE INTO supported_languages (code, name, native_name, region, flag_emoji, is_default, active, display_order, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+        args: [lang.code, lang.name, lang.nativeName, lang.region, lang.flagEmoji, lang.isDefault, lang.order, Date.now()],
+      });
+    }
+
+    // Normalize legacy user language codes to standard master codes
+    try {
+      await libSqlClient.execute(`UPDATE users SET preferred_language = 'fil' WHERE preferred_language IN ('tl-PH', 'tl', 'fil-PH');`);
+      await libSqlClient.execute(`UPDATE users SET preferred_language = 'en' WHERE preferred_language IN ('en-SG', 'en-US', 'en-GB');`);
+      await libSqlClient.execute(`UPDATE users SET preferred_language = 'ms' WHERE preferred_language IN ('ms-MY');`);
+      await libSqlClient.execute(`UPDATE users SET preferred_language = 'vi' WHERE preferred_language IN ('vi-VN');`);
+    } catch (normErr) {}
+
+    console.log('[DB Schema] Master Schema & Seeded Tables (Surveys, Payment Methods, Payment Terms, Governance, Stores, Supported Languages) verified in DB.');
   } catch (err) {
     console.warn('[DB Schema] Schema verification notice:', err);
   }

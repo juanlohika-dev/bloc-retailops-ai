@@ -27,7 +27,7 @@ export async function seedDatabase() {
       email: 'sarah.tan@retailops.ai',
       phone: '+65 9123 4567',
       role: 'promoter',
-      preferredLanguage: 'en-SG',
+      preferredLanguage: 'en',
       timezone: 'Asia/Singapore',
       createdAt: new Date(),
     },
@@ -38,7 +38,7 @@ export async function seedDatabase() {
       email: 'liza.santos@retailops.ai',
       phone: '+63 917 555 1234',
       role: 'promoter',
-      preferredLanguage: 'tl-PH', // Tagalog
+      preferredLanguage: 'fil', // Tagalog / Filipino
       timezone: 'Asia/Manila',
       createdAt: new Date(),
     },

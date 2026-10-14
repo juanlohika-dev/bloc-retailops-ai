@@ -2473,8 +2473,25 @@
       <div class="m3-persona-chip" title="Active Staff Persona">
         <span class="ms-icon sm">account_circle</span>
         <select id="userSelector" onchange="switchPersona(this.value)">
-          <option value="usr-liza-ph">Liza Santos (SM Megamall · Tagalog)</option>
-          <option value="usr-sarah-sg">Sarah Tan (VivoCity · Singlish/EN)</option>
+          <option value="usr-marco-ph">Marco Diaz (🚐 Roving 8-Stop · Filipino)</option>
+          <option value="usr-liza-ph">Liza Santos (SM Megamall · Filipino)</option>
+          <option value="usr-sarah-sg">Sarah Tan (VivoCity · English)</option>
+          <option value="usr-ahmad-my">Ahmad Razak (Pavilion KL · Bahasa Melayu)</option>
+          <option value="usr-nguyen-vn">Nguyen Van Minh (Vincom HCMC · Tiếng Việt)</option>
+          <option value="usr-priya-in">Priya Sharma (Phoenix Mumbai · Urdu / Hindi)</option>
+        </select>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="m3-persona-chip" title="Preferred Language (Configured per staff member)">
+        <span class="ms-icon sm">translate</span>
+        <select id="globalLangSelector" onchange="changeActiveUserLanguage(this.value)">
+          <option value="en">🌐 English</option>
+          <option value="fil">🇵🇭 Filipino</option>
+          <option value="ms">🇲🇾 Bahasa Melayu</option>
+          <option value="vi">🇻🇳 Tiếng Việt</option>
+          <option value="ur">🇵🇰 اردو (Urdu)</option>
+          <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
         </select>
       </div>
 
@@ -2529,9 +2546,16 @@
           <div class="m3-chats-header">
             <div class="chats-headline-bar">
               <span class="m3-title-large">Chats</span>
-              <div class="m3-store-chip" id="lblRosterStore">
-                <span class="ms-icon sm">storefront</span>
-                <span id="txtRosterStoreName">SM Megamall</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="m3-lang-chip" id="btnUserLanguage" onclick="openLanguageModal()" title="Switch Preferred Language" style="font-size:11.5px;font-weight:650;color:#1D1D1F;background:#ECEFF1;padding:4px 9px;border-radius:999px;display:flex;align-items:center;gap:4px;cursor:pointer;border:1px solid rgba(0,0,0,0.08);transition:background 0.15s;">
+                  <span id="txtUserLangFlag">🇵🇭</span>
+                  <span id="txtUserLangCode">FIL</span>
+                  <span class="ms-icon sm" style="font-size:13px;color:#666;">arrow_drop_down</span>
+                </div>
+                <div class="m3-store-chip" id="lblRosterStore">
+                  <span class="ms-icon sm">storefront</span>
+                  <span id="txtRosterStoreName">SM Megamall</span>
+                </div>
               </div>
             </div>
             <div class="m3-search-bar">
@@ -2643,9 +2667,15 @@
               <div class="convo-main-title" id="activeChatTitle">Pax · Frontline Copilot</div>
               <div class="convo-sub-status" id="activeChatStatus"><span class="ms-icon sm" style="font-size:11px;color:var(--m3-tertiary-emerald);">circle</span> Autonomous Daily Guide</div>
             </div>
-            <button class="m3-icon-btn" onclick="openSkuSearchSheet()" title="Search SKU">
-              <span class="ms-icon sm">search</span>
-            </button>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <button class="m3-icon-btn" onclick="openLanguageModal()" title="Change Language" id="btnActiveChatLang" style="font-size:12px;display:flex;align-items:center;justify-content:center;background:#F2F2F7;border-radius:999px;padding:4px 8px;gap:3px;border:none;cursor:pointer;">
+                <span id="activeChatLangFlag">🇵🇭</span>
+                <span id="activeChatLangCode" style="font-size:11px;font-weight:700;color:#1D1D1F;">FIL</span>
+              </button>
+              <button class="m3-icon-btn" onclick="openSkuSearchSheet()" title="Search SKU">
+                <span class="ms-icon sm">search</span>
+              </button>
+            </div>
           </div>
 
           <!-- Shift Quota Indicator Bar (Slim Apple Activity Capsule) -->
@@ -3952,6 +3982,25 @@
     </div>
 
     <!-- ============================================================
+         GLOBAL MODAL: MULTI-LINGUAL PREFERRED LANGUAGE SELECTOR
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalLanguageSelector">
+      <div class="demo-modal-dialog" style="max-width: 440px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.06);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon" style="color:#0071E3;">translate</span>
+            <div style="font-size:16px;font-weight:700;color:#1D1D1F;">Select Preferred Language</div>
+          </div>
+          <button class="m3-icon-btn" onclick="closeLanguageModal()"><span class="ms-icon sm">close</span></button>
+        </div>
+        <p style="font-size:12px;color:#6E6E73;margin:10px 0 14px;">Choose your native language for Pax morning briefings, route guidance, coaching tips, and interactive cards.</p>
+        <div id="languageOptionsContainer" style="display:flex;flex-direction:column;gap:8px;">
+          <!-- Dynamically populated from database table supported_languages -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
          GLOBAL MODAL: SURVEY & DYNAMIC FORM BUILDER
          ============================================================ -->
     <div class="global-modal-scrim" id="modalSurveyBuilder">
@@ -4961,7 +5010,9 @@
           const opt = document.createElement('option');
           opt.value = u.id;
           const modeTag = u.employmentType === 'roving' ? ' (🚐 Roving 8-Store Route)' : (u.storeName ? ` (${u.storeName})` : '');
-          opt.innerText = `${u.name}${modeTag}`;
+          const langCode = (u.preferredLanguage || 'en').toLowerCase();
+          const langFlag = langCode.startsWith('fil') || langCode.startsWith('tl') ? '🇵🇭' : (langCode.startsWith('ms') ? '🇲🇾' : (langCode.startsWith('vi') ? '🇻🇳' : (langCode.startsWith('ur') ? '🇵🇰' : (langCode.startsWith('hi') ? '🇮🇳' : '🌐'))));
+          opt.innerText = `${langFlag} ${u.name}${modeTag}`;
           sel.appendChild(opt);
         });
 
@@ -5009,12 +5060,16 @@
         updateKpiBanner(currentShiftTotal);
         currentUserName = data.user?.name || 'Staff User';
 
+        currentUserPreferredLanguage = data.user?.preferredLanguage || 'en';
+        updateLanguagePillAndSelectors(currentUserPreferredLanguage);
+
         if (typeof renderMobileShiftCard === 'function') {
           renderMobileShiftCard();
         }
 
         // Await catalog products so instant search is ready immediately
         await fetchCatalogProducts();
+        if (!cachedLanguages.length) await fetchSupportedLanguages();
       } catch (err) {
         console.error('Failed to load user state:', err);
       }
@@ -5036,6 +5091,116 @@
       document.getElementById('lblKpiTarget').innerText = `${currencySymbol}${targetAmount.toLocaleString()}`;
       document.getElementById('lblKpiCurrent').innerText = `${currencySymbol}${currentShiftTotal.toLocaleString()} (${pct}%)`;
       document.getElementById('kpiProgressFill').style.width = `${pct}%`;
+    }
+
+    // ============================================================
+    // MULTI-LINGUAL SUPPORT & PREFERRED LANGUAGE RESOLUTION
+    // ============================================================
+    let cachedLanguages = [];
+    let currentUserPreferredLanguage = 'en';
+
+    async function fetchSupportedLanguages() {
+      try {
+        const res = await fetch('/api/languages');
+        cachedLanguages = await res.json();
+        populateLanguageDropdowns();
+      } catch (err) {
+        console.warn('Failed to load supported languages:', err);
+      }
+    }
+
+    function populateLanguageDropdowns() {
+      if (!cachedLanguages || !cachedLanguages.length) return;
+
+      const globalSel = document.getElementById('globalLangSelector');
+      if (globalSel) {
+        globalSel.innerHTML = cachedLanguages.map(l => `<option value="${l.code}">${l.flagEmoji} ${l.name}</option>`).join('');
+        if (currentUserPreferredLanguage) globalSel.value = currentUserPreferredLanguage;
+      }
+
+      const userFormSel = document.getElementById('userFormLanguage');
+      if (userFormSel) {
+        userFormSel.innerHTML = cachedLanguages.map(l => `<option value="${l.code}">${l.flagEmoji} ${l.name} (${l.nativeName})</option>`).join('');
+      }
+
+      const container = document.getElementById('languageOptionsContainer');
+      if (container) {
+        container.innerHTML = cachedLanguages.map(l => `
+          <div onclick="changeActiveUserLanguage('${l.code}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F8F9FA;border:1px solid rgba(0,0,0,0.06);border-radius:12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#E8F0FE'" onmouseout="this.style.background='#F8F9FA'">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">${l.flagEmoji}</span>
+              <div>
+                <div style="font-size:13.5px;font-weight:700;color:#1D1D1F;">${escapeHtml(l.name)}</div>
+                <div style="font-size:11.5px;color:#86868B;">${escapeHtml(l.nativeName)} · ${escapeHtml(l.region)}</div>
+              </div>
+            </div>
+            ${(currentUserPreferredLanguage === l.code) ? '<span class="ms-icon sm" style="color:#0071E3;">check_circle</span>' : '<span class="ms-icon sm" style="color:#C7C7CC;">chevron_right</span>'}
+          </div>
+        `).join('');
+      }
+    }
+
+    function updateLanguagePillAndSelectors(langCode) {
+      currentUserPreferredLanguage = langCode || 'en';
+      const lang = cachedLanguages.find(l => l.code === currentUserPreferredLanguage) || {
+        code: currentUserPreferredLanguage,
+        name: 'English',
+        flagEmoji: currentUserPreferredLanguage === 'fil' ? '🇵🇭' : (currentUserPreferredLanguage === 'ms' ? '🇲🇾' : (currentUserPreferredLanguage === 'vi' ? '🇻🇳' : (currentUserPreferredLanguage === 'ur' ? '🇵🇰' : (currentUserPreferredLanguage === 'hi' ? '🇮🇳' : '🌐'))))
+      };
+
+      const flagEl = document.getElementById('txtUserLangFlag');
+      const codeEl = document.getElementById('txtUserLangCode');
+      const activeFlagEl = document.getElementById('activeChatLangFlag');
+      const activeCodeEl = document.getElementById('activeChatLangCode');
+      const globalSel = document.getElementById('globalLangSelector');
+
+      if (flagEl) flagEl.innerText = lang.flagEmoji || '🌐';
+      if (codeEl) codeEl.innerText = (lang.code || 'en').toUpperCase();
+      if (activeFlagEl) activeFlagEl.innerText = lang.flagEmoji || '🌐';
+      if (activeCodeEl) activeCodeEl.innerText = (lang.code || 'en').toUpperCase();
+      if (globalSel) globalSel.value = lang.code;
+    }
+
+    async function changeActiveUserLanguage(newLangCode) {
+      try {
+        const res = await fetch(`/api/user/${currentUserId}/language`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language: newLangCode }),
+        });
+        const result = await res.json();
+        if (result.success) {
+          currentUserPreferredLanguage = result.language;
+          updateLanguagePillAndSelectors(currentUserPreferredLanguage);
+          showToastNotification(`${result.flagEmoji || '🌐'} Preferred language set to ${result.languageName}`);
+          closeLanguageModal();
+          await loadUserState();
+
+          // Refresh morning briefing in chat if in Pax chat
+          if (currentChatId === 'chat-pax') {
+            const briefRes = await fetch('/api/pax/briefing', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: currentUserId }),
+            });
+            const briefData = await briefRes.json();
+            if (briefData.briefing) {
+              appendPaxBubble(briefData.briefing);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to change user language:', err);
+      }
+    }
+
+    function openLanguageModal() {
+      populateLanguageDropdowns();
+      document.getElementById('modalLanguageSelector')?.classList.add('active');
+    }
+
+    function closeLanguageModal() {
+      document.getElementById('modalLanguageSelector')?.classList.remove('active');
     }
 
     // ============================================================
@@ -5446,6 +5611,11 @@
           if (data.interactiveCardType === 'route_card' || data.interactiveCardType === 'route_optimized') {
             appendPaxRouteInteractiveCard(data.reply, data.cardMetadata, data.interactiveCardType);
             renderMobileStatusPill();
+          } else if (data.interactiveCardType === 'language_updated') {
+            appendPaxBubble(data.reply);
+            currentUserPreferredLanguage = data.cardMetadata?.language || 'en';
+            updateLanguagePillAndSelectors(currentUserPreferredLanguage);
+            showToastNotification(`${data.cardMetadata?.flag || '🌐'} Language set to ${data.cardMetadata?.languageName}`);
           } else {
             appendPaxBubble(data.reply);
           }

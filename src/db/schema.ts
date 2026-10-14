@@ -449,3 +449,19 @@ export const aiGovernanceConfigs = sqliteTable('ai_governance_configs', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
+// ==========================================
+// 27. SUPPORTED LOCALES & PREFERRED LANGUAGES (Zero-Hardcoded Taxonomy)
+// ==========================================
+export const supportedLanguages = sqliteTable('supported_languages', {
+  code: text('code').primaryKey(), // 'en', 'fil', 'ms', 'vi', 'ur', 'hi'
+  name: text('name').notNull(), // 'English', 'Filipino', 'Bahasa Melayu', 'Tiếng Việt', 'Urdu', 'Hindi'
+  nativeName: text('native_name').notNull(), // 'English', 'Wikang Filipino', 'Bahasa Melayu', 'Tiếng Việt', 'اردو', 'हिन्दी'
+  region: text('region').notNull(), // 'Global', 'Philippines', 'Malaysia', 'Vietnam', 'South Asia / India', 'India'
+  flagEmoji: text('flag_emoji').notNull(), // '🌐', '🇵🇭', '🇲🇾', '🇻🇳', '🇵🇰', '🇮🇳'
+  isDefault: integer('is_default', { mode: 'boolean' }).default(false),
+  active: integer('active', { mode: 'boolean' }).default(true),
+  displayOrder: integer('display_order').default(1),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+

@@ -1,6 +1,6 @@
 import { ai, MODELS } from '../../integrations/google/gemini.js';
 import { db } from '../../db/client.js';
-import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages, auditLogs, rovingStoreVisits } from '../../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages, auditLogs, rovingStoreVisits, supportedLanguages } from '../../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 
 export interface FastSaleItem {
@@ -8,7 +8,175 @@ export interface FastSaleItem {
   quantity: number;
 }
 
+export interface LanguageMeta {
+  code: string;
+  name: string;
+  nativeName: string;
+  flag: string;
+  promptInstruction: string;
+  morningGreeting: (name: string, store: string, target: string, focusSku: string) => string;
+  rovingGreeting: (name: string, stopNum: number, activeStore: string, nextStore: string, target: string) => string;
+  routeGuidance: (activeStore: string, nextStore: string, stopNum: number, total: number, time: string) => string;
+  routeOptimized: (nextStore: string, nextNum: number, savedMins: number) => string;
+  tasksChecklist: string;
+  allStopsCompleted: (name: string, total: number) => string;
+  languageChangedNotice: (langName: string, flag: string) => string;
+}
+
+export const SUPPORTED_LANGUAGES_MAP: Record<string, LanguageMeta> = {
+  en: {
+    code: 'en',
+    name: 'English',
+    nativeName: 'English',
+    flag: '🌐',
+    promptInstruction: 'Write the response in natural, professional English suitable for a frontline retail sales promoter. Be encouraging, crisp, and direct.',
+    morningGreeting: (name, store, target, sku) => `Good morning, ${name}! Attendance verified at ${store}. Today's target is ${target}. Focus SKU: ${sku}. Let's make it a high-conversion day!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `Good morning, ${name}! Checked in at Stop ${stopNum}/8 (${active}). Next destination: ${next}. Target: ${target}. Let's crush our route!`,
+    routeGuidance: (active, next, stopNum, total, time) => `You are currently on site at Stop ${stopNum}/${total}: ${active} (GPS Verified). Once you clock out, your next destination is ${next} (${time}). Tap below to manage your route.`,
+    routeOptimized: (next, num, saved) => `⚡ I have re-sequenced your remaining store route based on Metro Manila traffic and real-time geographic proximity! Next up is Stop ${num}: ${next}, saving ~${saved} minutes.`,
+    tasksChecklist: `Frontline Checklist: 1) Geofenced Check-In, 2) Vera Shelf Audit for planograms, 3) 1-Tap Fast-Sale for focus bundles, and 4) Store checkout before moving.`,
+    allStopsCompleted: (name, total) => `Outstanding job, ${name}! You have completed all ${total} scheduled retail store stops for today! Telemetry is synchronized to HQ.`,
+    languageChangedNotice: (langName, flag) => `${flag} Preferred language updated to ${langName}. I will now assist you in this language.`,
+  },
+  fil: {
+    code: 'fil',
+    name: 'Filipino / Tagalog',
+    nativeName: 'Wikang Filipino',
+    flag: '🇵🇭',
+    promptInstruction: 'Sumulat gamit ang natural at masiglang Filipino / Taglish (ang pangkaraniwang salita ng mga frontline retail merchandiser at promoter sa Pilipinas). Gamitin ang magiliw na tono tulad ng "Magandang umaga!", "Kumusta ang benta?", "Handa na ba ang ating display?". Huwag maging sobrang pormal; gawing natural, diretso, at propesyonal.',
+    morningGreeting: (name, store, target, sku) => `Magandang umaga, ${name}! Naka-check in ka na sa ${store}. Target natin ngayong araw ay ${target}. Focus product: ${sku}. Kayang-kaya nating abutin 'to!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `Magandang umaga, ${name}! Naka-check in ka sa Stop ${stopNum}/8 (${active}). Ang susunod na pupuntahan ay ${next}. Target: ${target}. Simulan na natin ang ruta!`,
+    routeGuidance: (active, next, stopNum, total, time) => `Kasalukuyan kang nasa Stop ${stopNum}/${total}: ${active} (GPS Verified). Pagka-clock out mo rito, ang susunod na destinasyon ay ${next} bandang ${time}. I-tap ang nasa ibaba para sa direksyon.`,
+    routeOptimized: (next, num, saved) => `⚡ Na-resequence ko na ang iyong mga nalalabing tindahan batay sa traffic at lapit ng distansya! Ang susunod mong pupuntahan ay Stop ${num}: ${next}, makakatipid tayo ng mga ${saved} minuto sa biyahe.`,
+    tasksChecklist: `Frontline Checklist: 1) Geofenced Store Check-In, 2) Vera Shelf Camera Audit para sa planogram, 3) 1-Tap Fast-Sale sa bawat benta, at 4) Checkout bago lumipat ng branch.`,
+    allStopsCompleted: (name, total) => `Napakagaling, ${name}! Nakumpleto mo ang lahat ng ${total} nakatakdang retail store stops para sa araw na ito! Na-sync na sa headquarters ang iyong telemetry.`,
+    languageChangedNotice: (langName, flag) => `${flag} Na-update ang wika sa ${langName}. Dito na tayo mag-uusap mula ngayon!`,
+  },
+  ms: {
+    code: 'ms',
+    name: 'Bahasa Melayu',
+    nativeName: 'Bahasa Melayu',
+    flag: '🇲🇾',
+    promptInstruction: 'Tulis dalam Bahasa Melayu yang mesra, sopan dan profesional untuk jurujual / promoter runcit barisan hadapan. Gunakan istilah runcit tempatan seperti "Selamat pagi!", "Sasaran jualan", "Daftar masuk", "Pemeriksaan rak". Ringkas dan bertenaga.',
+    morningGreeting: (name, store, target, sku) => `Selamat pagi, ${name}! Kehadiran telah disahkan di ${store}. Sasaran jualan hari ini ialah ${target}. Produk tumpuan: ${sku}. Mari capai sasaran kita hari ini!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `Selamat pagi, ${name}! Telah mendaftar masuk di Hentian ${stopNum}/8 (${active}). Destinasi seterusnya: ${next}. Sasaran: ${target}. Semoga perjalanan lancar!`,
+    routeGuidance: (active, next, stopNum, total, time) => `Anda kini berada di Hentian ${stopNum}/${total}: ${active} (Disahkan GPS). Selepas mendaftar keluar, destinasi seterusnya ialah ${next} (${time}). Ketik di bawah untuk tindakan seterusnya.`,
+    routeOptimized: (next, num, saved) => `⚡ Saya telah menyusun semula baki laluan kedai anda mengikut jarak geografi dan keadaan trafik! Hentian seterusnya ialah Hentian ${num}: ${next}, menjimatkan kira-kira ${saved} minit perjalanan.`,
+    tasksChecklist: `Senarai Semak Barisan Hadapan: 1) Daftar Masuk Kedai (GPS), 2) Audit Rak Kamera Vera, 3) Rekod Jualan Pantas 1-Ketik, dan 4) Daftar Keluar sebelum ke cawangan seterusnya.`,
+    allStopsCompleted: (name, total) => `Tahniah, ${name}! Anda telah melengkapkan kesemua ${total} lawatan cawangan yang dijadualkan hari ini! Data telah diselaraskan ke ibu pejabat.`,
+    languageChangedNotice: (langName, flag) => `${flag} Bahasa pilihan telah dikemas kini ke ${langName}. Saya sedia membantu anda dalam bahasa ini.`,
+  },
+  vi: {
+    code: 'vi',
+    name: 'Tiếng Việt',
+    nativeName: 'Tiếng Việt',
+    flag: '🇻🇳',
+    promptInstruction: 'Hãy viết bằng Tiếng Việt tự nhiên, thân thiện và chuyên nghiệp dành cho nhân viên bán hàng / tiếp thị bán lẻ tại cửa hàng. Sử dụng văn phong khuyến khích, rõ ràng, không rườm rà.',
+    morningGreeting: (name, store, target, sku) => `Chào buổi sáng, ${name}! Đã xác nhận điểm danh tại ${store}. Chỉ tiêu doanh số hôm nay là ${target}. Sản phẩm trọng tâm: ${sku}. Cùng đạt mục tiêu hôm nay nhé!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `Chào buổi sáng, ${name}! Đã điểm danh tại Điểm dừng ${stopNum}/8 (${active}). Điểm đến tiếp theo: ${next}. Mục tiêu: ${target}. Chúc bạn một ngày làm việc hiệu quả!`,
+    routeGuidance: (active, next, stopNum, total, time) => `Bạn đang có mặt tại Điểm dừng ${stopNum}/${total}: ${active} (Đã xác minh GPS). Sau khi kết thúc, điểm đến tiếp theo là ${next} (${time}). Nhấn bên dưới để quản lý lộ trình.`,
+    routeOptimized: (next, num, saved) => `⚡ Tôi đã sắp xếp lại lộ trình các cửa hàng còn lại dựa trên khoảng cách và tình trạng giao thông thực tế! Điểm dừng tiếp theo là Điểm dừng ${num}: ${next}, tiết kiệm khoảng ${saved} phút di chuyển.`,
+    tasksChecklist: `Quy trình làm việc: 1) Điểm danh GPS tại cửa hàng, 2) Kiểm tra kệ hàng Vera, 3) Ghi nhận đơn hàng nhanh 1-chạm, và 4) Đăng xuất khi hoàn thành.`,
+    allStopsCompleted: (name, total) => `Tuyệt vời, ${name}! Bạn đã hoàn thành toàn bộ ${total} điểm dừng cửa hàng theo lịch trình hôm nay! Dữ liệu đã đồng bộ về hệ thống trung tâm.`,
+    languageChangedNotice: (langName, flag) => `${flag} Đã cập nhật ngôn ngữ ưu tiên sang ${langName}. Tôi sẽ hỗ trợ bạn bằng ngôn ngữ này.`,
+  },
+  ur: {
+    code: 'ur',
+    name: 'Urdu',
+    nativeName: 'اردو',
+    flag: '🇵🇰 / 🇮🇳',
+    promptInstruction: 'اردو زبان میں شائستہ، پیشہ ورانہ اور دوستانہ انداز میں جواب دیں۔ ریٹیل سیلز پروموٹر کے لیے واضح اور پرجوش الفاظ استعمال کریں۔',
+    morningGreeting: (name, store, target, sku) => `صبح بخیر، ${name}! ${store} پر آپ کی حاضری کی تصدیق ہو گئی ہے۔ آج کا سیلز ٹارگٹ ${target} ہے۔ فوکس پروڈکٹ: ${sku}۔ آئیے آج کا ہدف حاصل کریں!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `صبح بخیر، ${name}! اسٹاپ ${stopNum}/8 (${active}) پر چیک ان مکمل ہے۔ اگلی منزل: ${next}۔ ٹارگٹ: ${target}۔ کامیابی کے ساتھ روٹ مکمل کریں!`,
+    routeGuidance: (active, next, stopNum, total, time) => `آپ اس وقت اسٹاپ ${stopNum}/${total}: ${active} پر موجود ہیں (GPS تصدیق شدہ)۔ یہاں کا کام مکمل ہونے پر اگلی منزل ${next} ہوگی (${time})۔`,
+    routeOptimized: (next, num, saved) => `⚡ میں نے جغرافیائی قربت اور ٹریفک کے مطابق آپ کا روٹ دوبارہ ترتیب دے دیا ہے! اگلا اسٹاپ نمبر ${num}: ${next} ہے، جس سے تقریباً ${saved} منٹ کی بچت ہوگی۔`,
+    tasksChecklist: `فرنٹ لائن چیک لسٹ: 1) جی پی ایس چیک ان، 2) ویرا شیلف آڈٹ، 3) 1-ٹیپ فاسٹ سیل اندراج، 4) روانگی سے قبل چیک آؤٹ۔`,
+    allStopsCompleted: (name, total) => `شاندار کارکردگی، ${name}! آپ نے آج کے تمام ${total} مقررہ ریٹیل اسٹاپس کامیابی سے مکمل کر لیے ہیں! ڈیٹا ہیڈ کوارٹر کے ساتھ ہم آہنگ ہو چکا ہے۔`,
+    languageChangedNotice: (langName, flag) => `${flag} ترجیحی زبان اردو میں تبدیل کر دی گئی ہے۔ اب میں آپ سے اردو میں بات چیت کروں گا۔`,
+  },
+  hi: {
+    code: 'hi',
+    name: 'Hindi',
+    nativeName: 'हिन्दी',
+    flag: '🇮🇳',
+    promptInstruction: 'हिंदी में स्वाभाविक, उत्साहवर्धक और पेशेवर शैली में उत्तर दें। रिटेल सेल्स प्रमोटर के लिए आसान और सटीक शब्दों का प्रयोग करें।',
+    morningGreeting: (name, store, target, sku) => `नमस्ते / शुभ प्रभात, ${name}! ${store} पर आपकी उपस्थिति दर्ज हो गई है। आज का बिक्री लक्ष्य ${target} है। मुख्य उत्पाद: ${sku}। आइए आज का लक्ष्य हासिल करें!`,
+    rovingGreeting: (name, stopNum, active, next, target) => `नमस्ते, ${name}! स्टॉप ${stopNum}/8 (${active}) पर चेक-इन पूरा हुआ। अगला गंतव्य: ${next}। लक्ष्य: ${target}। आपका दिन शुभ हो!`,
+    routeGuidance: (active, next, stopNum, total, time) => `आप वर्तमान में स्टॉप ${stopNum}/${total}: ${active} पर उपस्थित हैं (GPS सत्यापित)। चेक-आउट के बाद आपका अगला पड़ाव ${next} (${time}) होगा।`,
+    routeOptimized: (next, num, saved) => `⚡ मैंने ट्रैफ़िक और भौगोलिक दूरी के अनुसार आपके शेष रूट को अनुकूलित कर दिया है! अगला स्टॉप नंबर ${num}: ${next} है, जिससे लगभग ${saved} मिनट की बचत होगी।`,
+    tasksChecklist: `फ़्रंटलाइन चेकलिस्ट: 1) जीपीएस चेक-इन, 2) वेरा शेल्फ़ अनुपालन ऑडिट, 3) 1-टैप फ़ास्ट-सेल बिक्री प्रविष्टि, और 4) प्रस्थान से पहले चेक-आउट।`,
+    allStopsCompleted: (name, total) => `बहुत बढ़िया काम, ${name}! आपने आज के सभी ${total} निर्धारित रिटेल स्टोर स्टॉप्स पूरे कर लिए हैं! डेटा मुख्यालय से सिंक हो चुका है।`,
+    languageChangedNotice: (langName, flag) => `${flag} पसंदीदा भाषा हिंदी में अपडेट कर दी गई है। अब से मैं आपकी इसी भाषा में सहायता करूँगा।`,
+  },
+};
+
 export class PaxAgent {
+  /**
+   * Normalizes incoming raw language codes into supported taxonomy keys
+   */
+  static normalizeLanguageCode(code?: string | null): string {
+    if (!code) return 'en';
+    const c = String(code).toLowerCase().trim();
+    if (c === 'fil' || c === 'tl' || c === 'tl-ph' || c === 'fil-ph' || c.includes('tagalog') || c.includes('filipino')) return 'fil';
+    if (c === 'ms' || c === 'ms-my' || c.includes('malay') || c.includes('melayu')) return 'ms';
+    if (c === 'vi' || c === 'vi-vn' || c.includes('vietnam') || c.includes('tiếng việt')) return 'vi';
+    if (c === 'ur' || c === 'ur-pk' || c === 'ur-in' || c.includes('urdu')) return 'ur';
+    if (c === 'hi' || c === 'hi-in' || c.includes('hindi')) return 'hi';
+    return 'en';
+  }
+
+  /**
+   * Resolves language configuration meta object
+   */
+  static getLanguageConfig(code?: string | null): LanguageMeta {
+    const norm = this.normalizeLanguageCode(code);
+    return SUPPORTED_LANGUAGES_MAP[norm] || SUPPORTED_LANGUAGES_MAP['en'];
+  }
+
+  /**
+   * Updates user preferred language in database and logs audit trail
+   */
+  static async changeUserLanguage(userId: string, newLanguageCode: string) {
+    const normalized = this.normalizeLanguageCode(newLanguageCode);
+    const lang = this.getLanguageConfig(normalized);
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) throw new Error('User not found');
+
+    const previousLanguage = user.preferredLanguage || 'en';
+    await db.update(users).set({ preferredLanguage: normalized } as any).where(eq(users.id, userId));
+
+    try {
+      await db.insert(auditLogs).values({
+        id: `audit-lang-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        workspaceId: user.workspaceId,
+        actorId: user.id,
+        actorName: user.name,
+        actorRole: user.role,
+        action: 'user.language_changed',
+        entityType: 'user',
+        entityId: user.id,
+        module: 'users',
+        diff: {
+          previousLanguage,
+          newLanguage: normalized,
+          languageName: lang.name,
+        },
+        timestamp: new Date(),
+      } as any);
+    } catch (auditErr) {
+      console.warn('[Audit] Language change audit skipped:', auditErr);
+    }
+
+    return {
+      success: true,
+      userId,
+      language: normalized,
+      languageName: lang.name,
+      nativeName: lang.nativeName,
+      flagEmoji: lang.flag,
+      confirmationMessage: lang.languageChangedNotice(lang.name, lang.flag),
+    };
+  }
   /**
    * Calculates Haversine distance in km between two lat/lng coordinates
    */
@@ -233,6 +401,8 @@ export class PaxAgent {
       shift = (await db.select().from(shifts).where(eq(shifts.id, shiftId)))[0];
     }
 
+    const lang = this.getLanguageConfig(user.preferredLanguage);
+
     // Generate prompt for Gemini 2.5 Flash
     let prompt = '';
     if (isRoving && routeCtx && routeCtx.isRoving) {
@@ -240,7 +410,7 @@ export class PaxAgent {
       const nextName = routeCtx.nextVisit?.store?.name || 'Glorietta 4';
       prompt = `You are Pax, frontline retail operations copilot for Project BLOC.
 Promoter: ${user.name} (Roving Fleet Multi-Store Ambassador)
-Language: ${user.preferredLanguage || 'Taglish'}
+Language Requirement: You MUST generate your response ENTIRELY in ${lang.name} (${lang.nativeName}). ${lang.promptInstruction}
 Today's Roving Route: 8 scheduled retail branches across Metro Manila.
 Current On-Site Store: Stop ${routeCtx.activeVisit?.sequenceOrder || 3}/8 - ${activeName} (GPS Geofence Verified).
 Next Destination: ${nextName}.
@@ -254,7 +424,7 @@ Tone: Warm, conversational, zero fluff.`;
     } else {
       prompt = `You are Pax, frontline retail operations copilot for Project BLOC.
 Promoter Name: ${user.name}
-Language Preference: ${user.preferredLanguage || 'English'}
+Language Requirement: You MUST generate your response ENTIRELY in ${lang.name} (${lang.nativeName}). ${lang.promptInstruction}
 Assigned Store: ${store.name}
 Today's Target: ${shift.currency} ${shift.targetAmount.toLocaleString()}
 Focus SKUs: ${focusProducts.map(p => `${p.name} (${p.currency} ${p.unitPrice})`).join(', ')}
@@ -266,8 +436,8 @@ Keep it punchy, warm, and zero fluff.`;
     }
 
     const defaultBriefing = (isRoving && routeCtx && routeCtx.isRoving)
-      ? `Good morning, ${user.name}! Checked in at Stop ${routeCtx.activeVisit?.sequenceOrder || 3}/8 (${routeCtx.activeVisit?.store?.name || 'SM Aura Premier'}). Next destination is ${routeCtx.nextVisit?.store?.name || 'Glorietta 4'}. Let's crush our ₱15,000 target!`
-      : `Good morning, ${user.name}! Checked in at ${store.name}. Today's target is ${shift.currency} ${shift.targetAmount.toLocaleString()}. Let's crush our goals!`;
+      ? lang.rovingGreeting(user.name, routeCtx.activeVisit?.sequenceOrder || 3, routeCtx.activeVisit?.store?.name || 'SM Aura Premier', routeCtx.nextVisit?.store?.name || 'Glorietta 4', `${shift.currency} ${shift.targetAmount.toLocaleString()}`)
+      : lang.morningGreeting(user.name, store.name, `${shift.currency} ${shift.targetAmount.toLocaleString()}`, focusProducts[0]?.name || 'Promo Bundle');
 
     let briefingText = defaultBriefing;
     try {
@@ -287,7 +457,7 @@ Keep it punchy, warm, and zero fluff.`;
       shiftId: shift.id,
       sender: 'pax',
       message: briefingText,
-      originalLanguage: user.preferredLanguage || 'en',
+      originalLanguage: lang.code,
       interactiveCardType: isRoving ? 'route_briefing' : 'target_summary',
       metadata: isRoving ? {
         activeStop: routeCtx?.activeVisit ? {
@@ -482,22 +652,46 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       timestamp: new Date(),
     } as any);
 
+    const lang = this.getLanguageConfig(user.preferredLanguage);
+
     const msgLower = userMessage.toLowerCase();
-    const isOptimizeQuery = /optimi|traffic|reorder|ayusin|sequence|ayos|fastest|route order/i.test(msgLower);
-    const isRouteQuery = /next|store|where|saan|san|route|itinerary|puntahan|stop|stops|rota|bisi|visit/i.test(msgLower);
-    const isTasksQuery = /task|gagawin|checklist|guide|todo|to\s*do/i.test(msgLower);
+    const isLangChange = /(?:change|switch|set|palit|lipat|tukar|đổi|تبدیل|बदल)\s+(?:language|wika|bahasa|ngôn ngữ|زبان|भाषा)/i.test(msgLower) ||
+      /(?:speak|talk|mag-usap|bercakap|nói|بات کریں|बात करो)\s+(?:in|sa|dalam|bằng|میں|में)?\s*(filipino|tagalog|english|malay|bahasa|melayu|vietnamese|tiếng việt|urdu|hindi)/i.test(msgLower);
+
+    const isOptimizeQuery = /optimi|traffic|reorder|ayusin|sequence|ayos|fastest|route order|susun|tối ưu/i.test(msgLower);
+    const isRouteQuery = /next|store|where|saan|san|route|itinerary|puntahan|stop|stops|rota|bisi|visit|destinasi|lộ trình|منزل|स्टॉप/i.test(msgLower);
+    const isTasksQuery = /task|gagawin|checklist|guide|todo|to\s*do|tugas|nhiệm vụ|کام|कार्य/i.test(msgLower);
 
     let reply = '';
     let interactiveCardType: string | null = null;
     let cardMetadata: any = null;
 
-    if (isOptimizeQuery && routeCtx?.isRoving) {
+    if (isLangChange) {
+      let targetCode = 'en';
+      if (/filipino|tagalog|fil/i.test(msgLower)) targetCode = 'fil';
+      else if (/malay|melayu|ms/i.test(msgLower)) targetCode = 'ms';
+      else if (/vietnam|tiếng việt|vi/i.test(msgLower)) targetCode = 'vi';
+      else if (/urdu|اردو|ur/i.test(msgLower)) targetCode = 'ur';
+      else if (/hindi|हिन्दी|hi/i.test(msgLower)) targetCode = 'hi';
+      else if (/english|en/i.test(msgLower)) targetCode = 'en';
+
+      const changeResult = await this.changeUserLanguage(userId, targetCode);
+      const newLang = this.getLanguageConfig(targetCode);
+      reply = changeResult.confirmationMessage || newLang.languageChangedNotice(newLang.name, newLang.flag);
+      interactiveCardType = 'language_updated';
+      cardMetadata = {
+        language: newLang.code,
+        languageName: newLang.name,
+        nativeName: newLang.nativeName,
+        flag: newLang.flag,
+      };
+    } else if (isOptimizeQuery && routeCtx?.isRoving) {
       // Execute intelligent proximity optimization
       const optResult = await this.optimizeUserRoute(userId);
       const updatedCtx = await this.getPromoterRouteContext(userId);
 
       const nextStoreName = updatedCtx?.nextVisit?.store?.name || 'Glorietta 4';
-      reply = `⚡ I have re-sequenced your remaining store route based on Metro Manila traffic and real-time geographic proximity! Your stops are clustered to minimize transit time across BGC, Makati, and Ortigas, saving an estimated 35 minutes today. Next up is Stop ${updatedCtx?.nextVisit?.sequenceOrder || 4}: ${nextStoreName}.`;
+      reply = lang.routeOptimized(nextStoreName, updatedCtx?.nextVisit?.sequenceOrder || 4, 35);
       interactiveCardType = 'route_optimized';
       cardMetadata = {
         savedMinutes: 35,
@@ -529,11 +723,11 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       const total = routeCtx.totalStops;
 
       if (active) {
-        reply = `You are currently on site at Stop ${active.sequenceOrder}/${total}: ${active.store?.name || 'SM Aura Premier'} (GPS Verified). Once you clock out, your next destination is Stop ${next?.sequenceOrder || 4}/${total}: ${next?.store?.name || 'Glorietta 4'} (${next?.scheduledTime || '01:30 PM'}). Tap below to manage your route.`;
+        reply = lang.routeGuidance(active.store?.name || 'SM Aura Premier', next?.store?.name || 'Glorietta 4', active.sequenceOrder, total, next?.scheduledTime || '01:30 PM');
       } else if (next) {
-        reply = `Your next scheduled destination is Stop ${next.sequenceOrder}/${total}: ${next.store?.name || 'Retail Branch'} (${next.store?.address || 'Metro Manila'}). Estimated transit time is ~15 minutes. Tap Check In when within 150m!`;
+        reply = lang.routeGuidance('In Transit', next.store?.name || 'Retail Branch', next.sequenceOrder, total, next.scheduledTime || '01:30 PM');
       } else {
-        reply = `Awesome work, ${user.name}! You have completed all ${total} scheduled retail store stops for today! Full telemetry is synchronized to headquarters.`;
+        reply = lang.allStopsCompleted(user.name, total);
       }
 
       interactiveCardType = 'route_card';
@@ -557,7 +751,7 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
         } : null,
       };
     } else if (isTasksQuery) {
-      reply = `Here is your frontline operational checklist: 1) Geofenced Store Check-In, 2) Vera Shelf Camera Audit for planogram compliance, 3) 1-Tap Fast-Sale for focus promo bundles, and 4) Store checkout upon departure.`;
+      reply = lang.tasksChecklist;
       interactiveCardType = 'tasks_card';
     } else {
       // General retail operations query via Gemini Flash
@@ -569,16 +763,15 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
 Promoter: ${user.name} (${routeCtx?.isRoving ? 'Roving Multi-Store Ambassador' : 'Stationary Sales Rep'})
 Current Store Location: ${activeStoreName}
 Shift Status: Active (${shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()} target` : 'Active'})
-Language: ${user.preferredLanguage || 'English'}
+Language Requirement: You MUST answer strictly in ${lang.name} (${lang.nativeName}). ${lang.promptInstruction}
 User Said: "${userMessage}"
 
 Guidelines:
 - If asking about products or pricing: Give concise promotional guidance.
 - If asking about store operations: Keep answers practical and friendly.
-- If Tagalog or tl-PH: Respond in natural Taglish.
 - Length: 2 sentences max. Zero fluff.`;
 
-      reply = `I'm here with you at ${activeStoreName}! Let me know if you need to log sales, check your next route stop, or run Vera shelf audits.`;
+      reply = lang.morningGreeting(user.name, activeStoreName, shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()}` : 'daily target', 'Focus Promo');
       try {
         const aiRes = await ai.models.generateContent({
           model: MODELS.FLASH,
@@ -597,7 +790,7 @@ Guidelines:
       shiftId: shift?.id,
       sender: 'pax',
       message: reply,
-      originalLanguage: user.preferredLanguage || 'en',
+      originalLanguage: lang.code,
       interactiveCardType,
       metadata: cardMetadata,
       timestamp: new Date(),
