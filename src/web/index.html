@@ -255,6 +255,14 @@
       overflow: hidden;
       z-index: 10;
     }
+    main.workspace-canvas.canvas-fullbleed {
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: calc(100vh - 56px);
+    }
 
     /* ============================================================
        3. APPLE HARDWARE DEVICE SHELL (NATURAL TITANIUM)
@@ -1555,39 +1563,238 @@
        ============================================================ */
     .m3-supervisor-horizon {
       width: 100%;
-      max-width: 1120px;
-      height: calc(100vh - 96px);
-      background: #FFFFFF;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 24px;
-      padding: 26px;
+      height: 100%;
+      background: #F8F9FA;
+      border: none;
+      border-radius: 0;
+      padding: 0;
       display: none;
-      flex-direction: column;
-      gap: 22px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-      overflow-y: auto;
+      flex-direction: row;
+      box-shadow: none;
+      overflow: hidden;
+      position: relative;
     }
 
-    .horizon-top-header {
+    /* Supervisor Dedicated Left Sidebar */
+    .supervisor-sidebar {
+      width: 250px;
+      background: #FFFFFF;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 16px 12px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .supervisor-sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 14px 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      margin-bottom: 6px;
+    }
+    .supervisor-brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #EBF4FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .supervisor-nav-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #8E8E93;
+      padding: 12px 10px 4px 10px;
+    }
+    .supervisor-nav-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      padding-bottom: 18px;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 550;
+      color: #48484A;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      width: 100%;
     }
-    .horizon-titles h2 {
-      font-size: 21px;
+    .supervisor-nav-item:hover {
+      background: #F2F2F7;
+      color: #1D1D1F;
+    }
+    .supervisor-nav-item.active {
+      background: #EBF4FF;
+      color: #0071E3;
+      font-weight: 650;
+    }
+    .supervisor-nav-item.active .ms-icon {
+      font-variation-settings: 'FILL' 1;
+      color: #0071E3;
+    }
+    .supervisor-nav-pill-live {
+      font-size: 9.5px;
+      font-weight: 700;
+      background: #E8F8EE;
+      color: #1B5E20;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+    .supervisor-nav-pill-count {
+      font-size: 10px;
+      font-weight: 600;
+      background: #F2F2F7;
+      color: #8E8E93;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+    .supervisor-nav-pill-alert {
+      font-size: 10px;
+      font-weight: 700;
+      background: #FFF3DC;
+      color: #B25E00;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+
+    /* Supervisor Main View Container */
+    .supervisor-main-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #F8F9FA;
+    }
+    .supervisor-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      background: #FFFFFF;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      flex-shrink: 0;
+    }
+    .supervisor-topbar-titles h2 {
+      font-size: 20px;
       font-weight: 650;
       letter-spacing: -0.3px;
       color: #1D1D1F;
       display: flex;
       align-items: center;
       gap: 10px;
+      margin: 0;
     }
-    .horizon-titles p {
-      font-size: 13px;
+    .supervisor-topbar-titles p {
+      font-size: 12.5px;
       color: #86868B;
-      margin-top: 4px;
+      margin: 3px 0 0 0;
+    }
+    .supervisor-link-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #E8F8EE;
+      color: #1B5E20;
+      border: 1px solid rgba(52, 199, 89, 0.25);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .supervisor-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34C759;
+      box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+    }
+    .supervisor-content-scroller {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .supervisor-panel {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .supervisor-panel.active {
+      display: flex;
+    }
+
+    /* Operational Exception Radar */
+    .sup-exception-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .sup-exception-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .sup-exception-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    .sup-exception-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sup-exception-badge-crit {
+      font-size: 10px;
+      font-weight: 700;
+      background: #FEECEB;
+      color: #D32F2F;
+      padding: 2px 7px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .sup-exception-badge-warn {
+      font-size: 10px;
+      font-weight: 700;
+      background: #FFF8EB;
+      color: #B25E00;
+      padding: 2px 7px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .sup-exception-badge-good {
+      font-size: 10px;
+      font-weight: 700;
+      background: #E8F8EE;
+      color: #1B5E20;
+      padding: 2px 7px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
     .horizon-kpi-grid {
@@ -1596,10 +1803,10 @@
       gap: 14px;
     }
     .m3-stat-card-dark {
-      background: #FBFBFD;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      border-radius: 18px;
-      padding: 18px;
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 16px;
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -1613,7 +1820,7 @@
       color: #86868B;
     }
     .m3-stat-num {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 650;
       color: #1D1D1F;
       font-family: -apple-system, BlinkMacSystemFont, 'Google Sans Flex', sans-serif;
@@ -1625,64 +1832,6 @@
       display: flex;
       align-items: center;
       gap: 4px;
-    }
-
-    /* Enterprise Lineage / Org Chart (Apple Inset Grouped) */
-    .m3-lineage-card {
-      background: #FBFBFD;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      border-radius: 18px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .lineage-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .lineage-card-title {
-      font-size: 14.5px;
-      font-weight: 650;
-      color: #1D1D1F;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .lineage-shield-pill {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: #FFF8EB;
-      color: #B25E00;
-      border: 1px solid rgba(255, 149, 0, 0.2);
-    }
-
-    .org-topology-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .org-node-bar {
-      background: #FFFFFF;
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 12px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.15s;
-    }
-    .org-node-bar:hover {
-      border-color: var(--apple-blue);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    }
-    .org-node-meta {
-      font-size: 11.5px;
-      color: #86868B;
-      font-family: 'JetBrains Mono', monospace;
     }
 
     .m3-telemetry-table {
@@ -1698,53 +1847,25 @@
       color: #86868B;
       font-weight: 600;
       border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      font-size: 11.5px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .m3-telemetry-table td {
-      padding: 14px;
+      padding: 12px 14px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    /* ============================================================
-       5. ADMIN OPERATIONS CONSOLE & AI DEMO GENERATOR STYLES
-       ============================================================ */
-    .m3-btn-demo {
-      background: linear-gradient(135deg, #0071E3 0%, #5856D6 100%);
-      color: #FFFFFF;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-family: inherit;
-      font-size: 12.5px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 2px 8px rgba(88, 86, 214, 0.25);
-      flex-shrink: 0;
-    }
-    .m3-btn-demo:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(88, 86, 214, 0.35);
-    }
-    .m3-btn-demo:active {
-      transform: scale(0.97);
-    }
-
+    /* Full-Bleed Enterprise Admin Console */
     .m3-admin-console {
       width: 100%;
-      max-width: 1400px;
-      height: calc(100vh - 84px);
+      height: 100%;
       background: #F8F9FA;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 24px;
+      border: none;
+      border-radius: 0;
       display: none;
       flex-direction: row;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
+      box-shadow: none;
       overflow: hidden;
       position: relative;
     }
@@ -2900,110 +3021,317 @@
     <!-- ============================================================
          SUPERVISOR COMMAND HORIZON (M3 DARK / VERTEX AI STUDIO IDENTITY)
          ============================================================ -->
+    <!-- ============================================================
+         SUPERVISOR COMMAND HORIZON (FULL-BLEED DUAL PANE ARCHITECTURE)
+         ============================================================ -->
     <div class="m3-supervisor-horizon" id="supervisorWrapper">
-      <div class="horizon-top-header">
-        <div class="horizon-titles">
-          <h2>
-            <span class="ms-icon" style="color:var(--apple-blue);">monitoring</span>
-            <span>Regional Retail Operations Command Horizon</span>
-          </h2>
-          <p>Real-Time Sell-Through Telemetry · JAPAC Multi-Tenant Matrix · Google Sheets WSS Sync</p>
-        </div>
-        <div style="display:flex;gap:12px;align-items:center;">
-          <div style="display:flex;align-items:center;gap:6px;background:#E8F8EE;color:#1B5E20;border:1px solid rgba(52,199,89,0.25);padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;">
-            <div style="width:6px;height:6px;border-radius:50%;background:#34C759;box-shadow:0 0 6px rgba(52,199,89,0.6);"></div>
-            <span>WSS Bidirectional Link</span>
+      <!-- Left Supervisor Operational Sidebar -->
+      <aside class="supervisor-sidebar">
+        <div class="supervisor-sidebar-header">
+          <div class="supervisor-brand-badge">
+            <span class="ms-icon" style="color:#0071E3;">monitoring</span>
           </div>
-          <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);padding:6px 14px;font-size:12px;border:none;">
-            <span class="ms-icon sm">shield</span> Ask Aegis Copilot
-          </button>
-          <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-            <span class="ms-icon sm">refresh</span>
-            Refresh Telemetry
-          </button>
+          <div>
+            <b style="font-size:13.5px;color:#1D1D1F;display:block;">Supervisor Horizon</b>
+            <span style="font-size:11px;color:#86868B;">Field Ops & Pacing</span>
+          </div>
         </div>
-      </div>
 
-      <!-- KPI Grid -->
-      <div class="horizon-kpi-grid">
-        <div class="m3-stat-card-dark">
-          <span class="m3-stat-caption">Regional Revenue (USD)</span>
-          <span class="m3-stat-num" id="supKpiRevenue">$18,450</span>
-          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 14.2% vs previous shift</span>
-        </div>
-        <div class="m3-stat-card-dark">
-          <span class="m3-stat-caption">Avg Planogram Compliance</span>
-          <span class="m3-stat-num" id="supKpiCompliance">92%</span>
-          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 4 pts Share of Shelf (Vera)</span>
-        </div>
-        <div class="m3-stat-card-dark">
-          <span class="m3-stat-caption">Promoter Attendance Ratio</span>
-          <span class="m3-stat-num" id="supKpiPromoters">2 / 2</span>
-          <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;color:#1B5E20;">verified</span> 100% Geofenced Check-In</span>
-        </div>
-        <div class="m3-stat-card-dark">
-          <span class="m3-stat-caption">Open Exceptions Flagged</span>
-          <span class="m3-stat-num" id="supKpiExceptions" style="color:var(--apple-amber);">1</span>
-          <span class="m3-stat-trend" style="color:var(--apple-amber);"><span class="ms-icon sm" style="font-size:14px;color:var(--apple-amber);">error_outline</span> Missing Shelf Tag Detected</span>
-        </div>
-      </div>
+        <div class="supervisor-nav-group-label">OPERATIONAL COMMAND</div>
+        <button type="button" class="supervisor-nav-item active" id="supNavItemShift" onclick="switchSupervisorNav('shift')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm">dashboard</span>
+            <span>Shift Command</span>
+          </div>
+          <span class="supervisor-nav-pill-live">LIVE</span>
+        </button>
+        <button type="button" class="supervisor-nav-item" id="supNavItemFleet" onclick="switchSupervisorNav('fleet')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm">route</span>
+            <span>Fleet & Routes</span>
+          </div>
+          <span class="supervisor-nav-pill-count">8 Stops</span>
+        </button>
+        <button type="button" class="supervisor-nav-item" id="supNavItemVera" onclick="switchSupervisorNav('vera')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm">photo_camera</span>
+            <span>Vera Shelf CV</span>
+          </div>
+          <span class="supervisor-nav-pill-alert" id="supNavVeraAlerts">1 Alert</span>
+        </button>
+        <button type="button" class="supervisor-nav-item" id="supNavItemSales" onclick="switchSupervisorNav('sales')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm">bolt</span>
+            <span>Fast-Sale Stream</span>
+          </div>
+          <span class="supervisor-nav-pill-count">POS</span>
+        </button>
+        <button type="button" class="supervisor-nav-item" id="supNavItemSurveys" onclick="switchSupervisorNav('surveys')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm">assignment</span>
+            <span>Surveys Queue</span>
+          </div>
+          <span class="supervisor-nav-pill-count" id="supNavSurveyCount">2</span>
+        </button>
 
-      <!-- Enterprise Lineage / Org Chart -->
-      <div class="m3-lineage-card">
-        <div class="lineage-card-top">
-          <div class="lineage-card-title">
-            <span class="ms-icon" style="color:var(--apple-blue);">account_tree</span>
-            <span>Company Org Chart & Automated Channel Governance</span>
+        <div class="supervisor-nav-group-label" style="margin-top:14px;">AGENTIC COPILOT</div>
+        <button type="button" class="supervisor-nav-item" id="supNavItemAegis" onclick="openAegisDrawer()">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm" style="color:#0071E3;">shield</span>
+            <span>Ask Aegis Copilot</span>
           </div>
-          <span class="lineage-shield-pill">Enterprise Admin Enforced</span>
-        </div>
-        <p style="font-size: 12.5px; color: #86868B; line-height: 1.5;">
-          All group communication channels are programmatically provisioned and tied to the enterprise corporate hierarchy. Promoters cannot spawn unverified channels, ensuring enterprise auditability and compliance.
-        </p>
-        <div class="org-topology-rows">
-          <div class="org-node-bar">
-            <div>
-              <b style="color:#1D1D1F;">JAPAC Retail Operations HQ</b> &mdash; Regional Supervisor: Lester Alarcon
-            </div>
-            <span class="org-node-meta">Channel: # JAPAC Retail Operations (24 Reps)</span>
-          </div>
-          <div class="org-node-bar" style="margin-left: 20px;">
-            <div>
-              <b style="color:#1D1D1F;">SM Megamall Branch (PH)</b> &mdash; Promoter: Liza Santos
-            </div>
-            <span class="org-node-meta">Channel: # SM Megamall Floor Ops (6 Members)</span>
-          </div>
-          <div class="org-node-bar" style="margin-left: 20px;">
-            <div>
-              <b style="color:#1D1D1F;">FairPrice Xtra VivoCity (SG)</b> &mdash; Promoter: Sarah Tan
-            </div>
-            <span class="org-node-meta">Channel: # FairPrice VivoCity Ops (5 Members)</span>
-          </div>
-        </div>
-      </div>
+          <span class="ms-icon sm" style="font-size:14px;color:#8E8E93;">open_in_new</span>
+        </button>
+      </aside>
 
-      <!-- Store Breakdown Table -->
-      <div style="background: #FFFFFF; border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 18px; padding: 18px;">
-        <h3 style="font-size: 14.5px; font-weight: 650; color: #1D1D1F; margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
-          <span class="ms-icon sm" style="color:var(--apple-blue);">storefront</span>
-          <span>Store Sell-Through Telemetry</span>
-        </h3>
-        <table class="m3-telemetry-table">
-          <thead>
-            <tr>
-              <th>Branch Code & Store</th>
-              <th>Country</th>
-              <th>Target Quota</th>
-              <th>Actual Sell-Through</th>
-              <th>Pacing %</th>
-              <th>Shelf Compliance</th>
-            </tr>
-          </thead>
-          <tbody id="supTableBody">
-            <!-- Populated via JS -->
-          </tbody>
-        </table>
-      </div>
+      <!-- Right Operational Main Body -->
+      <main class="supervisor-main-body">
+        <!-- Top Action Bar -->
+        <header class="supervisor-topbar">
+          <div class="supervisor-topbar-titles">
+            <h2 id="supViewTitle">
+              <span class="ms-icon" id="supViewIcon" style="color:#0071E3;">dashboard</span>
+              <span id="supViewHeading">Shift Command & Live Pacing</span>
+            </h2>
+            <p id="supViewSubtitle">Real-Time Sell-Through Telemetry · JAPAC Multi-Tenant Matrix · Google Sheets WSS Sync</p>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="supervisor-link-pill">
+              <div class="supervisor-pulse-dot"></div>
+              <span>WSS Bidirectional Link</span>
+            </div>
+            <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);padding:6px 14px;font-size:12px;border:none;">
+              <span class="ms-icon sm">shield</span> Ask Aegis Copilot
+            </button>
+            <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;">
+              <span class="ms-icon sm">refresh</span>
+              Refresh Telemetry
+            </button>
+          </div>
+        </header>
+
+        <!-- Content Scroller for Panels -->
+        <div class="supervisor-content-scroller">
+          <!-- PANEL 1: SHIFT COMMAND & PACING (DEFAULT) -->
+          <section class="supervisor-panel active" id="supPanelShift">
+            <!-- KPI Pulse Grid -->
+            <div class="horizon-kpi-grid">
+              <div class="m3-stat-card-dark">
+                <span class="m3-stat-caption">Regional Revenue (USD)</span>
+                <span class="m3-stat-num" id="supKpiRevenue">$18,450</span>
+                <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 14.2% vs previous shift</span>
+              </div>
+              <div class="m3-stat-card-dark">
+                <span class="m3-stat-caption">Avg Planogram Compliance</span>
+                <span class="m3-stat-num" id="supKpiCompliance">92%</span>
+                <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;">trending_up</span> 4 pts Share of Shelf (Vera)</span>
+              </div>
+              <div class="m3-stat-card-dark">
+                <span class="m3-stat-caption">Promoter Attendance Ratio</span>
+                <span class="m3-stat-num" id="supKpiPromoters">2 / 2</span>
+                <span class="m3-stat-trend"><span class="ms-icon sm" style="font-size:14px;color:#1B5E20;">verified</span> 100% Geofenced Check-In</span>
+              </div>
+              <div class="m3-stat-card-dark">
+                <span class="m3-stat-caption">Open Exceptions Flagged</span>
+                <span class="m3-stat-num" id="supKpiExceptions" style="color:var(--apple-amber);">1</span>
+                <span class="m3-stat-trend" style="color:var(--apple-amber);"><span class="ms-icon sm" style="font-size:14px;color:var(--apple-amber);">error_outline</span> Missing Shelf Tag Detected</span>
+              </div>
+            </div>
+
+            <!-- LIVE OPERATIONAL EXCEPTION RADAR (Replaces Static Org Chart in Center!) -->
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="ms-icon" style="color:#D32F2F;font-size:20px;">radar</span>
+                  <b style="font-size:14px;color:#1D1D1F;">Live Operational Exception Radar & Supervisor Action Feed</b>
+                </div>
+                <span style="font-size:11px;font-weight:600;color:#0071E3;background:#EBF4FF;padding:2px 8px;border-radius:999px;">Real-Time AI Scan</span>
+              </div>
+
+              <div class="sup-exception-grid">
+                <!-- Exception Card 1: Vera CV Tag -->
+                <div class="sup-exception-card" style="border-left:3px solid #D32F2F;">
+                  <div class="sup-exception-header">
+                    <span class="sup-exception-badge-crit"><span class="ms-icon sm" style="font-size:12px;">priority_high</span> Shelf Planogram Alert</span>
+                    <span style="font-size:11px;color:#86868B;">10:24 AM</span>
+                  </div>
+                  <b style="font-size:13px;color:#1D1D1F;">SM Megamall · Missing Promo Shelf Tag</b>
+                  <p style="font-size:11.5px;color:#6E6E73;margin:0;line-height:1.4;">Vera Computer Vision flagged missing price label on Focus SKU #BND-01. Planogram score dropped to 88%.</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                    <span style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">Assigned: Liza Santos</span>
+                    <button type="button" onclick="switchSupervisorNav('vera')" style="background:#EBF4FF;color:#0071E3;border:none;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">View Proof</button>
+                  </div>
+                </div>
+
+                <!-- Exception Card 2: Fleet Route Check -->
+                <div class="sup-exception-card" style="border-left:3px solid #34C759;">
+                  <div class="sup-exception-header">
+                    <span class="sup-exception-badge-good"><span class="ms-icon sm" style="font-size:12px;">check_circle</span> Roving Fleet Verified</span>
+                    <span style="font-size:11px;color:#86868B;">11:15 AM</span>
+                  </div>
+                  <b style="font-size:13px;color:#1D1D1F;">TriNoma · Stop 6/8 Arrived Early</b>
+                  <p style="font-size:11.5px;color:#6E6E73;margin:0;line-height:1.4;">Promoter Marco Diaz completed Stop 5 and arrived at TriNoma 14 mins ahead of scheduled traffic buffer.</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                    <span style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">Progress: 6/8 Done</span>
+                    <button type="button" onclick="switchSupervisorNav('fleet')" style="background:#E8F8EE;color:#1B5E20;border:none;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">View Route</button>
+                  </div>
+                </div>
+
+                <!-- Exception Card 3: Midday Pacing Follow-Up -->
+                <div class="sup-exception-card" style="border-left:3px solid #FF9500;">
+                  <div class="sup-exception-header">
+                    <span class="sup-exception-badge-warn"><span class="ms-icon sm" style="font-size:12px;">trending_down</span> Run-Rate Warning</span>
+                    <span style="font-size:11px;color:#86868B;">01:30 PM</span>
+                  </div>
+                  <b style="font-size:13px;color:#1D1D1F;">VivoCity · Lagging Shift Quota</b>
+                  <p style="font-size:11.5px;color:#6E6E73;margin:0;line-height:1.4;">Current sell-through is tracking at 35% of daily target. Pacing deficit detected vs yesterday's run-rate.</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                    <span style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">Assigned: Sarah Tan</span>
+                    <button type="button" onclick="openAegisDrawer()" style="background:#FFF3DC;color:#B25E00;border:none;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Nudge Copilot</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-Time Store Sell-Through & Pacing Matrix -->
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="ms-icon" style="color:#0071E3;font-size:20px;">storefront</span>
+                  <b style="font-size:14px;color:#1D1D1F;">Real-Time Store Pacing & Sell-Through Matrix</b>
+                </div>
+                <span style="font-size:11px;color:#86868B;">Live Multi-Branch Telemetry Feed</span>
+              </div>
+
+              <table class="m3-telemetry-table">
+                <thead>
+                  <tr>
+                    <th>Branch Code & Store</th>
+                    <th>Country</th>
+                    <th>Target Quota</th>
+                    <th>Actual Sell-Through</th>
+                    <th>Pacing %</th>
+                    <th>Shelf Compliance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="supTableBody">
+                  <!-- Populated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- PANEL 2: FLEET & ROVING ROUTES -->
+          <section class="supervisor-panel" id="supPanelFleet">
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div>
+                  <b style="font-size:14.5px;color:#1D1D1F;display:block;">Metro Manila Roving Corridor · 8-Stop Scheduled Fleet</b>
+                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">GPS Geofenced Itinerary · Arrival Proof & Dwell Times</p>
+                </div>
+                <button type="button" onclick="loadSupervisorConsoleData()" style="background:#EBF4FF;color:#0071E3;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                  <span class="ms-icon sm">refresh</span> Sync Fleet
+                </button>
+              </div>
+
+              <table class="m3-telemetry-table">
+                <thead>
+                  <tr>
+                    <th>Seq</th>
+                    <th>Retail Branch & Address</th>
+                    <th>Scheduled Window</th>
+                    <th>Arrival Stamp</th>
+                    <th>GPS Geofence Status</th>
+                    <th>Audit Status</th>
+                  </tr>
+                </thead>
+                <tbody id="fleetTableBody">
+                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- PANEL 3: VERA SHELF AUDITS & PLANOGRAM CV -->
+          <section class="supervisor-panel" id="supPanelVera">
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div>
+                  <b style="font-size:14.5px;color:#1D1D1F;display:block;">Vera Optical Computer Vision Shelf Audits</b>
+                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">Multimodal Gemini Planogram Compliance & Out-of-Stock Verification</p>
+                </div>
+                <span style="font-size:11px;font-weight:700;background:#E8F8EE;color:#1B5E20;padding:4px 10px;border-radius:999px;">92% Regional Avg</span>
+              </div>
+
+              <div id="veraAuditCardsGrid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- PANEL 4: FAST-SALE LIVE TRANSACTION LEDGER -->
+          <section class="supervisor-panel" id="supPanelSales">
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div>
+                  <b style="font-size:14.5px;color:#1D1D1F;display:block;">Live Fast-Sale Transaction Ledger & Settlement Mix</b>
+                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">Zero-Typing 1-Tap Sell-Out Stream across Singapore & Philippines</p>
+                </div>
+                <span style="font-size:11px;font-weight:700;background:#EBF4FF;color:#0071E3;padding:4px 10px;border-radius:999px;">WSS Stream Active</span>
+              </div>
+
+              <table class="m3-telemetry-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Branch</th>
+                    <th>Promoter</th>
+                    <th>SKU & Item</th>
+                    <th>Qty</th>
+                    <th>Total Amount</th>
+                    <th>Payment Channel</th>
+                    <th>Terms</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- PANEL 5: SURVEYS & AUDIT QUEUE -->
+          <section class="supervisor-panel" id="supPanelSurveys">
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div>
+                  <b style="font-size:14.5px;color:#1D1D1F;display:block;">Frontline Field Audits & Digital Survey Review Queue</b>
+                  <p style="font-size:12px;color:#86868B;margin:3px 0 0 0;">Competitor Price Checks, Customer VOC NPS & Store Readiness Sign-Offs</p>
+                </div>
+                <span style="font-size:11px;font-weight:700;background:#E8F8EE;color:#1B5E20;padding:4px 10px;border-radius:999px;">DB Verified</span>
+              </div>
+
+              <table class="m3-telemetry-table">
+                <thead>
+                  <tr>
+                    <th>Submission Time</th>
+                    <th>Survey Form</th>
+                    <th>Branch</th>
+                    <th>Promoter</th>
+                    <th>Verification Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="surveysSupTableBody">
+                  <!-- Populated dynamically via loadSupervisorConsoleData() -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
     <!-- ============================================================
@@ -6217,42 +6545,306 @@
     }
 
     // ============================================================
-    // 8. SUPERVISOR COMMAND HORIZON DATA
+    // 8. SUPERVISOR COMMAND HORIZON DATA & MULTI-PANE NAVIGATION
     // ============================================================
+    let currentSupervisorNav = 'shift';
+
+    function switchSupervisorNav(tabKey) {
+      currentSupervisorNav = tabKey;
+      const navKeys = ['shift', 'fleet', 'vera', 'sales', 'surveys'];
+      
+      navKeys.forEach(k => {
+        const btn = document.getElementById(`supNavItem${capitalize(k)}`);
+        const panel = document.getElementById(`supPanel${capitalize(k)}`);
+        if (btn) btn.classList.toggle('active', k === tabKey);
+        if (panel) panel.classList.toggle('active', k === tabKey);
+      });
+
+      // Update Topbar Titles
+      const titleConfig = {
+        shift: {
+          icon: 'dashboard',
+          heading: 'Shift Command & Live Pacing',
+          subtitle: 'Real-Time Sell-Through Telemetry · JAPAC Multi-Tenant Matrix · Google Sheets WSS Sync'
+        },
+        fleet: {
+          icon: 'route',
+          heading: 'Metro Manila Roving Corridor · 8-Stop Scheduled Fleet',
+          subtitle: 'GPS Geofenced Itinerary Tracking · Verified Dwell Times & Live Arrival Logs'
+        },
+        vera: {
+          icon: 'photo_camera',
+          heading: 'Vera Optical Computer Vision Shelf Audits',
+          subtitle: 'Multimodal Gemini Planogram Compliance, Share of Shelf (SoS) & Out-of-Stock Verification'
+        },
+        sales: {
+          icon: 'bolt',
+          heading: 'Live Fast-Sale Transaction Ledger & Settlement Mix',
+          subtitle: 'Zero-Typing 1-Tap Sell-Out Stream across Singapore & Philippines'
+        },
+        surveys: {
+          icon: 'assignment',
+          heading: 'Frontline Field Audits & Digital Survey Review Queue',
+          subtitle: 'Competitor Price Checks, Customer VOC NPS & Store Readiness Sign-Offs'
+        }
+      };
+
+      const cfg = titleConfig[tabKey] || titleConfig.shift;
+      const iconEl = document.getElementById('supViewIcon');
+      const headingEl = document.getElementById('supViewHeading');
+      const subEl = document.getElementById('supViewSubtitle');
+      if (iconEl) iconEl.innerText = cfg.icon;
+      if (headingEl) headingEl.innerText = cfg.heading;
+      if (subEl) subEl.innerText = cfg.subtitle;
+    }
+
     async function loadSupervisorConsoleData() {
       try {
         const wsParam = currentWorkspaceId ? `?ws=${currentWorkspaceId}` : '';
         const res = await fetch(`/api/supervisor/dashboard${wsParam}`);
         const data = await res.json();
 
-        document.getElementById('supKpiRevenue').innerText = data.overview.totalRevenueNormalizedUSD;
-        document.getElementById('supKpiCompliance').innerText = data.overview.avgCompliancePct;
-        document.getElementById('supKpiPromoters').innerText = data.overview.checkedInPromoters;
-        document.getElementById('supKpiExceptions').innerText = data.overview.openExceptionsCount;
+        // 1. Overview KPIs
+        if (data.overview) {
+          const revEl = document.getElementById('supKpiRevenue');
+          const compEl = document.getElementById('supKpiCompliance');
+          const promEl = document.getElementById('supKpiPromoters');
+          const excEl = document.getElementById('supKpiExceptions');
+          if (revEl) revEl.innerText = data.overview.totalRevenueNormalizedUSD || '$0';
+          if (compEl) compEl.innerText = data.overview.avgCompliancePct || '0%';
+          if (promEl) promEl.innerText = data.overview.checkedInPromoters || '0 / 0';
+          if (excEl) excEl.innerText = data.overview.openExceptionsCount || '0';
+        }
 
+        // 2. Real-Time Store Pacing Matrix (Replaces static org chart)
         const tbody = document.getElementById('supTableBody');
-        tbody.innerHTML = '';
-        data.stores.forEach(s => {
-          tbody.innerHTML += `
-            <tr>
-              <td>
-                <b style="color:#1D1D1F;font-weight:600;">${s.name}</b>
-                <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${s.code}</div>
-              </td>
-              <td><span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">${s.country}</span></td>
-              <td style="color:#86868B;">${s.currency} ${s.target?.toLocaleString()}</td>
-              <td style="color:#1D1D1F;font-weight:600;">${s.currency} ${s.actualSales.toLocaleString()}</td>
-              <td>
-                <span style="background:${s.pctAchieved >= 100 ? '#E8F8EE' : '#F2F2F7'};color:${s.pctAchieved >= 100 ? '#1B5E20' : '#1D1D1F'};padding:3px 8px;border-radius:6px;font-weight:600;">
-                  ${s.pctAchieved}%
-                </span>
-              </td>
-              <td style="color:#1B5E20;font-weight:600;">${s.compliance}%</td>
-            </tr>
-          `;
-        });
+        if (tbody && data.stores) {
+          tbody.innerHTML = '';
+          data.stores.forEach(s => {
+            const pct = s.pctAchieved || 0;
+            let badgeBg = '#FDE8E8';
+            let badgeColor = '#D32F2F';
+            let statusText = '🔴 Pacing Deficit';
+            if (pct >= 100) {
+              badgeBg = '#E8F8EE';
+              badgeColor = '#1B5E20';
+              statusText = '🟢 Quota Met';
+            } else if (pct >= 50) {
+              badgeBg = '#FFF3DC';
+              badgeColor = '#B25E00';
+              statusText = '🟡 On Track';
+            }
+
+            tbody.innerHTML += `
+              <tr>
+                <td>
+                  <b style="color:#1D1D1F;font-weight:600;font-size:13px;">${s.name}</b>
+                  <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${s.code} · ${s.city || ''}</div>
+                </td>
+                <td><span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">${s.country}</span></td>
+                <td style="color:#86868B;font-family:'JetBrains Mono';font-size:12px;">${s.currency} ${s.target ? s.target.toLocaleString() : 'N/A'}</td>
+                <td style="color:#1D1D1F;font-weight:600;font-family:'JetBrains Mono';font-size:12.5px;">${s.currency} ${(s.actualSales || 0).toLocaleString()}</td>
+                <td>
+                  <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-weight:600;font-size:11.5px;">
+                    ${pct}%
+                  </span>
+                </td>
+                <td style="color:#1B5E20;font-weight:600;font-size:12px;">${s.compliance || 90}%</td>
+                <td>
+                  <span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">
+                    ${statusText}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+        // 3. Metro Manila 8-Stop Roving Corridor Fleet Tracker
+        const fleetTbody = document.getElementById('fleetTableBody');
+        if (fleetTbody) {
+          try {
+            const rovRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/roving-telemetry`);
+            const rovData = await rovRes.json();
+            const marco = (rovData.fleet && rovData.fleet.find(f => f.user && f.user.name && f.user.name.includes('Marco'))) || (rovData.fleet && rovData.fleet[0]);
+            if (marco && marco.visits) {
+              fleetTbody.innerHTML = '';
+              marco.visits.forEach(v => {
+                const isDone = v.status === 'completed';
+                const isActive = v.status === 'checked_in';
+                
+                let statusBadge = '<span style="background:#F2F2F7;color:#86868B;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">Scheduled</span>';
+                if (isDone) {
+                  statusBadge = '<span style="background:#E8F8EE;color:#1B5E20;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">check</span> Completed</span>';
+                } else if (isActive) {
+                  statusBadge = '<span style="background:#EBF4FF;color:#0071E3;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">radio_button_checked</span> Active On-Site</span>';
+                }
+
+                let arrivalStamp = '<span style="color:#8E8E93;font-size:11px;">Pending arrival</span>';
+                if (v.checkInTime) {
+                  const timeStr = new Date(v.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  arrivalStamp = `<b style="color:${isDone ? '#1B5E20' : '#0071E3'};font-size:11.5px;font-family:'JetBrains Mono';">${timeStr}</b>`;
+                  if (v.checkOutTime) {
+                    const outStr = new Date(v.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    arrivalStamp += ` <span style="font-size:10.5px;color:#86868B;">(Dept: ${outStr})</span>`;
+                  }
+                }
+
+                const geofenceBadge = v.gpsVerified
+                  ? `<span style="background:#E8F8EE;color:#1B5E20;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;gap:2px;"><span class="ms-icon sm" style="font-size:11px;">verified</span> Geofence Verified</span>`
+                  : `<span style="background:#F2F2F7;color:#86868B;padding:2px 7px;border-radius:5px;font-size:10.5px;">Pending Check-In</span>`;
+
+                fleetTbody.innerHTML += `
+                  <tr>
+                    <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">Stop #${v.sequenceOrder}</td>
+                    <td>
+                      <b style="color:#1D1D1F;font-size:13px;">${v.store ? v.store.name : 'Branch Stop'}</b>
+                      <div style="font-size:11px;color:#86868B;">${v.store ? v.store.city : 'Metro Manila Corridor'} · ${v.notes || ''}</div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono';font-size:11.5px;color:#1D1D1F;">${v.scheduledTime}</td>
+                    <td>${arrivalStamp}</td>
+                    <td>${geofenceBadge}</td>
+                    <td>${statusBadge}</td>
+                  </tr>
+                `;
+              });
+            }
+          } catch (err) {
+            console.warn('Could not load fleet telemetry', err);
+          }
+        }
+
+        // 4. Vera Optical Shelf Audits Grid
+        const veraGrid = document.getElementById('veraAuditCardsGrid');
+        if (veraGrid) {
+          const audits = (data.recentAudits && data.recentAudits.length > 0) ? data.recentAudits : [
+            {
+              storeId: 'store-sm-mega',
+              complianceScore: 94,
+              shareOfShelfPct: 45,
+              geminiVerdict: 'All promotional shelf strips and fast-sale POS displays verified in full accordance with regional standard.',
+              detectedIssues: ['Planogram matched 94%', 'Zero out-of-stock'],
+              timestamp: new Date().toISOString()
+            },
+            {
+              storeId: 'store-fp-vivo',
+              complianceScore: 89,
+              shareOfShelfPct: 40,
+              geminiVerdict: 'Minor gap detected on upper secondary rack shelf. Share of shelf healthy at 40%.',
+              detectedIssues: ['Shelf 2 spacing gap', 'Price tag aligned'],
+              timestamp: new Date().toISOString()
+            },
+            {
+              storeId: 'store-glorietta',
+              complianceScore: 92,
+              shareOfShelfPct: 43,
+              geminiVerdict: 'Flagship experience visual merchandising verified. Focus promo bundles prominently displayed.',
+              detectedIssues: ['Promo hero stand active'],
+              timestamp: new Date().toISOString()
+            }
+          ];
+
+          veraGrid.innerHTML = '';
+          audits.forEach(a => {
+            const storeObj = (data.stores && data.stores.find(s => s.id === a.storeId)) || { name: a.storeId || 'Retail Branch', city: 'Metro Manila' };
+            const scoreColor = a.complianceScore >= 90 ? '#1B5E20' : (a.complianceScore >= 75 ? '#B25E00' : '#D32F2F');
+            const scoreBg = a.complianceScore >= 90 ? '#E8F8EE' : (a.complianceScore >= 75 ? '#FFF3DC' : '#FDE8E8');
+            const issuesBadges = (a.detectedIssues || []).map(iss => `<span style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);color:#1D1D1F;font-size:10.5px;padding:2px 6px;border-radius:4px;">${iss}</span>`).join(' ');
+
+            veraGrid.innerHTML += `
+              <div style="background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div>
+                    <b style="font-size:13px;color:#1D1D1F;display:block;">${storeObj.name}</b>
+                    <span style="font-size:10.5px;color:#86868B;">${new Date(a.timestamp || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · Vera Optical Agent</span>
+                  </div>
+                  <span style="background:${scoreBg};color:${scoreColor};font-weight:700;font-size:11px;padding:3px 8px;border-radius:6px;">
+                    ${a.complianceScore}% Match
+                  </span>
+                </div>
+
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span style="font-size:11px;color:#86868B;">Share of Shelf:</span>
+                  <b style="font-size:12px;color:#0071E3;">${a.shareOfShelfPct || 42}%</b>
+                  <div style="flex:1;background:#E5E5EA;height:6px;border-radius:999px;overflow:hidden;">
+                    <div style="background:#0071E3;height:100%;width:${a.shareOfShelfPct || 42}%;"></div>
+                  </div>
+                </div>
+
+                <p style="font-size:11.5px;color:#6E6E73;margin:0;line-height:1.4;background:#FFFFFF;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.04);">
+                  "${a.geminiVerdict || 'Planogram analyzed via Gemini Multimodal Vision.'}"
+                </p>
+
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;">
+                  ${issuesBadges}
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        // 5. Live Fast-Sale Transaction Ledger
+        const salesTbody = document.getElementById('salesTableBody');
+        if (salesTbody) {
+          salesTbody.innerHTML = '';
+          const txList = (data.recentTransactions && data.recentTransactions.length > 0) ? data.recentTransactions : [];
+          if (txList.length === 0) {
+            salesTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#86868B;padding:18px;">No transactions logged yet today</td></tr>`;
+          } else {
+            txList.forEach(tx => {
+              const storeObj = (data.stores && data.stores.find(s => s.id === tx.storeId)) || { name: tx.storeId || 'Retail Branch' };
+              const timeStr = new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+              salesTbody.innerHTML += `
+                <tr>
+                  <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${timeStr}</td>
+                  <td style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${storeObj.name}</td>
+                  <td style="color:#0071E3;font-weight:500;font-size:12px;">${tx.userId}</td>
+                  <td style="font-weight:600;font-family:'JetBrains Mono';font-size:11.5px;">${tx.productId}</td>
+                  <td style="font-weight:600;color:#1D1D1F;">${tx.quantity}</td>
+                  <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">${tx.currency} ${(tx.totalAmount || 0).toLocaleString()}</td>
+                  <td><span style="background:#F2F2F7;color:#1D1D1F;text-transform:uppercase;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">${tx.paymentMethod || 'cash'}</span></td>
+                  <td style="color:#86868B;font-size:11px;text-transform:capitalize;">${tx.paymentTerms || 'straight'}</td>
+                </tr>
+              `;
+            });
+          }
+        }
+
+        // 6. Surveys Review Queue
+        const surveysTbody = document.getElementById('surveysSupTableBody');
+        if (surveysTbody) {
+          try {
+            const srvRes = await fetch(`/api/admin/${currentWorkspaceId || 'ws-japac-retail'}/surveys`);
+            const srvList = await srvRes.json();
+            surveysTbody.innerHTML = '';
+            if (Array.isArray(srvList) && srvList.length > 0) {
+              srvList.forEach(srv => {
+                const subCount = srv.submissionsCount || 0;
+                const latestTime = srv.latestSubmissionAt ? new Date(srv.latestSubmissionAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Active Queue';
+                surveysTbody.innerHTML += `
+                  <tr>
+                    <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${latestTime}</td>
+                    <td>
+                      <b style="color:#1D1D1F;font-size:12.5px;">${srv.title}</b>
+                      <div style="font-size:11px;color:#86868B;">${srv.questionsCount || 5} Questions · ${srv.surveyType}</div>
+                    </td>
+                    <td style="font-size:11.5px;color:#1D1D1F;">All Active Branches (${(srv.targetStoreNames || []).length})</td>
+                    <td><span style="background:#EBF4FF;color:#0071E3;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;">${subCount} Submitted</span></td>
+                    <td><span style="background:#E8F8EE;color:#1B5E20;font-weight:600;font-size:11px;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:12px;">verified</span> DB Verified</span></td>
+                    <td>
+                      <button type="button" onclick="switchAdminNav('surveys');setViewMode('admin');" style="background:#F2F2F7;border:1px solid rgba(0,0,0,0.06);color:#1D1D1F;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;">Inspect</button>
+                    </td>
+                  </tr>
+                `;
+              });
+            }
+          } catch (err) {
+            console.warn('Could not load surveys queue', err);
+          }
+        }
+
       } catch (err) {
-        console.error(err);
+        console.error('Error loading supervisor console data:', err);
       }
     }
 
@@ -6271,6 +6863,7 @@
 
     function setViewMode(mode) {
       currentViewMode = mode;
+      const canvas = document.querySelector('main.workspace-canvas');
       const p = document.getElementById('phoneWrapper');
       const s = document.getElementById('supervisorWrapper');
       const a = document.getElementById('adminWrapper');
@@ -6286,14 +6879,17 @@
       ba.classList.remove('active');
 
       if (mode === 'phone') {
+        canvas?.classList.remove('canvas-fullbleed');
         p.style.display = 'flex';
         bp.classList.add('active');
         if (typeof renderMobileShiftCard === 'function') renderMobileShiftCard();
       } else if (mode === 'supervisor') {
+        canvas?.classList.add('canvas-fullbleed');
         s.style.display = 'flex';
         bs.classList.add('active');
         loadSupervisorConsoleData();
       } else if (mode === 'admin') {
+        canvas?.classList.add('canvas-fullbleed');
         a.style.display = 'flex';
         ba.classList.add('active');
         loadAdminData();
