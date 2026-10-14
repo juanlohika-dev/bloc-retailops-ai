@@ -1,10 +1,11 @@
 # Project BLOC: Enterprise Frontline Retail Operations & Agentic Orchestration Platform
-## Comprehensive Master Technical Architecture & System Specification (v3.0)
+## Comprehensive Master Technical Architecture & System Specification (v4.0)
 
 **Project Name**: Project BLOC (Frontline Agentic Orchestration Engine)  
-**Target Enterprise**: Distributed Multi-Store Retail Networks across JAPAC (Singapore, Philippines, Malaysia, Thailand, Vietnam, Japan)  
+**Target Enterprise**: Distributed Multi-Store Retail Networks across JAPAC (1,000+ Branches, 5,000+ Frontline Personnel)  
 **Hackathon Event**: Google Cloud AI Builder Cup 2026  
 **Repository**: [github.com/juanlohika-dev/bloc-retailops-ai](https://github.com/juanlohika-dev/bloc-retailops-ai)  
+**Companion Spec**: [ENTERPRISE_SYSTEM_ARCHITECTURE_AND_UI_UX_SPECIFICATION.md](file:///c:/Users/Lester%20Alarcon/Documents/Bloc%20Retail%20Ops/docs/ENTERPRISE_SYSTEM_ARCHITECTURE_AND_UI_UX_SPECIFICATION.md)
 
 ---
 
@@ -13,9 +14,11 @@
 Distributed retail operations suffer from chronic operational disconnects across the enterprise stack:
 1. **The Frontline Compliance Abyss**: Field promoters and merchandisers are bombarded with manual tasks (shelf photo audits, POS tallies, competitor monitoring). Over 45% of assigned operational tasks are missed or reported 24–48 hours late because legacy software requires tedious 15-field mobile forms.
 2. **The "Shallow" Tooling Dilemma**: Most retail ops systems offer rigid, read-only dashboards that cannot take action. Headquarters sets planograms and daily targets, but has no mechanism to proactively follow up with individual store staff, verify execution via computer vision, or escalate non-compliance before the shift ends.
-3. **Multi-Agent Orchestration Solution**: Project BLOC replaces static reporting with an **Autonomous AI Agent Mesh** governed by an **Enterprise Operations Command Portal**:
-   - Authorized operations managers configure **AI Agents (Pax, Vera, Nexus)**, equip them with specialized **Skills**, and assign them **Autonomous Field Tasks**.
-   - Agents proactively reach out to field promoters across retail branches via low-bandwidth conversational channels, guide them through 3-second Fast-Sale logging and shelf photo audits, automatically follow up if tasks are delinquent, evaluate compliance, and generate executive summaries with deep drill-down analytics.
+3. **Multi-Agent Orchestration & Modular Extensibility**: Project BLOC replaces static reporting with an **Autonomous AI Agent Mesh** governed by an **Enterprise Operations Command Portal**:
+   - **Modular Dynamic Fields Engine**: Clean segregation between Standard Fields and Custom Fields across modules (`sales`, `stores`, `products`, `users`, `tasks`, `shelf_audits`).
+   - **Dedicated Supervisor Operations Horizon**: A dedicated navigation menu and segregated ledgers for **Sales Entries**, **Vera Optical Audits**, **Attendance Logs**, and **Field Exceptions**.
+   - **Massive Scalability Architecture**: Multi-level hierarchical Org Chart (HQ &rarr; Regional Hub &rarr; Area &rarr; Territory &rarr; Store &rarr; Staff) engineered to handle 1,000+ stores with lazy loading and server-side cursor pagination.
+   - **Autonomous Agents (Pax, Vera, Nexus, Aegis)**: Real-time frontline guidance, optical shelf verification, enterprise routing, and role-guarded administrative copilot actions with immutable audit trail.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -23,15 +26,16 @@ Distributed retail operations suffer from chronic operational disconnects across
 │                                                                                        │
 │  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
 │  │                    ENTERPRISE MANAGEMENT PORTAL (WEB CONSOLE)                    │  │
-│  │   [Left Navigation Menu]                                                         │  │
-│  │   ├─ 📊 Executive BI & AI Decision Briefings (Real-time Pacing, Outliers, SoS)  │  │
-│  │   ├─ 🤖 AI Agent Registry & Skill Studio (Pax, Vera, Nexus + Custom Skills)     │  │
-│  │   ├─ 🎯 Autonomous Field Tasks & Compliance Engine (Reminders & Escalations)     │  │
-│  │   ├─ 🏬 Retail Store Network & Geofences (SM, FairPrice, Robinsons 360° Drill)   │  │
-│  │   ├─ 📦 Product Catalog & 1-Tap Fast-Sale Pins (SKUs, Barcodes, Commissions)    │  │
-│  │   ├─ 👥 Staff, Org Chart & Roster (Multi-Tier Hierarchy, Shift Assignments)      │  │
-│  │   ├─ 📑 Executive Reports & Non-Compliance Audits (Gemini Automated Synthesis)   │  │
-│  │   └─ ⚙️ Company & Cloud Settings (Google Drive 5TB Vault, Google Sheets 2-Way)   │  │
+│  │   [Admin Left Navigation Menu]                [Supervisor Left Navigation Menu]  │  │
+│  │   ├─ 📊 Executive BI & AI Decision Briefings  ├─ 🛰️ Command Horizon Overview     │  │
+│  │   ├─ 🤖 AI Agent Registry & Skill Studio     ├─ 💳 Sales & Fast-Sale Ledger     │  │
+│  │   ├─ 🎯 Autonomous Field Tasks Engine         ├─ 📷 Vera Shelf Photo Audits      │  │
+│  │   ├─ 🏬 Retail Store Network & 360° Dossier   ├─ ⏰ Attendance & Shift Roster    │  │
+│  │   ├─ 📦 Product Catalog & Fast-Sale Stepper   ├─ ⚠️ Field Exceptions & Approvals │  │
+│  │   ├─ 👥 Staff, Org Chart & Roster (CRUD)      ├─ 🏬 Territory Store Network      │  │
+│  │   ├─ 📑 Executive Reports & Compliance Ledger └─ 👥 Territory Frontline Staff    │  │
+│  │   ├─ 📜 Cross-Module Audit Trail & Security                                      │  │
+│  │   └─ ⚙️ Module Dynamic Fields & Cloud Settings                                   │  │
 │  └───────────────────────────────┬──────────────────────────────────────────────────┘  │
 │                                  │                                                     │
 │                                  ▼ Autonomous Task Dispatch & Telemetry                │

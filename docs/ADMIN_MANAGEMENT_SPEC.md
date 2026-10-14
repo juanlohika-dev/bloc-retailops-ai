@@ -103,17 +103,39 @@ Visualizes and enforces the corporate command lineage:
 ---
 
 ### Module 7: Executive Reports & Audit Governance (`/admin/reports`)
-- **AI-Generated Executive Reports**: One-click synthesis of weekly and daily operations:
-  - *Planogram & Merchandising Compliance Report*.
-  - *On-Shelf Availability (OSA) & Stock-Out Report*.
-  - *Regional Sell-Through & Commission Payout Summary*.
-- **Audit Trails**: Immutable log recording all configuration updates, role modifications, and task dispatches.
+- **AI-Generated Executive Reports Catalog**: Structured multi-report entries across distinct business domains:
+  - *Executive Sell-Through & Financial Reconciliation Report*.
+  - *Multimodal Planogram & Shelf Compliance Audit Report*.
+  - *Frontline Promoter Performance & Commission Ledger*.
+  - *Payment Channel Settlement & Financing Mix Report*.
+  - *Out-of-Stock (OOS) Gap & Replenishment Urgency Digest*.
+- **Report Entry Inspection**: Data breakdowns, Gemini strategic interventions, and CSV/PDF export.
 
 ---
 
-### Module 8: Company & Cloud Settings (`/admin/settings`)
-Configures enterprise-wide cloud connections:
-- **Base Reporting Currency**: SGD, PHP, USD, MYR, JPY.
-- **Google Drive 5TB Media Vault**: Service account credentials and root folder ID for shelf media ingestion.
-- **Google Sheets Bidirectional Link**: Live spreadsheet ID for WSS two-way data sync.
-- **Operating Hours & SLA**: Shift cutoff times and automated End-of-Day Nexus digest dispatch times.
+### Module 8: Full Cross-Module Audit Trail & Security Ledger (`/admin/audit-trail`)
+- **Multi-Module Audit Telemetry**: Filterable across `sales`, `ai_governance`, `config`, `tasks`, `stores`, `products`, `users`.
+- **Tamper-Evident Entries**: Timestamp, Actor identity, Role, Digital Approval Signature (HMAC / Exec Signature), AI Copilot attribution, before/after JSON diffs.
+
+---
+
+### Module 9: Dynamic Fields & Payment Channels Configuration (`/admin/settings`)
+- **Module Field Builder**: Manage Standard vs Custom Fields per module (`sales`, `stores`, `products`, `users`, `tasks`, `shelf_audits`).
+- **Payment Gateway & Financing Matrix**: Live toggles for Cash, Credit Card, Home Credit (0% APR), and E-Wallet settlement channels with financing terms (`straight`, `3_months`, `6_months`, `12_months`, `24_months`).
+- **AI Governance & Guardrails**: Role-based access control matrix (Promoter Level 0, Supervisor Level 1, Admin Level 2).
+- **Google Cloud Media Vault**: Root Google Drive 5TB Folder ID and Google Sheets real-time bridge.
+
+---
+
+## 3. Dedicated Supervisor Command Horizon Specification
+
+To support field operations supervisors overseeing 10–50 retail branches, the **Supervisor Operations Horizon** provides a dedicated, persistent navigation sidebar and segregated operational ledgers:
+
+1. **🛰️ Live Command Horizon Overview**: Regional KPI cards, live pacing progress, and automated operational outlier alerts.
+2. **💳 Sales & Fast-Sale Entries Ledger**: Real-time transaction stream across territory branches, filterable by store, promoter, payment method, and financing terms, with instant receipt inspection drawer.
+3. **📷 Vera Shelf Photo Audits Ledger**: Visual evidence feed with optical compliance scores, Share of Shelf (SoS) analytics, and Gemini bounding-box verdicts.
+4. **⏰ Attendance & Shift Roster**: Real-time GPS geofenced check-in verification, scheduled hours, and native Pax chat language tracking.
+5. **⚠️ Field Exceptions & Approvals**: Queue of transactions and planogram delinquencies requiring supervisor sign-off.
+6. **🏬 Territory Store Network (360° Inspection)**: Branch cards with store quotas, pacing, and 360° dossiers.
+7. **👥 Territory Frontline Staff Roster**: Staff directory with language preferences, performance, and transfer tools.
+
