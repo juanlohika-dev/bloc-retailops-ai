@@ -141,6 +141,7 @@ export const salesTransactions = sqliteTable('sales_transactions', {
   paymentMethod: text('payment_method').default('cash'),       // 'cash' | 'credit_card' | 'home_credit' | 'e_wallet' | 'bnpl'
   paymentTerms: text('payment_terms').default('straight'),     // 'straight' | '3_months' | '6_months' | '12_months' | '24_months'
   approvalCode: text('approval_code'),                          // Card/Financing authorization reference
+  customFields: text('custom_fields', { mode: 'json' }),        // Dynamic custom fields payload
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
 
@@ -463,5 +464,26 @@ export const supportedLanguages = sqliteTable('supported_languages', {
   displayOrder: integer('display_order').default(1),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
+
+// ==========================================
+// 28. MODULAR DYNAMIC FIELD ENGINE (Standard vs Custom Fields)
+// ==========================================
+export const moduleFieldDefinitions = sqliteTable('module_field_definitions', {
+  id: text('id').primaryKey(),                                  // e.g. "field-sales-cust-phone"
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  module: text('module').notNull(),                             // 'sales' | 'stores' | 'products' | 'users' | 'tasks' | 'shelf_audits'
+  fieldKey: text('field_key').notNull(),                         // e.g. "customer_phone", "serial_number"
+  fieldLabel: text('field_label').notNull(),                     // e.g. "Customer Phone / Loyalty #"
+  fieldType: text('field_type').notNull(),                       // 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'currency'
+  isStandard: integer('is_standard', { mode: 'boolean' }).default(false), // true = core system attribute, false = custom
+  isRequired: integer('is_required', { mode: 'boolean' }).default(false),
+  options: text('options', { mode: 'json' }),                    // For 'select' type: ["None", "1 Year Extended", "2 Year Care"]
+  defaultValue: text('default_value'),
+  placeholder: text('placeholder'),
+  displayOrder: integer('display_order').default(0),
+  active: integer('active', { mode: 'boolean' }).default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
 
 

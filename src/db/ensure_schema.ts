@@ -275,7 +275,99 @@ export async function ensureTablesAndColumns() {
       await libSqlClient.execute(`UPDATE users SET preferred_language = 'vi' WHERE preferred_language IN ('vi-VN');`);
     } catch (normErr) {}
 
-    console.log('[DB Schema] Master Schema & Seeded Tables (Surveys, Payment Methods, Payment Terms, Governance, Stores, Supported Languages) verified in DB.');
+    // 28. Module Field Definitions (Dynamic Field Engine)
+    await libSqlClient.execute(`
+      CREATE TABLE IF NOT EXISTS module_field_definitions (
+        id TEXT PRIMARY KEY,
+        workspace_id TEXT NOT NULL,
+        module TEXT NOT NULL,
+        field_key TEXT NOT NULL,
+        field_label TEXT NOT NULL,
+        field_type TEXT NOT NULL,
+        is_standard INTEGER DEFAULT 0,
+        is_required INTEGER DEFAULT 0,
+        options TEXT,
+        default_value TEXT,
+        placeholder TEXT,
+        display_order INTEGER DEFAULT 0,
+        active INTEGER DEFAULT 1,
+        created_at INTEGER NOT NULL
+      );
+    `);
+
+    // Ensure custom_fields column exists on sales_transactions
+    try {
+      await libSqlClient.execute(`ALTER TABLE sales_transactions ADD COLUMN custom_fields TEXT;`);
+    } catch (e) {}
+
+    // Seed master field definitions for ws-alpha
+    const defaultModuleFields = [
+      // SALES
+      { id: 'fld-sales-store', ws: 'ws-alpha', mod: 'sales', key: 'store_id', label: 'Store Branch', type: 'select', isStd: 1, req: 1, opts: null, ph: 'Select Store', order: 1 },
+      { id: 'fld-sales-items', ws: 'ws-alpha', mod: 'sales', key: 'items', label: 'SKU Items & Quantity', type: 'stepper', isStd: 1, req: 1, opts: null, ph: null, order: 2 },
+      { id: 'fld-sales-paymethod', ws: 'ws-alpha', mod: 'sales', key: 'payment_method', label: 'Payment Method', type: 'select', isStd: 1, req: 1, opts: null, ph: null, order: 3 },
+      { id: 'fld-sales-payterms', ws: 'ws-alpha', mod: 'sales', key: 'payment_terms', label: 'Financing Terms', type: 'select', isStd: 1, req: 1, opts: null, ph: null, order: 4 },
+      { id: 'fld-sales-authcode', ws: 'ws-alpha', mod: 'sales', key: 'approval_code', label: 'Payment Auth Reference', type: 'text', isStd: 1, req: 0, opts: null, ph: 'AUTH-123456', order: 5 },
+      { id: 'fld-sales-custphone', ws: 'ws-alpha', mod: 'sales', key: 'customer_phone', label: 'Customer Mobile / Loyalty #', type: 'text', isStd: 0, req: 0, opts: null, ph: '+63 9XX XXX XXXX', order: 10 },
+      { id: 'fld-sales-serial', ws: 'ws-alpha', mod: 'sales', key: 'serial_number', label: 'Serial / IMEI Number', type: 'text', isStd: 0, req: 0, opts: null, ph: 'SN-88291039', order: 11 },
+      { id: 'fld-sales-warranty', ws: 'ws-alpha', mod: 'sales', key: 'extended_warranty', label: 'Extended Warranty Protection', type: 'select', isStd: 0, req: 0, opts: JSON.stringify(['None', '1-Year Extended (₱999)', '2-Year Care+ Screen & Liquid (₱1,899)']), ph: 'Choose Protection Pack', order: 12 },
+      { id: 'fld-sales-gift', ws: 'ws-alpha', mod: 'sales', key: 'promo_gift_included', label: 'Promotional Freebie Issued', type: 'checkbox', isStd: 0, req: 0, opts: null, ph: null, order: 13 },
+      
+      // STORES
+      { id: 'fld-store-code', ws: 'ws-alpha', mod: 'stores', key: 'store_code', label: 'Store Code', type: 'text', isStd: 1, req: 1, opts: null, ph: 'PH-NCR-001', order: 1 },
+      { id: 'fld-store-name', ws: 'ws-alpha', mod: 'stores', key: 'name', label: 'Store Name', type: 'text', isStd: 1, req: 1, opts: null, ph: 'SM Megamall', order: 2 },
+      { id: 'fld-store-chain', ws: 'ws-alpha', mod: 'stores', key: 'chain', label: 'Retail Chain', type: 'text', isStd: 1, req: 1, opts: null, ph: 'SM Cyberzone', order: 3 },
+      { id: 'fld-store-country', ws: 'ws-alpha', mod: 'stores', key: 'country', label: 'Country / Jurisdiction', type: 'select', isStd: 1, req: 1, opts: JSON.stringify(['Philippines', 'Singapore', 'Malaysia', 'Vietnam']), ph: null, order: 4 },
+      { id: 'fld-store-floor', ws: 'ws-alpha', mod: 'stores', key: 'mall_floor', label: 'Mall Floor & Unit Location', type: 'text', isStd: 0, req: 0, opts: null, ph: '4th Floor Cyberzone Unit 402', order: 10 },
+      { id: 'fld-store-format', ws: 'ws-alpha', mod: 'stores', key: 'store_format', label: 'Store Format Tier', type: 'select', isStd: 0, req: 0, opts: JSON.stringify(['Flagship Experience Store', 'Standard Concept Shop', 'Mall Kiosk', 'High-Street Partner']), ph: null, order: 11 },
+      { id: 'fld-store-posid', ws: 'ws-alpha', mod: 'stores', key: 'pos_terminal_id', label: 'Partner POS Terminal ID', type: 'text', isStd: 0, req: 0, opts: null, ph: 'POS-NCR-092', order: 12 },
+
+      // PRODUCTS
+      { id: 'fld-prod-sku', ws: 'ws-alpha', mod: 'products', key: 'sku_code', label: 'SKU Code', type: 'text', isStd: 1, req: 1, opts: null, ph: 'PROD-ULTRA', order: 1 },
+      { id: 'fld-prod-name', ws: 'ws-alpha', mod: 'products', key: 'name', label: 'Product Title', type: 'text', isStd: 1, req: 1, opts: null, ph: 'Galaxy S25 Ultra', order: 2 },
+      { id: 'fld-prod-category', ws: 'ws-alpha', mod: 'products', key: 'category', label: 'Product Category', type: 'select', isStd: 1, req: 1, opts: JSON.stringify(['Smartphones', 'Tablets', 'Wearables', 'Televisions', 'Accessories']), ph: null, order: 3 },
+      { id: 'fld-prod-price', ws: 'ws-alpha', mod: 'products', key: 'unit_price', label: 'Retail Price (₱)', type: 'currency', isStd: 1, req: 1, opts: null, ph: '₱0.00', order: 4 },
+      { id: 'fld-prod-tier', ws: 'ws-alpha', mod: 'products', key: 'brand_tier', label: 'Brand Lineup Tier', type: 'select', isStd: 0, req: 0, opts: JSON.stringify(['Galaxy Ultra Tier', 'Premium Foldable', 'Mid-Range A-Series', 'Essential Series']), ph: null, order: 10 },
+      { id: 'fld-prod-map', ws: 'ws-alpha', mod: 'products', key: 'min_advertised_price', label: 'MAP Price Floor (₱)', type: 'currency', isStd: 0, req: 0, opts: null, ph: '₱0.00', order: 11 },
+      { id: 'fld-prod-bundle', ws: 'ws-alpha', mod: 'products', key: 'bundle_eligible', label: 'Eligible for Multi-SKU Bundle', type: 'checkbox', isStd: 0, req: 0, opts: null, ph: null, order: 12 },
+
+      // USERS
+      { id: 'fld-user-name', ws: 'ws-alpha', mod: 'users', key: 'name', label: 'Full Name', type: 'text', isStd: 1, req: 1, opts: null, ph: 'Juan Dela Cruz', order: 1 },
+      { id: 'fld-user-email', ws: 'ws-alpha', mod: 'users', key: 'email', label: 'Work Email', type: 'text', isStd: 1, req: 1, opts: null, ph: 'user@company.com', order: 2 },
+      { id: 'fld-user-role', ws: 'ws-alpha', mod: 'users', key: 'role', label: 'System Persona / Role', type: 'select', isStd: 1, req: 1, opts: JSON.stringify(['promoter', 'supervisor', 'store_manager', 'merchandiser', 'company_admin']), ph: null, order: 3 },
+      { id: 'fld-user-govid', ws: 'ws-alpha', mod: 'users', key: 'government_id', label: 'Government / Tax ID (TIN)', type: 'text', isStd: 0, req: 0, opts: null, ph: 'XXX-XXX-XXX', order: 10 },
+      { id: 'fld-user-emergency', ws: 'ws-alpha', mod: 'users', key: 'emergency_contact', label: 'Emergency Contact Person & Phone', type: 'text', isStd: 0, req: 0, opts: null, ph: 'Name (+63 9XX XXX XXXX)', order: 11 },
+
+      // TASKS
+      { id: 'fld-task-title', ws: 'ws-alpha', mod: 'tasks', key: 'title', label: 'Task Title', type: 'text', isStd: 1, req: 1, opts: null, ph: 'Planogram Compliance Audit', order: 1 },
+      { id: 'fld-task-agent', ws: 'ws-alpha', mod: 'tasks', key: 'agent_id', label: 'Dispatching AI Agent', type: 'select', isStd: 1, req: 1, opts: JSON.stringify(['agent-vera', 'agent-pax', 'agent-nexus']), ph: null, order: 2 },
+      { id: 'fld-task-priority', ws: 'ws-alpha', mod: 'tasks', key: 'priority', label: 'Operational Priority', type: 'select', isStd: 0, req: 0, opts: JSON.stringify(['High (Immediate)', 'Medium (Shift Window)', 'Normal (End of Day)']), ph: null, order: 10 },
+      { id: 'fld-task-photo', ws: 'ws-alpha', mod: 'tasks', key: 'photo_mandatory', label: 'Mandatory Optical Photo Proof', type: 'checkbox', isStd: 0, req: 0, opts: null, ph: null, order: 11 },
+
+      // SHELF AUDITS
+      { id: 'fld-shelf-score', ws: 'ws-alpha', mod: 'shelf_audits', key: 'compliance_score', label: 'Compliance Score (%)', type: 'number', isStd: 1, req: 1, opts: null, ph: '100', order: 1 },
+      { id: 'fld-shelf-sos', ws: 'ws-alpha', mod: 'shelf_audits', key: 'share_of_shelf_pct', label: 'Share of Shelf (%)', type: 'number', isStd: 1, req: 1, opts: null, ph: '40', order: 2 },
+      { id: 'fld-shelf-endcap', ws: 'ws-alpha', mod: 'shelf_audits', key: 'endcap_location', label: 'Endcap Gondola Location', type: 'text', isStd: 0, req: 0, opts: null, ph: 'Aisle 3 Front Endcap', order: 10 },
+      { id: 'fld-shelf-pop', ws: 'ws-alpha', mod: 'shelf_audits', key: 'pop_material_installed', label: 'POSM / Promo Banner Present', type: 'checkbox', isStd: 0, req: 0, opts: null, ph: null, order: 11 },
+    ];
+
+    const allWsForFields = await libSqlClient.execute('SELECT id FROM workspaces;');
+    const workspaceIds = (allWsForFields.rows || []).map(r => String(r.id));
+    if (!workspaceIds.includes('ws-alpha')) workspaceIds.push('ws-alpha');
+    if (!workspaceIds.includes('ws-japac-retail')) workspaceIds.push('ws-japac-retail');
+
+    for (const targetWs of workspaceIds) {
+      for (const f of defaultModuleFields) {
+        const fieldId = `fld-${targetWs}-${f.mod}-${f.key}`;
+        await libSqlClient.execute({
+          sql: `INSERT OR IGNORE INTO module_field_definitions (id, workspace_id, module, field_key, field_label, field_type, is_standard, is_required, options, placeholder, display_order, active, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+          args: [fieldId, targetWs, f.mod, f.key, f.label, f.type, f.isStd, f.req, f.opts, f.ph, f.order, Date.now()],
+        });
+      }
+    }
+
+    console.log('[DB Schema] Master Schema & Seeded Tables (Surveys, Payment Methods, Payment Terms, Governance, Stores, Supported Languages, Dynamic Module Fields) verified in DB.');
   } catch (err) {
     console.warn('[DB Schema] Schema verification notice:', err);
   }

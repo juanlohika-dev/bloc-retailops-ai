@@ -4535,6 +4535,99 @@
               </div>
             </div>
           </div>
+
+          <!-- 4. Dynamic Module Fields & Schema Extensibility Engine -->
+          <div class="admin-card-box" style="margin-top:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+              <div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:#0071E3;">tune</span>
+                  <span>Modular Dynamic Field Engine & Schema Extensibility</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;">Configure Standard system attributes and provision custom enterprise dynamic fields per module with live frontline reflection and audit logs.</div>
+              </div>
+              <button type="button" class="btn-commit-fsc" onclick="openAddCustomFieldModal()" style="padding:7px 16px;font-size:12px;background:#0071E3;">
+                <span class="ms-icon sm" style="font-size:14px;">add</span> Add Custom Field
+              </button>
+            </div>
+
+            <!-- Module Selector Tabs -->
+            <div class="m3-segmented-control" style="margin-top:14px;background:#F2F2F7;padding:3px;border-radius:10px;display:inline-flex;gap:4px;flex-wrap:wrap;" id="moduleFieldSegmentTabs">
+              <button type="button" class="m3-seg-item active" id="tabModSales" onclick="switchModuleFieldsTab('sales')">
+                <span class="ms-icon sm">point_of_sale</span> Sales Transactions
+              </button>
+              <button type="button" class="m3-seg-item" id="tabModStores" onclick="switchModuleFieldsTab('stores')">
+                <span class="ms-icon sm">storefront</span> Stores & Branches
+              </button>
+              <button type="button" class="m3-seg-item" id="tabModProducts" onclick="switchModuleFieldsTab('products')">
+                <span class="ms-icon sm">inventory_2</span> SKU Catalog
+              </button>
+              <button type="button" class="m3-seg-item" id="tabModUsers" onclick="switchModuleFieldsTab('users')">
+                <span class="ms-icon sm">badge</span> Personnel & Roster
+              </button>
+              <button type="button" class="m3-seg-item" id="tabModTasks" onclick="switchModuleFieldsTab('tasks')">
+                <span class="ms-icon sm">assignment</span> Autonomous Tasks
+              </button>
+              <button type="button" class="m3-seg-item" id="tabModShelf" onclick="switchModuleFieldsTab('shelf_audits')">
+                <span class="ms-icon sm">photo_camera</span> Shelf Audits
+              </button>
+            </div>
+
+            <!-- Standard System Fields (Protected Core) -->
+            <div style="margin-top:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <b style="font-size:13px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="font-size:15px;color:#86868B;">lock</span>
+                  <span>Standard System Fields (Protected Core)</span>
+                </b>
+                <span class="m3-tag-pill" style="background:#F2F2F7;color:#86868B;font-size:10px;font-weight:600;">System Enforced</span>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:12px;overflow:hidden;">
+                <table class="m3-telemetry-table" style="margin:0;">
+                  <thead>
+                    <tr>
+                      <th style="width:25%;">Field Key</th>
+                      <th style="width:30%;">Field Label</th>
+                      <th style="width:20%;">Data Type</th>
+                      <th style="width:15%;">Required</th>
+                      <th style="width:10%;text-align:right;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableStandardFieldsBody">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Active Custom Fields (Extensibility Matrix) -->
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <b style="font-size:13px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="font-size:15px;color:#0071E3;">tune</span>
+                  <span>Active Dynamic Custom Fields (Configurable Schema)</span>
+                </b>
+                <span class="m3-tag-pill" id="badgeCustomFieldsCount" style="background:#EBF4FF;color:#0071E3;font-size:10px;font-weight:700;">4 ACTIVE</span>
+              </div>
+              <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:12px;overflow:hidden;">
+                <table class="m3-telemetry-table" style="margin:0;">
+                  <thead>
+                    <tr>
+                      <th style="width:20%;">Field Key</th>
+                      <th style="width:25%;">Field Label</th>
+                      <th style="width:15%;">Data Type</th>
+                      <th style="width:12%;">Mandatory</th>
+                      <th style="width:12%;">Frontline Active</th>
+                      <th style="width:16%;text-align:right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableCustomFieldsBody">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- PANEL 10: ENTERPRISE DIGITAL SURVEYS & FORMS -->
@@ -5012,6 +5105,94 @@
         <div id="languageOptionsContainer" style="display:flex;flex-direction:column;gap:8px;">
           <!-- Dynamically populated from database table supported_languages -->
         </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         GLOBAL MODAL: DYNAMIC CUSTOM FIELD ENGINE BUILDER
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalCustomField">
+      <div class="demo-modal-dialog" style="max-width:540px;border-radius:18px;padding:22px;background:#FFF;box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,0.06);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon" style="color:#0071E3;font-size:22px;">tune</span>
+            <b style="font-size:16px;color:#1D1D1F;" id="modalCustomFieldTitle">Add Dynamic Custom Field</b>
+          </div>
+          <button type="button" onclick="closeCustomFieldModal()" style="background:none;border:none;cursor:pointer;color:#86868B;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <form id="formCustomField" onsubmit="event.preventDefault(); saveCustomFieldFromModal();">
+          <input type="hidden" id="cfEditingFieldId" value="">
+          
+          <div style="margin-bottom:12px;">
+            <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Target Operational Module</label>
+            <select id="cfModuleSelect" class="fsc-approval-input" style="width:100%;height:34px;font-size:12.5px;background:#FFF;">
+              <option value="sales">Sales Transactions (Frontline Fast-Sale Card)</option>
+              <option value="stores">Stores & Retail Network</option>
+              <option value="products">SKU Catalog & Products</option>
+              <option value="users">Personnel & Roster</option>
+              <option value="tasks">Autonomous Field Tasks</option>
+              <option value="shelf_audits">Vera Optical Shelf Audits</option>
+            </select>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Field Label (Display Name)</label>
+              <input type="text" id="cfFieldLabelInput" class="fsc-approval-input" placeholder="e.g. Serial / IMEI Number" required style="width:100%;height:34px;font-size:12.5px;background:#FFF;" oninput="autoGenerateFieldKey(this.value)">
+            </div>
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Database Field Key</label>
+              <input type="text" id="cfFieldKeyInput" class="fsc-approval-input" placeholder="e.g. serial_number" required style="width:100%;height:34px;font-size:12.5px;background:#FFF;font-family:'JetBrains Mono';">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Field Data Type</label>
+              <select id="cfFieldTypeSelect" class="fsc-approval-input" style="width:100%;height:34px;font-size:12.5px;background:#FFF;" onchange="onFieldTypeChanged(this.value)">
+                <option value="text">Text (Single-line)</option>
+                <option value="number">Numeric (Quantity / Integer)</option>
+                <option value="currency">Currency Amount (₱ / $)</option>
+                <option value="select">Dropdown Options (Single-select)</option>
+                <option value="checkbox">Checkbox (Boolean True/False)</option>
+                <option value="date">Date Picker (YYYY-MM-DD)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Input Placeholder / Tooltip</label>
+              <input type="text" id="cfPlaceholderInput" class="fsc-approval-input" placeholder="e.g. Enter IMEI or SN..." style="width:100%;height:34px;font-size:12.5px;background:#FFF;">
+            </div>
+          </div>
+
+          <div id="cfOptionsGroup" style="margin-bottom:12px;display:none;">
+            <label style="font-size:11.5px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Dropdown Options (Comma separated)</label>
+            <input type="text" id="cfOptionsInput" class="fsc-approval-input" placeholder="e.g. None, 1 Year Extended, 2 Year Care+" style="width:100%;height:34px;font-size:12.5px;background:#FFF;">
+            <span style="font-size:11px;color:#86868B;">Separate each selectable option with a comma.</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:16px;margin-top:12px;padding:10px 12px;background:#F9F9FB;border-radius:10px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#1D1D1F;cursor:pointer;">
+              <input type="checkbox" id="cfIsRequiredInput" style="accent-color:#0071E3;">
+              <span>Mandatory Field (Required to submit)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#1D1D1F;cursor:pointer;">
+              <input type="checkbox" id="cfIsActiveInput" checked style="accent-color:#0071E3;">
+              <span>Active on Frontline Form</span>
+            </label>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+            <button type="button" onclick="closeCustomFieldModal()" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);background:#FFF;color:#1D1D1F;font-size:12.5px;font-weight:600;cursor:pointer;">
+              Cancel
+            </button>
+            <button type="submit" style="padding:8px 18px;border-radius:8px;border:none;background:#0071E3;color:#FFF;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+              <span class="ms-icon sm" style="font-size:14px;">check</span> Save Dynamic Field
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -6060,6 +6241,7 @@
 
         updateWorkspaceUI();
         await loadWorkspaceUsers(currentWorkspaceId);
+        await loadModuleFields();
       } catch (err) {
         console.error('Failed to init workspaces:', err);
         await loadUserState();
@@ -7001,6 +7183,58 @@
           </div>
         </div>
 
+        <!-- Dynamic Module Custom Fields (Sales Extensibility) -->
+        ${(() => {
+          const salesCustom = (cachedModuleFields?.sales || []).filter(f => !f.isStandard && f.active !== false);
+          if (salesCustom.length === 0) return '';
+          return `
+            <div class="fsc-custom-fields-box" style="margin-top:10px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:11px;font-weight:700;color:#6E6E73;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+                <span class="ms-icon sm" style="font-size:14px;color:#0071E3;">tune</span> Dynamic Sale Fields
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                ${salesCustom.map(f => {
+                  if (f.fieldType === 'select') {
+                    const opts = Array.isArray(f.options) ? f.options : (typeof f.options === 'string' ? JSON.parse(f.options || '[]') : []);
+                    return `
+                      <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+                          <label style="font-size:11px;color:#1D1D1F;font-weight:600;">${escapeHtml(f.fieldLabel)} ${f.isRequired ? '<span style="color:#FF3B30;">*</span>' : ''}</label>
+                          <span style="font-size:10px;color:#86868B;">Select</span>
+                        </div>
+                        <select class="fsc-approval-input" id="cf_sales_${f.fieldKey}" style="width:100%;height:32px;font-size:12px;background:#FFF;padding:4px 8px;">
+                          ${opts.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}
+                        </select>
+                      </div>
+                    `;
+                  } else if (f.fieldType === 'checkbox') {
+                    return `
+                      <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#1D1D1F;cursor:pointer;padding:4px 0;">
+                        <input type="checkbox" id="cf_sales_${f.fieldKey}" style="accent-color:#0071E3;">
+                        <span>${escapeHtml(f.fieldLabel)} ${f.isRequired ? '<span style="color:#FF3B30;">*</span>' : ''}</span>
+                      </label>
+                    `;
+                  } else {
+                    return `
+                      <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+                          <label style="font-size:11px;color:#1D1D1F;font-weight:600;">${escapeHtml(f.fieldLabel)} ${f.isRequired ? '<span style="color:#FF3B30;">*</span>' : ''}</label>
+                          <span style="font-size:10px;color:#86868B;">${f.fieldType === 'currency' ? '₱ Currency' : f.fieldType === 'number' ? 'Number' : 'Text'}</span>
+                        </div>
+                        <input type="${f.fieldType === 'number' || f.fieldType === 'currency' ? 'number' : 'text'}" 
+                               class="fsc-approval-input" 
+                               id="cf_sales_${f.fieldKey}" 
+                               placeholder="${escapeHtml(f.placeholder || f.fieldLabel)}" 
+                               style="width:100%;height:32px;font-size:12px;background:#FFF;padding:4px 8px;">
+                      </div>
+                    `;
+                  }
+                }).join('')}
+              </div>
+            </div>
+          `;
+        })()}
+
         <div class="fsc-totals-footer">
           <span>Subtotal: <b id="fswTotalValue" style="color:#1D1D1F;">${currencySymbol}0</b></span>
           <span style="color:#34C759;font-weight:600;" id="fswCommissionValue">+${currencySymbol}0 bonus</span>
@@ -7136,6 +7370,25 @@
       btn.innerText = 'Syncing ERP & BigQuery...';
       btn.disabled = true;
 
+      // Collect dynamic custom fields for sales
+      const customFields = {};
+      const salesCustomFields = (cachedModuleFields?.sales || []).filter(f => !f.isStandard && f.active !== false);
+      for (const f of salesCustomFields) {
+        const el = document.getElementById(`cf_sales_${f.fieldKey}`);
+        if (el) {
+          const val = el.type === 'checkbox' ? el.checked : el.value;
+          if (f.isRequired && (val === '' || val === null || val === undefined)) {
+            alert(`Please complete mandatory dynamic field: ${f.fieldLabel}`);
+            btn.innerText = 'Record Sale';
+            btn.disabled = false;
+            return;
+          }
+          if (val !== '' && val !== null && val !== undefined) {
+            customFields[f.fieldKey] = val;
+          }
+        }
+      }
+
       try {
         const res = await fetch('/api/sales/fast-sale', {
           method: 'POST',
@@ -7147,6 +7400,7 @@
             paymentMethod: selectedPaymentMethod,
             paymentTerms: selectedPaymentTerms,
             approvalCode: currentApprovalCode || (selectedPaymentMethod !== 'cash' ? `AUTH-${Math.floor(100000 + Math.random() * 900000)}` : null),
+            customFields,
           }),
         });
         const data = await res.json();
@@ -7154,7 +7408,10 @@
         const payDesc = selectedPaymentTerms !== 'straight' 
           ? `[${selectedPaymentMethod.replace('_', ' ').toUpperCase()} · ${selectedPaymentTerms.replace('_', ' ')}]`
           : `[${selectedPaymentMethod.replace('_', ' ').toUpperCase()}]`;
-        appendUserBubble(`Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale ${payDesc} (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
+        
+        const cfCount = Object.keys(customFields).length;
+        const cfSnippet = cfCount > 0 ? ` + ${cfCount} custom field${cfCount > 1 ? 's' : ''}` : '';
+        appendUserBubble(`Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale ${payDesc}${cfSnippet} (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
         appendPaxBubble(data.paxMessage);
         updateKpiBanner(data.currentShiftTotal);
 
@@ -8157,12 +8414,23 @@
         pageItems.forEach(tx => {
           const storeObj = (supStoresData && supStoresData.find(s => s.id === tx.storeId)) || { name: tx.storeId || 'Retail Branch' };
           const timeStr = new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const cfObj = typeof tx.customFields === 'string' ? JSON.parse(tx.customFields || '{}') : (tx.customFields || {});
+          const cfKeys = Object.keys(cfObj);
+          const cfPills = cfKeys.length > 0 
+            ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;">
+                ${cfKeys.map(k => `<span class="m3-tag-pill" style="background:#EBF4FF;color:#0071E3;font-size:9.5px;padding:1px 5px;font-family:'JetBrains Mono';" title="${escapeHtml(k)}: ${escapeHtml(String(cfObj[k]))}">🏷️ ${escapeHtml(k)}: ${escapeHtml(String(cfObj[k]))}</span>`).join('')}
+               </div>`
+            : '';
+
           tbody.innerHTML += `
             <tr>
               <td style="font-family:'JetBrains Mono';font-size:11px;color:#86868B;">${timeStr}</td>
               <td style="font-weight:600;color:#1D1D1F;font-size:12.5px;">${storeObj.name}</td>
               <td style="color:#0071E3;font-weight:500;font-size:12px;">${tx.userId}</td>
-              <td style="font-weight:600;font-family:'JetBrains Mono';font-size:11.5px;">${tx.productId}</td>
+              <td>
+                <span style="font-weight:600;font-family:'JetBrains Mono';font-size:11.5px;">${tx.productId}</span>
+                ${cfPills}
+              </td>
               <td style="font-weight:600;color:#1D1D1F;">${tx.quantity}</td>
               <td style="font-weight:700;color:#1D1D1F;font-family:'JetBrains Mono';">${tx.currency} ${(tx.totalAmount || 0).toLocaleString()}</td>
               <td><span style="background:#F2F2F7;color:#1D1D1F;text-transform:uppercase;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">${tx.paymentMethod || 'cash'}</span></td>
@@ -12158,6 +12426,7 @@ async function exportAnalyticsCsv() {
         if (chkAuto) chkAuto.checked = activeGovernanceConfig.autoAuditAllAI ?? activeGovernanceConfig.autoAuditAllAiActions ?? true;
         if (chkSig) chkSig.checked = activeGovernanceConfig.requireDigitalSignature ?? activeGovernanceConfig.requireSupervisorSignOffOnConfig ?? true;
 
+        await loadModuleFields();
       } catch (err) {
         console.error('Failed to load settings & governance:', err);
       }
@@ -12292,6 +12561,273 @@ async function exportAnalyticsCsv() {
         activePaymentMethodsConfig.terms = terms;
       }
       savePaymentConfigFromUI();
+    }
+
+    // ============================================================
+    // 13.5. DYNAMIC MODULE FIELDS & SCHEMA EXTENSIBILITY ENGINE
+    // ============================================================
+    let cachedModuleFields = { sales: [], stores: [], products: [], users: [], tasks: [], shelf_audits: [] };
+    let activeModuleTab = 'sales';
+
+    async function loadModuleFields(optModule = null) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/fields`);
+        const data = await res.json();
+        cachedModuleFields = data.grouped || {};
+        
+        // Ensure each module array exists
+        ['sales', 'stores', 'products', 'users', 'tasks', 'shelf_audits'].forEach(m => {
+          if (!cachedModuleFields[m]) cachedModuleFields[m] = [];
+        });
+
+        renderModuleFieldsUI(optModule || activeModuleTab);
+      } catch (err) {
+        console.error('Failed to load module fields:', err);
+      }
+    }
+
+    function switchModuleFieldsTab(modKey) {
+      activeModuleTab = modKey;
+      const tabIds = {
+        sales: 'tabModSales',
+        stores: 'tabModStores',
+        products: 'tabModProducts',
+        users: 'tabModUsers',
+        tasks: 'tabModTasks',
+        shelf_audits: 'tabModShelf',
+      };
+      Object.keys(tabIds).forEach(k => {
+        const btn = document.getElementById(tabIds[k]);
+        if (btn) btn.classList.toggle('active', k === modKey);
+      });
+      renderModuleFieldsUI(modKey);
+    }
+
+    function renderModuleFieldsUI(modKey) {
+      const list = cachedModuleFields[modKey] || [];
+      const stdList = list.filter(f => f.isStandard);
+      const customList = list.filter(f => !f.isStandard);
+
+      // 1. Standard Fields Table
+      const stdTbody = document.getElementById('tableStandardFieldsBody');
+      if (stdTbody) {
+        if (stdList.length === 0) {
+          stdTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#86868B;padding:14px;">No standard fields registered for this module.</td></tr>';
+        } else {
+          stdTbody.innerHTML = stdList.map(f => `
+            <tr>
+              <td><span style="font-family:\'JetBrains Mono\';font-size:11.5px;color:#0071E3;background:#EBF4FF;padding:2px 6px;border-radius:4px;">${escapeHtml(f.fieldKey)}</span></td>
+              <td><b style="font-size:12px;color:#1D1D1F;">${escapeHtml(f.fieldLabel)}</b></td>
+              <td><span style="font-size:11.5px;color:#6E6E73;text-transform:uppercase;font-weight:600;">${escapeHtml(f.fieldType)}</span></td>
+              <td><span style="font-size:11px;font-weight:600;color:${f.isRequired ? '#FF3B30' : '#86868B'};">${f.isRequired ? 'Mandatory' : 'Optional'}</span></td>
+              <td style="text-align:right;">
+                <span class="m3-tag-pill" style="background:#F2F2F7;color:#86868B;font-size:10px;font-weight:600;">🔒 System Locked</span>
+              </td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // 2. Custom Fields Table
+      const badgeCount = document.getElementById('badgeCustomFieldsCount');
+      if (badgeCount) {
+        const activeCount = customList.filter(f => f.active).length;
+        badgeCount.innerText = `${activeCount} ACTIVE (${customList.length} TOTAL)`;
+      }
+
+      const customTbody = document.getElementById('tableCustomFieldsBody');
+      if (customTbody) {
+        if (customList.length === 0) {
+          customTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#86868B;padding:20px;">No custom dynamic fields provisioned for this module yet. Tap <b>+ Add Custom Field</b> above to create one.</td></tr>';
+        } else {
+          customTbody.innerHTML = customList.map(f => {
+            const opts = f.options ? (Array.isArray(f.options) ? f.options.join(', ') : f.options) : null;
+            const subtitle = opts ? `<div style="font-size:10.5px;color:#86868B;margin-top:2px;">Options: ${escapeHtml(opts)}</div>` : (f.placeholder ? `<div style="font-size:10.5px;color:#86868B;margin-top:2px;">Hint: ${escapeHtml(f.placeholder)}</div>` : '');
+            return `
+              <tr>
+                <td><span style="font-family:\'JetBrains Mono\';font-size:11.5px;color:#1D1D1F;font-weight:600;">${escapeHtml(f.fieldKey)}</span></td>
+                <td>
+                  <b style="font-size:12.5px;color:#1D1D1F;">${escapeHtml(f.fieldLabel)}</b>
+                  ${subtitle}
+                </td>
+                <td><span class="m3-tag-pill" style="background:#F3E8FF;color:#6B21A8;font-size:10px;font-weight:700;">${escapeHtml(f.fieldType.toUpperCase())}</span></td>
+                <td>
+                  <label class="apple-switch" title="Toggle Mandatory">
+                    <input type="checkbox" ${f.isRequired ? 'checked' : ''} onchange="toggleFieldRequired('${f.id}', this.checked)">
+                    <span class="apple-slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <label class="apple-switch" title="Toggle Active on Frontline">
+                    <input type="checkbox" ${f.active ? 'checked' : ''} onchange="toggleFieldActive('${f.id}', this.checked)">
+                    <span class="apple-slider"></span>
+                  </label>
+                </td>
+                <td style="text-align:right;">
+                  <div style="display:inline-flex;gap:6px;">
+                    <button type="button" class="btn-fsc-option" onclick="openEditCustomFieldModal('${f.id}')" style="padding:4px 8px;font-size:11px;background:#F2F2F7;color:#0071E3;border:none;">
+                      Edit
+                    </button>
+                    <button type="button" class="btn-fsc-option" onclick="deleteCustomField('${f.id}', '${escapeHtml(f.fieldLabel)}')" style="padding:4px 8px;font-size:11px;background:#FDE8E8;color:#D32F2F;border:none;">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function openAddCustomFieldModal() {
+      document.getElementById('modalCustomFieldTitle').innerText = 'Add Dynamic Custom Field';
+      document.getElementById('cfEditingFieldId').value = '';
+      document.getElementById('cfModuleSelect').value = activeModuleTab;
+      document.getElementById('cfModuleSelect').disabled = false;
+      document.getElementById('cfFieldLabelInput').value = '';
+      document.getElementById('cfFieldKeyInput').value = '';
+      document.getElementById('cfFieldKeyInput').readOnly = false;
+      document.getElementById('cfFieldTypeSelect').value = 'text';
+      document.getElementById('cfPlaceholderInput').value = '';
+      document.getElementById('cfOptionsInput').value = '';
+      document.getElementById('cfOptionsGroup').style.display = 'none';
+      document.getElementById('cfIsRequiredInput').checked = false;
+      document.getElementById('cfIsActiveInput').checked = true;
+      document.getElementById('modalCustomField').classList.add('active');
+    }
+
+    function openEditCustomFieldModal(fieldId) {
+      let field = null;
+      for (const m of Object.keys(cachedModuleFields)) {
+        field = cachedModuleFields[m].find(f => f.id === fieldId);
+        if (field) break;
+      }
+      if (!field) return alert('Field not found.');
+
+      document.getElementById('modalCustomFieldTitle').innerText = `Edit Custom Field: ${field.fieldLabel}`;
+      document.getElementById('cfEditingFieldId').value = field.id;
+      document.getElementById('cfModuleSelect').value = field.module;
+      document.getElementById('cfModuleSelect').disabled = true;
+      document.getElementById('cfFieldLabelInput').value = field.fieldLabel;
+      document.getElementById('cfFieldKeyInput').value = field.fieldKey;
+      document.getElementById('cfFieldKeyInput').readOnly = true;
+      document.getElementById('cfFieldTypeSelect').value = field.fieldType;
+      document.getElementById('cfPlaceholderInput').value = field.placeholder || '';
+      
+      const opts = field.options ? (Array.isArray(field.options) ? field.options.join(', ') : (typeof field.options === 'string' ? JSON.parse(field.options).join(', ') : '')) : '';
+      document.getElementById('cfOptionsInput').value = opts;
+      document.getElementById('cfOptionsGroup').style.display = field.fieldType === 'select' ? 'block' : 'none';
+      document.getElementById('cfIsRequiredInput').checked = !!field.isRequired;
+      document.getElementById('cfIsActiveInput').checked = !!field.active;
+      document.getElementById('modalCustomField').classList.add('active');
+    }
+
+    function closeCustomFieldModal() {
+      document.getElementById('modalCustomField').classList.remove('active');
+    }
+
+    function autoGenerateFieldKey(label) {
+      const editId = document.getElementById('cfEditingFieldId').value;
+      if (editId) return;
+      const key = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 32);
+      document.getElementById('cfFieldKeyInput').value = key;
+    }
+
+    function onFieldTypeChanged(type) {
+      const group = document.getElementById('cfOptionsGroup');
+      if (group) group.style.display = type === 'select' ? 'block' : 'none';
+    }
+
+    async function saveCustomFieldFromModal() {
+      const editId = document.getElementById('cfEditingFieldId').value;
+      const module = document.getElementById('cfModuleSelect').value;
+      const fieldLabel = document.getElementById('cfFieldLabelInput').value.trim();
+      const fieldKey = document.getElementById('cfFieldKeyInput').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      const fieldType = document.getElementById('cfFieldTypeSelect').value;
+      const placeholder = document.getElementById('cfPlaceholderInput').value.trim();
+      const isRequired = document.getElementById('cfIsRequiredInput').checked;
+      const active = document.getElementById('cfIsActiveInput').checked;
+      const rawOpts = document.getElementById('cfOptionsInput').value;
+      const options = fieldType === 'select' 
+        ? rawOpts.split(',').map(s => s.trim()).filter(Boolean)
+        : null;
+
+      if (!fieldLabel || !fieldKey) return alert('Field label and key are required.');
+
+      try {
+        if (editId) {
+          const res = await fetch(`/api/admin/${currentWorkspaceId}/fields/${editId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fieldLabel, placeholder, isRequired, active, options }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Failed to update field');
+          showToastNotification('✓ Custom dynamic field updated!');
+        } else {
+          const res = await fetch(`/api/admin/${currentWorkspaceId}/fields/${module}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fieldKey, fieldLabel, fieldType, isRequired, active, placeholder, options }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Failed to create field');
+          showToastNotification('✓ New custom dynamic field provisioned!');
+        }
+
+        closeCustomFieldModal();
+        await loadModuleFields(module);
+        await loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to save field: ' + err.message);
+      }
+    }
+
+    async function toggleFieldActive(fieldId, isActive) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/fields/${fieldId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ active: isActive }),
+        });
+        if (!res.ok) throw new Error('Failed to update field status');
+        showToastNotification(`Field active status updated to ${isActive ? 'ENABLED' : 'DISABLED'}`);
+        await loadModuleFields(activeModuleTab);
+      } catch (err) {
+        alert('Error updating field: ' + err.message);
+      }
+    }
+
+    async function toggleFieldRequired(fieldId, isRequired) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/fields/${fieldId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isRequired: isRequired }),
+        });
+        if (!res.ok) throw new Error('Failed to update field mandatory status');
+        showToastNotification(`Field requirement updated to ${isRequired ? 'MANDATORY' : 'OPTIONAL'}`);
+        await loadModuleFields(activeModuleTab);
+      } catch (err) {
+        alert('Error updating field: ' + err.message);
+      }
+    }
+
+    async function deleteCustomField(fieldId, fieldLabel) {
+      if (!confirm(`Are you sure you want to permanently delete custom field "${fieldLabel}" from the database schema?`)) return;
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/fields/${fieldId}`, {
+          method: 'DELETE',
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete custom field');
+        showToastNotification('✓ Custom field removed from schema!');
+        await loadModuleFields(activeModuleTab);
+        await loadAuditTrailData();
+      } catch (err) {
+        alert('Error deleting field: ' + err.message);
+      }
     }
 
     // ============================================================

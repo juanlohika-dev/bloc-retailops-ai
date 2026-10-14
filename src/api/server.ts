@@ -178,8 +178,8 @@ app.post('/api/pax/chat', async (req, res) => {
 // ----------------------------------------------------
 app.post('/api/sales/fast-sale', async (req, res) => {
   try {
-    const { userId, storeId, items, paymentMethod, paymentTerms, approvalCode } = req.body;
-    const result = await PaxAgent.recordFastSale(userId, storeId, items, paymentMethod, paymentTerms, approvalCode);
+    const { userId, storeId, items, paymentMethod, paymentTerms, approvalCode, customFields } = req.body;
+    const result = await PaxAgent.recordFastSale(userId, storeId, items, paymentMethod, paymentTerms, approvalCode, customFields || {});
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

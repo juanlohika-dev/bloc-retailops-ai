@@ -529,7 +529,8 @@ Keep it punchy, warm, and zero fluff.`;
     items: FastSaleItem[],
     paymentMethod: string = 'cash',
     paymentTerms: string = 'straight',
-    approvalCode?: string
+    approvalCode?: string,
+    customFields: Record<string, any> = {}
   ) {
     const user = (await db.select().from(users).where(eq(users.id, userId)))[0];
     if (!user) throw new Error('User not found');
@@ -573,6 +574,7 @@ Keep it punchy, warm, and zero fluff.`;
         paymentMethod: paymentMethod || 'cash',
         paymentTerms: paymentTerms || 'straight',
         approvalCode: approvalCode || null,
+        customFields: customFields && Object.keys(customFields).length > 0 ? customFields : null,
         syncedToErp: true,
         timestamp: new Date(),
       } as any);
@@ -594,6 +596,7 @@ Keep it punchy, warm, and zero fluff.`;
             totalAmount: lineTotal,
             paymentMethod,
             paymentTerms,
+            customFields,
           },
           timestamp: new Date(),
         } as any);

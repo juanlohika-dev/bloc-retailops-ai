@@ -6,6 +6,7 @@ import {
   executiveReports, orgNodes, shifts, salesTransactions, shelfAudits, chatMessages,
   surveys, surveySubmissions, rovingStoreVisits,
   paymentMethods, paymentTerms, aiGovernanceConfigs, supportedLanguages,
+  moduleFieldDefinitions,
 } from '../db/schema.js';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { DemoGenerator } from '../agents/demo/index.js';
@@ -3298,4 +3299,185 @@ Return ONLY valid JSON matching this schema:
 
   res.json({ success: true, draft: draftedSurvey });
 }));
+
+// ============================================================
+// DYNAMIC MODULE FIELD ENGINE ENDPOINTS (PHASE 7 EXTENSIBILITY)
+// ============================================================
+
+// 1. GET ALL FIELDS (OR GROUPED BY MODULE)
+adminRouter.get('/admin/:ws/fields', wrap(async (req, res) => {
+  const ws = req.params.ws;
+  const list = await db.select().from(moduleFieldDefinitions).where(eq(moduleFieldDefinitions.workspaceId, ws)).orderBy(moduleFieldDefinitions.displayOrder);
+  
+  const grouped: Record<string, any[]> = {};
+  list.forEach(f => {
+    if (!grouped[f.module]) grouped[f.module] = [];
+    grouped[f.module].push(f);
+  });
+  
+  res.json({ fields: list, grouped });
+}));
+
+// 2. GET FIELDS FOR A SPECIFIC MODULE
+adminRouter.get('/admin/:ws/fields/:module', wrap(async (req, res) => {
+  const { ws, module } = req.params;
+  const list = await db.select().from(moduleFieldDefinitions).where(
+    and(eq(moduleFieldDefinitions.workspaceId, ws), eq(moduleFieldDefinitions.module, module))
+  ).orderBy(moduleFieldDefinitions.displayOrder);
+  res.json({ module, fields: list });
+}));
+
+// 3. CREATE NEW CUSTOM FIELD FOR A MODULE
+adminRouter.post('/admin/:ws/fields/:module', wrap(async (req, res) => {
+  const { ws, module } = req.params;
+  const { fieldKey, fieldLabel, fieldType, isRequired, options, defaultValue, placeholder, displayOrder } = req.body;
+
+  if (!fieldKey || !fieldLabel) {
+    return res.status(400).json({ error: 'fieldKey and fieldLabel are required' });
+  }
+
+  const cleanKey = fieldKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+  const [existing] = await db.select().from(moduleFieldDefinitions).where(
+    and(
+      eq(moduleFieldDefinitions.workspaceId, ws),
+      eq(moduleFieldDefinitions.module, module),
+      eq(moduleFieldDefinitions.fieldKey, cleanKey)
+    )
+  );
+
+  if (existing) {
+    return res.status(400).json({ error: `Field with key "${cleanKey}" already exists in module "${module}"` });
+  }
+
+  const id = `fld-${module}-${cleanKey}-${Date.now().toString(36)}`;
+  const now = new Date();
+
+  const newField = {
+    id,
+    workspaceId: ws,
+    module,
+    fieldKey: cleanKey,
+    fieldLabel: fieldLabel.trim(),
+    fieldType: fieldType || 'text',
+    isStandard: false,
+    isRequired: !!isRequired,
+    options: options ? (Array.isArray(options) ? options : [options]) : null,
+    defaultValue: defaultValue || null,
+    placeholder: placeholder || null,
+    displayOrder: displayOrder || 50,
+    active: true,
+    createdAt: now,
+  };
+
+  await db.insert(moduleFieldDefinitions).values(newField as any);
+
+  // Immutable audit log
+  await db.insert(auditLogs).values({
+    id: `log-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+    workspaceId: ws,
+    actorId: 'usr-admin-ops',
+    action: 'field.create',
+    module: 'config',
+    resourceType: 'module_field_definition',
+    resourceId: id,
+    approvalStatus: 'approved',
+    details: {
+      module,
+      fieldKey: cleanKey,
+      fieldLabel: newField.fieldLabel,
+      fieldType: newField.fieldType,
+      isRequired: newField.isRequired,
+    },
+    timestamp: now,
+  } as any);
+
+  res.status(201).json({ success: true, field: newField });
+}));
+
+// 4. UPDATE FIELD DEFINITION
+adminRouter.put('/admin/:ws/fields/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const { fieldLabel, isRequired, options, defaultValue, placeholder, displayOrder, active } = req.body;
+
+  const [field] = await db.select().from(moduleFieldDefinitions).where(
+    and(eq(moduleFieldDefinitions.id, id), eq(moduleFieldDefinitions.workspaceId, ws))
+  );
+
+  if (!field) {
+    return res.status(404).json({ error: 'Field definition not found' });
+  }
+
+  const updates: any = {};
+  if (fieldLabel !== undefined) updates.fieldLabel = fieldLabel.trim();
+  if (isRequired !== undefined) updates.isRequired = !!isRequired;
+  if (options !== undefined) updates.options = Array.isArray(options) ? options : options;
+  if (defaultValue !== undefined) updates.defaultValue = defaultValue;
+  if (placeholder !== undefined) updates.placeholder = placeholder;
+  if (displayOrder !== undefined) updates.displayOrder = displayOrder;
+  if (active !== undefined) updates.active = !!active;
+
+  await db.update(moduleFieldDefinitions).set(updates).where(eq(moduleFieldDefinitions.id, id));
+
+  // Immutable audit log
+  await db.insert(auditLogs).values({
+    id: `log-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+    workspaceId: ws,
+    actorId: 'usr-admin-ops',
+    action: 'field.update',
+    module: 'config',
+    resourceType: 'module_field_definition',
+    resourceId: id,
+    approvalStatus: 'approved',
+    details: {
+      fieldKey: field.fieldKey,
+      module: field.module,
+      before: field,
+      after: { ...field, ...updates },
+    },
+    timestamp: new Date(),
+  } as any);
+
+  res.json({ success: true, message: 'Field definition updated', updates });
+}));
+
+// 5. DELETE CUSTOM FIELD
+adminRouter.delete('/admin/:ws/fields/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+
+  const [field] = await db.select().from(moduleFieldDefinitions).where(
+    and(eq(moduleFieldDefinitions.id, id), eq(moduleFieldDefinitions.workspaceId, ws))
+  );
+
+  if (!field) {
+    return res.status(404).json({ error: 'Field definition not found' });
+  }
+
+  if (field.isStandard) {
+    return res.status(400).json({ error: 'Standard system fields cannot be deleted' });
+  }
+
+  await db.delete(moduleFieldDefinitions).where(eq(moduleFieldDefinitions.id, id));
+
+  // Immutable audit log
+  await db.insert(auditLogs).values({
+    id: `log-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+    workspaceId: ws,
+    actorId: 'usr-admin-ops',
+    action: 'field.delete',
+    module: 'config',
+    resourceType: 'module_field_definition',
+    resourceId: id,
+    approvalStatus: 'approved',
+    details: {
+      fieldKey: field.fieldKey,
+      module: field.module,
+      deletedField: field,
+    },
+    timestamp: new Date(),
+  } as any);
+
+  res.json({ success: true, message: 'Custom field removed from schema' });
+}));
+
 
