@@ -3481,6 +3481,31 @@
               </div>
             </div>
 
+            <!-- MANDATORY SHIFT CHECK-OUT TASK GOVERNANCE (Supervisor Control Center) -->
+            <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:18px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:34px;height:34px;border-radius:10px;background:#EBF4FF;color:#0071E3;display:flex;align-items:center;justify-content:center;">
+                    <span class="ms-icon sm" style="font-size:18px;">lock_clock</span>
+                  </div>
+                  <div>
+                    <b style="font-size:14px;color:#1D1D1F;display:block;">Shift Check-Out Restrictions & Mandatory Task Governance</b>
+                    <span style="font-size:11.5px;color:#86868B;">Configure required tasks before field promoters can clock out. Pax Sentinel intercepts departures.</span>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span id="supMandatoryTasksCountBadge" class="m3-tag-pill" style="background:#FFF3DC;color:#B25E00;font-size:11px;font-weight:700;">1 MANDATORY FOR CLOCK-OUT</span>
+                  <button type="button" onclick="loadSupervisorShiftTasksGovernance()" style="background:#F2F2F7;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                    <span class="ms-icon sm">refresh</span> Sync
+                  </button>
+                </div>
+              </div>
+
+              <div id="supShiftTasksList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:10px;">
+                <!-- Populated dynamically via loadSupervisorShiftTasksGovernance() -->
+              </div>
+            </div>
+
             <!-- Real-Time Store Sell-Through & Pacing Matrix (M3 Hairline Standard Table) -->
             <div class="m3-table-card">
               <div style="padding:16px 18px 12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.05);">
@@ -6172,6 +6197,66 @@
           <button type="button" class="btn-commit-fsc" onclick="closeRovingItineraryModal()" style="padding:8px 18px;background:#0071E3;">
             Done
           </button>
+    <!-- ============================================================
+         GLOBAL MODAL: SHIFT CHECK-OUT RESTRICTED (INCOMPLETE TASKS GUARD)
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalCheckoutBlocked" onclick="if(event.target===this) closeCheckoutBlockedModal()">
+      <div class="demo-modal-dialog" style="max-width: 520px; border-top: 4px solid #FF9500;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.06);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:12px;background:#FFF3DC;display:flex;align-items:center;justify-content:center;color:#B25E00;flex-shrink:0;">
+              <span class="ms-icon" style="font-size:22px;">lock_clock</span>
+            </div>
+            <div>
+              <h3 style="font-size:16.5px;font-weight:700;color:#1D1D1F;margin:0;">Shift Check-Out Intercepted</h3>
+              <p style="font-size:12px;color:#86868B;margin:2px 0 0 0;">Pax Sentinel Guardrail · Incomplete Mandatory Tasks</p>
+            </div>
+          </div>
+          <button onclick="closeCheckoutBlockedModal()" style="background:transparent;border:none;color:#86868B;cursor:pointer;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <div style="padding:16px 0;">
+          <div style="background:#FFF9EE;border:1px solid #FFE2A6;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;">
+            <span class="ms-icon sm" style="color:#B25E00;margin-top:2px;">info</span>
+            <div style="font-size:12.5px;color:#7A4100;line-height:1.45;">
+              Company policy requires all mandatory shift audits to be finished before clock-out so nothing is left behind on the retail floor.
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:#1D1D1F;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">
+            Pending Tasks (<span id="txtBlockedTasksCount">1</span>):
+          </div>
+
+          <div id="blockedTasksList" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- Emergency Override Section -->
+          <div style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(0,0,0,0.1);">
+            <details style="font-size:12px;color:#666;">
+              <summary style="cursor:pointer;font-weight:600;color:#8E8E93;user-select:none;">
+                Supervisor Clearance & Emergency Override
+              </summary>
+              <div style="margin-top:8px;padding:10px;background:#F9F9FB;border-radius:8px;border:1px solid rgba(0,0,0,0.06);">
+                <label style="display:block;font-size:11px;color:#86868B;margin-bottom:4px;">Override Justification (Logged to Enterprise Audit Trail):</label>
+                <input type="text" id="inputOverrideReason" placeholder="e.g. Verbal clearance from supervisor for early transit..." style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(0,0,0,0.12);font-size:12px;margin-bottom:8px;">
+                <button type="button" onclick="confirmForceClockOut()" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:6px;cursor:pointer;width:100%;">
+                  Force Departure with Exception Stamp
+                </button>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06);">
+          <button type="button" class="btn-fsc-option" onclick="closeCheckoutBlockedModal(); switchMobileNav('chats');" style="padding:8px 14px;font-size:12px;background:#EBF4FF;color:#0071E3;border:none;">
+            <span class="ms-icon sm">chat</span> Open Pax Copilot
+          </button>
+          <button type="button" class="btn-commit-fsc" onclick="closeCheckoutBlockedModal()" style="padding:8px 18px;background:#1D1D1F;">
+            Stay on Shift
+          </button>
         </div>
       </div>
     </div>
@@ -6565,6 +6650,8 @@
           list.slice(-6).forEach(m => {
             if (m.interactiveCardType === 'route_card' || m.interactiveCardType === 'route_optimized') {
               appendPaxRouteInteractiveCard(m.message, m.metadata, m.interactiveCardType);
+            } else if (m.interactiveCardType === 'checkout_guard_card') {
+              appendCheckoutGuardCard(m);
             } else if (m.interactiveCardType === 'audit_card' || (m.message && m.message.includes('Task Dispatch'))) {
               appendDispatchedTaskCard(m);
             } else if (m.sender === 'user') {
@@ -6703,6 +6790,52 @@
             <span class="ms-icon sm">bolt</span>
             <span>Fast-Sale</span>
           </button>
+        </div>
+      `;
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendCheckoutGuardCard(m) {
+      const stream = document.getElementById('activeChatStream');
+      if (!stream) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-packet-frame pax';
+      const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const incompleteTasks = m.metadata?.incompleteTasks || [];
+      let tasksHtml = '';
+      if (Array.isArray(incompleteTasks) && incompleteTasks.length > 0) {
+        tasksHtml = `
+          <div style="margin-top:8px;background:#FFFBF2;border:1px solid #FFE4B5;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:11px;font-weight:700;color:#B25E00;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
+              <span class="ms-icon sm" style="font-size:13px;">warning</span> Mandatory Action Required:
+            </div>
+            ${incompleteTasks.map(t => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.04);font-size:11.5px;">
+                <span style="font-weight:600;color:#1D1D1F;">${escapeHtml(t.title)}</span>
+                ${t.actionType === 'vera_audit' ? `
+                  <button type="button" onclick="openVeraAuditModal()" style="background:#34C759;color:#FFFFFF;border:none;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;">Run Audit</button>
+                ` : (t.actionType === 'survey' ? `
+                  <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="background:#0071E3;color:#FFFFFF;border:none;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;">Fill Form</button>
+                ` : `
+                  <button type="button" onclick="showTasksMilestoneCard()" style="background:#1D1D1F;color:#FFFFFF;border:none;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;">Open Task</button>
+                `)}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      wrap.innerHTML = `
+        <div class="msg-author-tag">Pax · Shift Departure Sentinel</div>
+        <div class="m3-bubble pax" style="border-left: 3px solid #FF9500;background:#FFFDF7;">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:4px;color:#B25E00;font-size:12.5px;">
+            <span class="ms-icon sm" style="font-size:16px;">lock_clock</span> Shift Check-Out Intercepted
+          </div>
+          <div style="font-size:12.5px;color:#1D1D1F;line-height:1.45;">${escapeHtml(m.message).replace(/\\n/g, '<br>')}</div>
+          ${tasksHtml}
+          <div class="bubble-meta-time">${time}</div>
         </div>
       `;
       stream.appendChild(wrap);
@@ -8662,8 +8795,57 @@
           console.warn('Could not load surveys queue', err);
         }
 
+        // 7. Shift Check-Out Restrictions & Mandatory Task Governance
+        loadSupervisorShiftTasksGovernance();
+
       } catch (err) {
         console.error('Error loading supervisor console data:', err);
+      }
+    }
+
+    async function loadSupervisorShiftTasksGovernance() {
+      const container = document.getElementById('supShiftTasksList');
+      const countBadge = document.getElementById('supMandatoryTasksCountBadge');
+      if (!container) return;
+
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/tasks`);
+        const tasks = await res.json();
+        if (!Array.isArray(tasks)) return;
+
+        const mandatoryTasks = tasks.filter(t => Boolean(t.isRequiredForClockout));
+        if (countBadge) {
+          countBadge.textContent = `${mandatoryTasks.length} MANDATORY FOR CLOCK-OUT`;
+          countBadge.style.background = mandatoryTasks.length > 0 ? '#FFF3DC' : '#F2F2F7';
+          countBadge.style.color = mandatoryTasks.length > 0 ? '#B25E00' : '#86868B';
+        }
+
+        container.innerHTML = '';
+        tasks.forEach(t => {
+          const isReq = Boolean(t.isRequiredForClockout);
+          container.innerHTML += `
+            <div style="background:#F9F9FB;border:${isReq ? '1.5px solid #FFA000' : '1px solid rgba(0,0,0,0.06)'};border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${isReq ? '#FFF3DC' : '#EBF4FF'};color:${isReq ? '#B25E00' : '#0071E3'};display:flex;align-items:center;justify-content:center;">
+                  <span class="ms-icon sm">${t.agentAvatar || 'checklist'}</span>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <b style="font-size:12.5px;color:#1D1D1F;">${escapeHtml(t.title)}</b>
+                    ${isReq ? '<span class="m3-tag-pill" style="background:#FFF3DC;color:#B25E00;font-size:9.5px;font-weight:700;">REQUIRED</span>' : ''}
+                  </div>
+                  <span style="font-size:10.5px;color:#86868B;">Agent: <b>${escapeHtml(t.agentName)}</b> · Cron: ${escapeHtml(t.scheduleCron)}</span>
+                </div>
+              </div>
+              <button type="button" onclick="toggleTaskClockoutRequired('${t.id}', ${!isReq})" style="background:${isReq ? '#B25E00' : '#FFFFFF'};border:1px solid ${isReq ? '#B25E00' : 'rgba(0,0,0,0.12)'};color:${isReq ? '#FFFFFF' : '#1D1D1F'};font-size:11px;font-weight:700;padding:5px 10px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:${isReq ? '0 1px 4px rgba(178,94,0,0.2)' : 'none'};" title="${isReq ? 'Click to make optional' : 'Click to enforce before shift check-out'}">
+                <span class="ms-icon sm" style="font-size:13px;">${isReq ? 'lock' : 'lock_open'}</span>
+                <span>${isReq ? 'Enforced' : 'Optional'}</span>
+              </button>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.warn('Failed to load supervisor shift tasks governance:', err);
       }
     }
 
@@ -8976,6 +9158,7 @@
         const tContainer = document.getElementById('tasksListContainer');
         tContainer.innerHTML = '';
         tasks.forEach(t => {
+          const isReq = Boolean(t.isRequiredForClockout);
           tContainer.innerHTML += `
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:12px;">
               <div style="display:flex;align-items:center;gap:12px;">
@@ -8983,18 +9166,25 @@
                   <span class="ms-icon">${t.agentAvatar || 'checklist'}</span>
                 </div>
                 <div>
-                  <b style="font-size:13.5px;color:#1D1D1F;">${t.title}</b>
-                  <div style="font-size:11px;color:#86868B;">
-                    Agent: <b>${t.agentName}</b> · Skill: <b>${t.skillName}</b> · Cron: <span style="font-family:'JetBrains Mono';">${t.scheduleCron}</span>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <b style="font-size:13.5px;color:#1D1D1F;">${escapeHtml(t.title)}</b>
+                    ${isReq ? '<span class="m3-tag-pill" style="background:#FFF3DC;color:#B25E00;font-size:10px;font-weight:700;">🔒 MANDATORY CLOCK-OUT</span>' : ''}
+                  </div>
+                  <div style="font-size:11px;color:#86868B;margin-top:2px;">
+                    Agent: <b>${escapeHtml(t.agentName)}</b> · Skill: <b>${escapeHtml(t.skillName)}</b> · Cron: <span style="font-family:'JetBrains Mono';">${escapeHtml(t.scheduleCron)}</span>
                   </div>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button type="button" onclick="toggleTaskClockoutRequired('${t.id}', ${!isReq})" style="background:${isReq ? '#FFF3DC' : '#FFFFFF'};border:1px solid ${isReq ? '#FFA000' : 'rgba(0,0,0,0.12)'};color:${isReq ? '#B25E00' : '#86868B'};font-size:11px;font-weight:700;padding:5px 9px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="${isReq ? 'Click to make optional' : 'Click to require before shift clock-out'}">
+                  <span class="ms-icon sm" style="font-size:13px;color:${isReq ? '#B25E00' : '#86868B'};">${isReq ? 'lock' : 'lock_open'}</span>
+                  <span>${isReq ? 'Mandatory' : 'Optional'}</span>
+                </button>
                 <span style="font-size:11.5px;background:#E8F8EE;color:#1B5E20;font-weight:600;padding:2px 8px;border-radius:6px;">
                   ${t.complianceRate}% Compliant
                 </span>
                 <button class="btn-fsc-option" onclick="dispatchTask('${t.id}')" style="background:#1D1D1F;color:#FFFFFF;padding:5px 12px;font-size:11.5px;border:none;">
-                  <span class="ms-icon sm" style="font-size:14px;color:#FFD60A;">bolt</span> Run / Dispatch Now
+                  <span class="ms-icon sm" style="font-size:14px;color:#FFD60A;">bolt</span> Run / Dispatch
                 </button>
               </div>
             </div>
@@ -9054,6 +9244,26 @@
         await loadAnalyticsSummary();
       } catch (err) {
         alert('Failed to dispatch tasks');
+      }
+    }
+
+    async function toggleTaskClockoutRequired(taskId, isRequired) {
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/tasks/${taskId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isRequiredForClockout: isRequired }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        showToastNotification(isRequired ? '✓ Task is now MANDATORY before shift check-out' : '✓ Task is now OPTIONAL for shift check-out');
+        await loadTasksData();
+        if (typeof loadSupervisorShiftTasksGovernance === 'function') {
+          await loadSupervisorShiftTasksGovernance();
+        }
+      } catch (err) {
+        alert('Failed to update task requirement: ' + err.message);
       }
     }
 
@@ -10162,24 +10372,101 @@ async function performClockIn(storeId, isRovingOrVisit = false, visitIdParam = n
   }
 }
 
-async function performClockOut(shiftId = null, visitId = null) {
+let pendingBlockedCheckoutContext = null;
+
+async function performClockOut(shiftId = null, visitId = null, force = false, overrideJustification = '') {
   try {
     const res = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/clock-out`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ shiftId, visitId }),
+      body: JSON.stringify({ shiftId, visitId, force, overrideJustification }),
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
 
-    showToastNotification('✓ Departure logged. Store visit completed!');
+    if (data.blocked) {
+      pendingBlockedCheckoutContext = { shiftId, visitId };
+      openCheckoutBlockedModal(data);
+      showToastNotification('⚠️ Check-Out Blocked: Mandatory shift tasks incomplete!');
+      if (typeof loadPaxConversation === 'function') loadPaxConversation();
+      return;
+    }
+
+    if (data.error && !data.blocked) throw new Error(data.error);
+
+    showToastNotification(force ? '⚠️ Departure logged via supervisor override' : '✓ Departure logged. Shift/visit completed!');
     await renderMobileShiftCard();
-    if (document.getElementById('modalRovingItinerary').classList.contains('active')) {
+    if (document.getElementById('modalRovingItinerary')?.classList.contains('active')) {
       await openRovingItineraryModal();
+    }
+    if (document.getElementById('modalCheckoutBlocked')?.classList.contains('active')) {
+      closeCheckoutBlockedModal();
     }
   } catch (err) {
     alert('Clock-out error: ' + err.message);
   }
+}
+
+function openCheckoutBlockedModal(data) {
+  const modal = document.getElementById('modalCheckoutBlocked');
+  const countEl = document.getElementById('txtBlockedTasksCount');
+  const listEl = document.getElementById('blockedTasksList');
+  if (!modal || !listEl) return;
+
+  const tasks = data.incompleteTasks || [];
+  if (countEl) countEl.textContent = tasks.length;
+
+  listEl.innerHTML = '';
+  tasks.forEach(t => {
+    let actionBtnHtml = '';
+    if (t.actionType === 'vera_audit') {
+      actionBtnHtml = `
+        <button type="button" onclick="closeCheckoutBlockedModal(); openVeraAuditModal();" style="background:#E8F8EE;border:1px solid #34C759;color:#1B5E20;font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <span class="ms-icon sm" style="font-size:13px;">photo_camera</span> Run Vera Audit
+        </button>
+      `;
+    } else if (t.actionType === 'survey') {
+      actionBtnHtml = `
+        <button type="button" onclick="closeCheckoutBlockedModal(); openSurveyFillModalForCurrentStore();" style="background:#EBF4FF;border:1px solid #0071E3;color:#0071E3;font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <span class="ms-icon sm" style="font-size:13px;">assignment</span> Fill Form
+        </button>
+      `;
+    } else {
+      actionBtnHtml = `
+        <button type="button" onclick="closeCheckoutBlockedModal(); switchMobileNav('chats');" style="background:#F2F2F7;border:1px solid rgba(0,0,0,0.1);color:#1D1D1F;font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <span class="ms-icon sm" style="font-size:13px;">chat</span> Complete in Pax
+        </button>
+      `;
+    }
+
+    listEl.innerHTML += `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="flex:1;padding-right:8px;">
+          <b style="font-size:12.5px;color:#1D1D1F;display:block;">${escapeHtml(t.title)}</b>
+          <span style="font-size:10.5px;color:#86868B;">${escapeHtml(t.description || 'Mandatory shift audit requirement')}</span>
+        </div>
+        <div>${actionBtnHtml}</div>
+      </div>
+    `;
+  });
+
+  modal.classList.add('active');
+}
+
+function closeCheckoutBlockedModal() {
+  document.getElementById('modalCheckoutBlocked')?.classList.remove('active');
+}
+
+function confirmForceClockOut() {
+  const reason = document.getElementById('inputOverrideReason')?.value?.trim();
+  if (!reason) {
+    alert('Please enter a justification for emergency departure override.');
+    return;
+  }
+  if (!confirm('Are you sure you want to force clock-out? This will record an exception flag in the supervisor audit trail.')) {
+    return;
+  }
+  const ctx = pendingBlockedCheckoutContext || {};
+  performClockOut(ctx.shiftId, ctx.visitId, true, reason);
 }
 
 async function toggleEmploymentMode() {

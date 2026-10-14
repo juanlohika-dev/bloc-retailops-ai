@@ -69,6 +69,9 @@ export async function ensureTablesAndColumns() {
     try {
       await libSqlClient.execute(`ALTER TABLE users ADD COLUMN assigned_store_ids TEXT;`);
     } catch (e) {}
+    try {
+      await libSqlClient.execute(`ALTER TABLE agent_tasks ADD COLUMN is_required_for_clockout INTEGER DEFAULT 0;`);
+    } catch (e) {}
 
     // 5. Payment Methods Table
     await libSqlClient.execute(`

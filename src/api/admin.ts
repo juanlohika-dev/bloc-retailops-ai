@@ -441,6 +441,7 @@ async function ensureEnterpriseAgentsAndSkills(wsId: string) {
       scheduleCron: '0 11 * * *',
       followUpIntervalMins: 30,
       escalationThresholdMins: 60,
+      isRequiredForClockout: true,
       status: 'active',
       createdBy: 'Lester Alarcon',
       createdAt: now,
@@ -1113,7 +1114,83 @@ adminRouter.post('/admin/:ws/users/:id/clock-in', wrap(async (req, res) => {
   });
 }));
 
-// 4. Frontline Clock-Out (Stationary Shift End / Roving Store Visit Completion)
+// Helper: Check incomplete required shift tasks for a user today
+export async function getIncompleteRequiredTasksForUser(ws: string, userId: string) {
+  const activeTasks = await db.select().from(agentTasks).where(
+    and(eq(agentTasks.workspaceId, ws), eq(agentTasks.status, 'active'))
+  );
+  const requiredTasks = activeTasks.filter(t => Boolean((t as any).isRequiredForClockout));
+  if (!requiredTasks.length) {
+    return { requiredTasks: [], incompleteTasks: [] };
+  }
+
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  // 1. Check agent_field_contacts for today
+  const contacts = await db.select().from(agentFieldContacts).where(
+    and(eq(agentFieldContacts.workspaceId, ws), eq(agentFieldContacts.userId, userId))
+  );
+  const todayContacts = contacts.filter(c => c.timestamp && new Date(c.timestamp).getTime() >= startOfDay.getTime() && (c.status === 'compliant' || c.status === 'submitted'));
+  const completedTaskIdsFromContacts = new Set(todayContacts.map(c => c.taskId));
+
+  // 2. Check shelf_audits for today
+  const audits = await db.select().from(shelfAudits).where(eq(shelfAudits.userId, userId));
+  const hasShelfAuditToday = audits.some(a => a.timestamp && new Date(a.timestamp).getTime() >= startOfDay.getTime());
+
+  // 3. Check survey_submissions for today
+  const submissions = await db.select().from(surveySubmissions).where(
+    and(eq(surveySubmissions.workspaceId, ws), eq(surveySubmissions.submittedByUserId, userId))
+  );
+  const hasSurveyToday = submissions.some(s => s.submittedAt && new Date(s.submittedAt).getTime() >= startOfDay.getTime());
+
+  const incompleteTasks = requiredTasks.filter(t => {
+    if (completedTaskIdsFromContacts.has(t.id)) return false;
+
+    const titleLower = (t.title || '').toLowerCase();
+    const isVeraOrShelf = t.agentId?.includes('vera') || titleLower.includes('shelf') || titleLower.includes('planogram');
+    if (isVeraOrShelf && hasShelfAuditToday) return false;
+
+    const isSurvey = titleLower.includes('survey') || titleLower.includes('checklist') || titleLower.includes('eod');
+    if (isSurvey && hasSurveyToday) return false;
+
+    return true;
+  });
+
+  return {
+    requiredTasks: requiredTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      agentId: t.agentId,
+      scheduleCron: t.scheduleCron,
+      isRequiredForClockout: true,
+      actionType: (t.agentId?.includes('vera') || (t.title || '').toLowerCase().includes('shelf')) ? 'vera_audit' : ((t.title || '').toLowerCase().includes('survey') ? 'survey' : 'task'),
+    })),
+    incompleteTasks: incompleteTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      agentId: t.agentId,
+      scheduleCron: t.scheduleCron,
+      isRequiredForClockout: true,
+      actionType: (t.agentId?.includes('vera') || (t.title || '').toLowerCase().includes('shelf')) ? 'vera_audit' : ((t.title || '').toLowerCase().includes('survey') ? 'survey' : 'task'),
+    })),
+  };
+}
+
+// Check Required Tasks Status for User
+adminRouter.get('/admin/:ws/users/:id/required-tasks-status', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const status = await getIncompleteRequiredTasksForUser(ws, id);
+  res.json({
+    ok: true,
+    ...status,
+    canClockOut: status.incompleteTasks.length === 0,
+  });
+}));
+
+// 4. Frontline Clock-Out (Stationary Shift End / Roving Store Visit Completion with Restrictive Task Guard)
 adminRouter.post('/admin/:ws/users/:id/clock-out', wrap(async (req, res) => {
   const { ws, id } = req.params;
   const b = req.body || {};
@@ -1123,10 +1200,84 @@ adminRouter.post('/admin/:ws/users/:id/clock-out', wrap(async (req, res) => {
   const now = new Date();
   const todayDate = now.toISOString().split('T')[0];
 
-  // Update active shift if any
+  // Resolve active shift or store
   const [activeShift] = await db.select().from(shifts).where(
     and(eq(shifts.userId, id), eq(shifts.shiftDate, todayDate), eq(shifts.status, 'active'))
   );
+  let storeName = 'Store Branch';
+  let storeId = activeShift?.storeId || b.storeId;
+  if (!storeId && user.assignedStoreIds) {
+    try {
+      const parsed = JSON.parse(String(user.assignedStoreIds));
+      if (Array.isArray(parsed) && parsed.length > 0) storeId = String(parsed[0]);
+    } catch (e) {}
+  }
+  if (storeId) {
+    const [store] = await db.select().from(stores).where(eq(stores.id, storeId));
+    if (store) storeName = store.name;
+  }
+
+  // RESTRICTIVE SHIFT CHECKOUT GUARD: Evaluate mandatory shift tasks
+  const { requiredTasks, incompleteTasks } = await getIncompleteRequiredTasksForUser(ws, id);
+
+  if (incompleteTasks.length > 0 && !b.force) {
+    // 1. Proactive AI Agent Intervention Message (Pax Sentinel)
+    const taskBulletList = incompleteTasks.map((t, idx) => `${idx + 1}. **${t.title}** (${t.agentId?.includes('vera') ? 'Vera CV Vision' : 'Ops'})`).join('\n');
+    const warningText = `⚠️ **Shift Check-Out Intercepted by Pax**\n\nHey ${user.name.split(' ')[0]}, you attempted to clock out at **${storeName}**, but you still have **${incompleteTasks.length} mandatory task(s)** pending before departure:\n\n${taskBulletList}\n\nCompany policy requires all mandatory audits to be completed before clock-out so nothing is left behind! Tap below to finish them now.`;
+
+    await db.insert(chatMessages).values({
+      id: newId('msg'),
+      userId: id,
+      shiftId: activeShift?.id || null,
+      sender: 'pax',
+      message: warningText,
+      originalLanguage: user.preferredLanguage || 'en',
+      englishTranslation: warningText,
+      interactiveCardType: 'checkout_guard_card',
+      metadata: {
+        incompleteTasks,
+        storeId,
+        storeName,
+        attemptedAt: now.toISOString(),
+      },
+      timestamp: now,
+    } as any);
+
+    // 2. Immutable Audit Log
+    await log(ws, 'shift.clockout_blocked_missing_tasks', 'shifts', activeShift?.id || id, {
+      userId: id,
+      userName: user.name,
+      storeId,
+      storeName,
+      incompleteCount: incompleteTasks.length,
+      incompleteTasks: incompleteTasks.map(t => t.title),
+      agentInterception: 'pax',
+    }, 'shifts', id, 'Pax AI Departure Sentinel', undefined, 'blocked');
+
+    // 3. Return 400 with blocked response
+    return res.status(400).json({
+      ok: false,
+      blocked: true,
+      error: `Shift check-out restricted: ${incompleteTasks.length} mandatory task(s) are incomplete.`,
+      message: `Pax AI Sentinel blocked check-out. You must complete your mandatory shift tasks before leaving.`,
+      incompleteTasks,
+      storeName,
+    });
+  }
+
+  // If forced with override justification, log exception
+  if (incompleteTasks.length > 0 && b.force) {
+    await log(ws, 'shift.clockout_forced_override', 'shifts', activeShift?.id || id, {
+      userId: id,
+      userName: user.name,
+      storeId,
+      storeName,
+      overrideJustification: b.overrideJustification || 'Supervisor verbal clearance',
+      uncompletedTasks: incompleteTasks.map(t => t.title),
+    }, 'shifts', id, 'Staff Attendance Tracker', undefined, 'flagged');
+  }
+
+  // Update active shift if any
   if (activeShift) {
     await db.update(shifts).set({
       clockOutTime: now,
@@ -1160,6 +1311,7 @@ adminRouter.post('/admin/:ws/users/:id/clock-out', wrap(async (req, res) => {
     userName: user.name,
     clockOutTime: now,
     notes: b.notes,
+    forcedOverride: Boolean(b.force),
   }, 'shifts', id, 'Staff Attendance Tracker');
 
   res.json({
@@ -1332,13 +1484,41 @@ adminRouter.post('/admin/:ws/tasks', wrap(async (req, res) => {
     scheduleCron: b.scheduleCron || '0 11 * * *',
     followUpIntervalMins: Number(b.followUpIntervalMins) || 30,
     escalationThresholdMins: Number(b.escalationThresholdMins) || 60,
+    isRequiredForClockout: !!b.isRequiredForClockout,
     status: 'active',
     createdBy: 'Company Operations',
     createdAt: new Date(),
   };
-  await db.insert(agentTasks).values(row);
+  await db.insert(agentTasks).values(row as any);
   await log(req.params.ws, 'task.create', 'task', row.id, row);
   res.json(row);
+}));
+
+adminRouter.put('/admin/:ws/tasks/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const b = req.body || {};
+  const [existing] = await db.select().from(agentTasks).where(and(eq(agentTasks.id, id), eq(agentTasks.workspaceId, ws)));
+  if (!existing) return res.status(404).json({ error: 'Task not found' });
+
+  const patch: Record<string, any> = {};
+  if (b.title !== undefined) patch.title = String(b.title);
+  if (b.description !== undefined) patch.description = String(b.description);
+  if (b.status !== undefined) patch.status = String(b.status);
+  if (b.isRequiredForClockout !== undefined) patch.isRequiredForClockout = Boolean(b.isRequiredForClockout);
+  if (b.followUpIntervalMins !== undefined) patch.followUpIntervalMins = Number(b.followUpIntervalMins);
+  if (b.escalationThresholdMins !== undefined) patch.escalationThresholdMins = Number(b.escalationThresholdMins);
+  if (b.scheduleCron !== undefined) patch.scheduleCron = String(b.scheduleCron);
+
+  await db.update(agentTasks).set(patch as any).where(and(eq(agentTasks.id, id), eq(agentTasks.workspaceId, ws)));
+  const [updated] = await db.select().from(agentTasks).where(and(eq(agentTasks.id, id), eq(agentTasks.workspaceId, ws)));
+
+  await log(ws, 'task.update', 'task', id, {
+    taskTitle: updated.title,
+    before: { isRequiredForClockout: existing.isRequiredForClockout, status: existing.status },
+    after: { isRequiredForClockout: updated.isRequiredForClockout, status: updated.status },
+  });
+
+  res.json({ ok: true, task: updated });
 }));
 
 // PROACTIVELY CONTACT FIELD FORCE: DISPATCH TASK TO PROMOTERS

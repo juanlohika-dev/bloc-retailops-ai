@@ -289,6 +289,7 @@ export const agentTasks = sqliteTable('agent_tasks', {
   scheduleCron: text('schedule_cron'),                          // e.g. "0 11 * * *"
   followUpIntervalMins: integer('follow_up_interval_mins').default(30),
   escalationThresholdMins: integer('escalation_threshold_mins').default(60),
+  isRequiredForClockout: integer('is_required_for_clockout', { mode: 'boolean' }).default(false),
   status: text('status').notNull().default('active'),           // 'active' | 'paused' | 'completed'
   createdBy: text('created_by'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
