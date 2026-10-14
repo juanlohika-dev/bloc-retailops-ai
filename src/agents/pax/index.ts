@@ -1,6 +1,6 @@
 import { ai, MODELS } from '../../integrations/google/gemini.js';
 import { db } from '../../db/client.js';
-import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages } from '../../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages, auditLogs } from '../../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 
 export interface FastSaleItem {
@@ -98,7 +98,14 @@ Keep it punchy, warm, and zero fluff.`;
   /**
    * Processes a 3-Second Fast-Sale submission, commits to Turso, and updates targets.
    */
-  static async recordFastSale(userId: string, storeId: string, items: FastSaleItem[]) {
+  static async recordFastSale(
+    userId: string,
+    storeId: string,
+    items: FastSaleItem[],
+    paymentMethod: string = 'cash',
+    paymentTerms: string = 'straight',
+    approvalCode?: string
+  ) {
     const user = (await db.select().from(users).where(eq(users.id, userId)))[0];
     if (!user) throw new Error('User not found');
 
@@ -138,9 +145,36 @@ Keep it punchy, warm, and zero fluff.`;
         currency: product.currency,
         commissionEarned: lineCommission,
         captureMode: 'stepper',
+        paymentMethod: paymentMethod || 'cash',
+        paymentTerms: paymentTerms || 'straight',
+        approvalCode: approvalCode || null,
         syncedToErp: true,
         timestamp: new Date(),
       } as any);
+
+      try {
+        await db.insert(auditLogs).values({
+          id: `log-${txId}`,
+          workspaceId: user.workspaceId,
+          actorId: user.id,
+          action: 'sale.create',
+          module: 'sales',
+          resourceType: 'sales_transaction',
+          resourceId: txId,
+          approvalStatus: 'approved',
+          details: {
+            skuCode: product.skuCode,
+            productName: product.name,
+            quantity: item.quantity,
+            totalAmount: lineTotal,
+            paymentMethod,
+            paymentTerms,
+          },
+          timestamp: new Date(),
+        } as any);
+      } catch (logErr) {
+        console.warn('Audit log write skipped:', logErr);
+      }
 
       recordedItems.push({
         productName: product.name,

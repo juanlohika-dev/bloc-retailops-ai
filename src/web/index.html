@@ -1953,6 +1953,241 @@
       color: #0071E3;
       font-weight: 600;
     }
+
+    /* ============================================================
+       PAYMENT CHIPS, AUDIT TRAIL & AEGIS COPILOT STYLES
+       ============================================================ */
+    .fsc-payment-section {
+      background: #FBFBFD;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .fsc-payment-label {
+      font-size: 11px;
+      font-weight: 650;
+      color: #1D1D1F;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fsc-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .btn-pay-chip {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 550;
+      color: #48484A;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .btn-pay-chip:hover {
+      background: #F2F2F7;
+    }
+    .btn-pay-chip.active {
+      background: #0071E3;
+      color: #FFFFFF;
+      border-color: #0071E3;
+      box-shadow: 0 1px 4px rgba(0, 113, 227, 0.25);
+    }
+    .fsc-approval-input {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      width: 100%;
+      color: #1D1D1F;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .fsc-approval-input:focus {
+      border-color: #0071E3;
+    }
+
+    /* Module Filter Pills in Audit Trail */
+    .audit-filter-pills-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .audit-filter-pill {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #48484A;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .audit-filter-pill:hover {
+      background: #F2F2F7;
+    }
+    .audit-filter-pill.active {
+      background: #1D1D1F;
+      color: #FFFFFF;
+      border-color: #1D1D1F;
+    }
+
+    /* Module Badges */
+    .module-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .module-badge.sales { background: #E8F8EE; color: #1B5E20; }
+    .module-badge.ai_governance { background: #FFF8EB; color: #B25E00; border: 1px solid rgba(255, 149, 0, 0.3); }
+    .module-badge.config { background: #EBF4FF; color: #0071E3; }
+    .module-badge.tasks { background: #F2EBF9; color: #5856D6; }
+    .module-badge.stores { background: #E6F4EA; color: #137333; }
+    .module-badge.products { background: #FCE8E6; color: #C5221F; }
+    .module-badge.users { background: #E8EAED; color: #3C4043; }
+    .module-badge.general { background: #F1F3F4; color: #5F6368; }
+
+    /* Aegis Drawer Scrim and Panel */
+    .aegis-drawer-scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(6px);
+      z-index: 250;
+      display: none;
+      justify-content: flex-end;
+    }
+    .aegis-drawer-scrim.active {
+      display: flex;
+    }
+    .aegis-drawer-panel {
+      width: 100%;
+      max-width: 520px;
+      height: 100vh;
+      background: #FFFFFF;
+      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      animation: slideAegis 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideAegis {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .aegis-drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FBFBFD;
+    }
+    .aegis-chat-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #F8F9FA;
+    }
+    .aegis-msg-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.55;
+      max-width: 90%;
+      word-wrap: break-word;
+    }
+    .aegis-msg-bubble.aegis {
+      background: #FFFFFF;
+      color: #1D1D1F;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-top-left-radius: 4px;
+      align-self: flex-start;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .aegis-msg-bubble.user {
+      background: #0071E3;
+      color: #FFFFFF;
+      border-top-right-radius: 4px;
+      align-self: flex-end;
+    }
+    .aegis-quick-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 20px 0 20px;
+      background: #F8F9FA;
+    }
+    .btn-aegis-chip {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 113, 227, 0.2);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 550;
+      color: #0071E3;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .btn-aegis-chip:hover {
+      background: #EBF4FF;
+    }
+    .aegis-drawer-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .aegis-approval-input-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #FBFBFD;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
+    .aegis-approval-input-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 11.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #1D1D1F;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -2289,6 +2524,9 @@
             <div style="width:6px;height:6px;border-radius:50%;background:#34C759;box-shadow:0 0 6px rgba(52,199,89,0.6);"></div>
             <span>WSS Bidirectional Link</span>
           </div>
+          <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);padding:6px 14px;font-size:12px;border:none;">
+            <span class="ms-icon sm">shield</span> Ask Aegis Copilot
+          </button>
           <button class="m3-seg-item" onclick="loadSupervisorConsoleData()" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
             <span class="ms-icon sm">refresh</span>
             Refresh Telemetry
@@ -2438,9 +2676,14 @@
           <span class="ms-icon sm">description</span>
           <span>Executive Reports</span>
         </button>
+        <button class="admin-nav-item" id="navItemAuditTrail" onclick="switchAdminNav('auditTrail')">
+          <span class="ms-icon sm">history_edu</span>
+          <span>Audit Trail & Governance</span>
+          <span class="admin-nav-badge" id="badgeAuditCount">0</span>
+        </button>
         <button class="admin-nav-item" id="navItemSettings" onclick="switchAdminNav('settings')">
-          <span class="ms-icon sm">settings</span>
-          <span>Cloud & Vault Settings</span>
+          <span class="ms-icon sm">tune</span>
+          <span>Settings & Guardrails</span>
         </button>
       </aside>
 
@@ -2455,6 +2698,10 @@
             <p id="adminCanvasSubtitle">Real-Time Multi-Store Telemetry · Gemini 2.5 Flash Autonomous Briefings</p>
           </div>
           <div style="display:flex;gap:10px;align-items:center;">
+            <button class="m3-btn-demo" onclick="openAegisDrawer()" style="background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);box-shadow:0 2px 10px rgba(0,113,227,0.25);">
+              <span class="ms-icon sm">shield</span>
+              <span>Ask Aegis Copilot</span>
+            </button>
             <button id="btnDeleteDemoWs" class="m3-seg-item" onclick="deleteCurrentDemoWorkspace()" style="display:none;background:#FFF0F0;border:1px solid rgba(255,59,48,0.25);color:#D32F2F;">
               <span class="ms-icon sm">delete</span>
               Delete Demo
@@ -2507,6 +2754,25 @@
               <span class="m3-stat-caption">Supervisor Escalations</span>
               <span class="m3-stat-num" id="kpiOverviewEscalated" style="color:var(--apple-amber);">0</span>
               <span class="m3-stat-trend" style="color:var(--apple-amber);"><span class="ms-icon sm" style="font-size:14px;">warning</span> Requires Area Follow-Up</span>
+            </div>
+          </div>
+
+          <!-- Financial Settlement & Payment Methods Mix Intelligence -->
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:14.5px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:#0071E3;">payments</span>
+                  <span>Financial Settlement & Payment Methods Mix</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;">Live volume distribution across Cash, Credit Cards, Home Credit 0% APR, and E-Wallets.</div>
+              </div>
+              <button class="btn-pay-chip active" onclick="switchAdminNav('settings')">
+                <span class="ms-icon sm" style="font-size:13px;">tune</span> Configure Methods & Terms
+              </button>
+            </div>
+            <div class="horizon-kpi-grid" id="overviewPaymentMixGrid" style="grid-template-columns: repeat(4, 1fr);">
+              <!-- Rendered via JS -->
             </div>
           </div>
 
@@ -2657,11 +2923,47 @@
           <div class="org-chart-container">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">Corporate Organizational Chart & Command Hierarchy</b>
-                <div style="font-size:12px;color:#86868B;">Hierarchical structure linking headquarters, regional leads, supervisors, and floor staff.</div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:#0071E3;">account_tree</span>
+                  <span>Corporate Organizational Chart & Command Hierarchy</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;">Manage headquarters, regional operating hubs, area territories, and assigned leadership with full CRUD & audit trail.</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-commit-fsc" onclick="openOrgNodeModal()" style="padding:7px 16px;font-size:12px;background:#0071E3;">
+                  <span class="ms-icon sm">add</span> Add Department / Node
+                </button>
+                <button class="btn-commit-fsc" onclick="loadOrgData()" style="padding:7px 12px;font-size:12px;background:#FFFFFF;color:#1D1D1F;border:1px solid rgba(0,0,0,0.1);">
+                  <span class="ms-icon sm">refresh</span> Refresh
+                </button>
               </div>
             </div>
-            <div id="orgChartTreeContainer" style="display:flex;flex-direction:column;gap:10px;">
+
+            <!-- Org KPIs Summary Strip -->
+            <div class="horizon-kpi-grid" style="grid-template-columns: repeat(4, 1fr);margin-top:14px;">
+              <div class="m3-stat-card-dark" style="padding:12px 14px;">
+                <span class="m3-stat-caption">Operating Units / Nodes</span>
+                <span class="m3-stat-num" id="orgKpiTotalNodes" style="font-size:22px;">0</span>
+                <span class="m3-stat-trend" style="color:#0071E3;">HQ & Regional Hubs</span>
+              </div>
+              <div class="m3-stat-card-dark" style="padding:12px 14px;">
+                <span class="m3-stat-caption">Assigned Leadership</span>
+                <span class="m3-stat-num" id="orgKpiLeaders" style="font-size:22px;">0</span>
+                <span class="m3-stat-trend" style="color:#34C759;">Supervisors & Leads</span>
+              </div>
+              <div class="m3-stat-card-dark" style="padding:12px 14px;">
+                <span class="m3-stat-caption">Roster Field Force</span>
+                <span class="m3-stat-num" id="orgKpiTotalStaff" style="font-size:22px;">0</span>
+                <span class="m3-stat-trend" style="color:#86868B;">Active Personnel</span>
+              </div>
+              <div class="m3-stat-card-dark" style="padding:12px 14px;">
+                <span class="m3-stat-caption">Network Stores Covered</span>
+                <span class="m3-stat-num" id="orgKpiTotalStores" style="font-size:22px;">0</span>
+                <span class="m3-stat-trend" style="color:#FF9500;">Retail Locations</span>
+              </div>
+            </div>
+
+            <div id="orgChartTreeContainer" style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -2669,8 +2971,8 @@
           <div class="admin-card-box">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <b style="font-size:14.5px;color:#1D1D1F;">Field Promoters & Regional Supervisors</b>
-                <div style="font-size:12px;color:#86868B;">Personnel roster, assigned branch, and Pax AI localized conversation language.</div>
+                <b style="font-size:14.5px;color:#1D1D1F;">Field Promoters & Regional Supervisors Roster</b>
+                <div style="font-size:12px;color:#86868B;">Personnel roster, organizational unit membership, assigned branch, and Pax AI language.</div>
               </div>
             </div>
             <table class="m3-telemetry-table">
@@ -2679,9 +2981,10 @@
                   <th>Staff Member</th>
                   <th>Role</th>
                   <th>Assigned Store</th>
+                  <th>Department / Org Node</th>
                   <th>Preferred Language</th>
-                  <th>Timezone</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="adminTableUsersBody">
@@ -2707,8 +3010,160 @@
           </div>
         </div>
 
-        <!-- PANEL 8: CLOUD VAULT & SETTINGS -->
+        <!-- PANEL 8: FULL CROSS-MODULE AUDIT TRAIL & GOVERNANCE -->
+        <div class="admin-view-panel" id="panelAuditTrail">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                <span class="ms-icon sm" style="color:#0071E3;">history_edu</span>
+                <span>Full Cross-Module Audit Trail & Security Ledger</span>
+              </b>
+              <div style="font-size:12px;color:#86868B;">Tamper-evident record of all system modifications, AI agent executions, digital approvals, and guardrail exceptions.</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-commit-fsc" onclick="loadAuditTrailData()" style="padding:7px 14px;font-size:12px;background:#FFFFFF;color:#1D1D1F;border:1px solid rgba(0,0,0,0.1);">
+                <span class="ms-icon sm">refresh</span> Refresh Trail
+              </button>
+            </div>
+          </div>
+
+          <!-- Module Filter Pills Bar -->
+          <div class="admin-card-box" style="padding:14px 18px;gap:8px;">
+            <div style="font-size:11px;font-weight:700;color:#86868B;text-transform:uppercase;letter-spacing:0.5px;">Filter by Enterprise Module</div>
+            <div class="audit-filter-pills-row" id="auditModuleFilterPills">
+              <button type="button" class="audit-filter-pill active" onclick="filterAuditByModule('all')">
+                <span class="ms-icon sm" style="font-size:14px;">apps</span> All Modules
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('sales')">
+                <span class="ms-icon sm" style="font-size:14px;color:#1B5E20;">payments</span> Sales & Fast-Sale
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('ai_governance')">
+                <span class="ms-icon sm" style="font-size:14px;color:#B25E00;">shield</span> AI Governance & Guardrails
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('config')">
+                <span class="ms-icon sm" style="font-size:14px;color:#0071E3;">tune</span> System Configuration
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('tasks')">
+                <span class="ms-icon sm" style="font-size:14px;color:#5856D6;">checklist</span> Autonomous Tasks
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('stores')">
+                <span class="ms-icon sm" style="font-size:14px;color:#137333;">storefront</span> Stores & Geofences
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('products')">
+                <span class="ms-icon sm" style="font-size:14px;color:#C5221F;">inventory_2</span> Products & Pricing
+              </button>
+              <button type="button" class="audit-filter-pill" onclick="filterAuditByModule('users')">
+                <span class="ms-icon sm" style="font-size:14px;color:#3C4043;">group</span> Users & Roles
+              </button>
+            </div>
+          </div>
+
+          <!-- Audit Log Telemetry Table -->
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <b style="font-size:14px;color:#1D1D1F;" id="auditTableTitle">Immutable Audit Log Entries</b>
+              <span style="font-size:11.5px;color:#86868B;" id="auditTableCount">Showing recent events</span>
+            </div>
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Module</th>
+                  <th>Action & Resource</th>
+                  <th>Actor & Role</th>
+                  <th>Approver / Signature</th>
+                  <th>AI Copilot</th>
+                  <th>Status</th>
+                  <th>Details & Diff</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PANEL 9: SETTINGS, PAYMENT CHANNELS & AI GOVERNANCE -->
         <div class="admin-view-panel" id="panelSettings">
+          <!-- 1. Payment Methods & Terms Dynamic Configuration -->
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:#0071E3;">payments</span>
+                  <span>Payment Gateway & Installment Terms Configuration</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;">Configure available frontline payment methods (Cash, Cards, Home Credit 0% APR) and allowable customer financing terms.</div>
+              </div>
+              <button class="btn-commit-fsc" onclick="savePaymentConfigFromUI()" style="padding:7px 16px;font-size:12px;background:#0071E3;">
+                <span class="ms-icon sm">save</span> Save Payment Policy
+              </button>
+            </div>
+
+            <div style="display:grid;grid-template-columns: 1fr 1fr;gap:16px;">
+              <!-- Left: Payment Methods -->
+              <div style="background:#FBFBFD;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:14px;">
+                <b style="font-size:13px;color:#1D1D1F;display:block;margin-bottom:10px;">Active Settlement Channels</b>
+                <div id="settingsPaymentMethodsList" style="display:flex;flex-direction:column;gap:8px;">
+                  <!-- Rendered via JS -->
+                </div>
+              </div>
+
+              <!-- Right: Financing Terms -->
+              <div style="background:#FBFBFD;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:14px;">
+                <b style="font-size:13px;color:#1D1D1F;display:block;margin-bottom:10px;">Allowable Installment & Financing Terms</b>
+                <div id="settingsPaymentTermsList" style="display:flex;flex-direction:column;gap:8px;">
+                  <!-- Rendered via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. AI Governance & Copilot Role-Based Guardrail Matrix -->
+          <div class="admin-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:15px;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:#B25E00;">shield</span>
+                  <span>AI Copilot Access Levels & Administrative Guardrail Matrix</span>
+                </b>
+                <div style="font-size:12px;color:#86868B;">Define who can transact with administrative AI agents, and what authorization level is required to apply configuration changes.</div>
+              </div>
+              <button class="btn-commit-fsc" onclick="saveGovernanceFromUI()" style="padding:7px 16px;font-size:12px;background:#1D1D1F;">
+                <span class="ms-icon sm">verified_user</span> Save Guardrail Policy
+              </button>
+            </div>
+
+            <table class="m3-telemetry-table">
+              <thead>
+                <tr>
+                  <th>Enterprise Role</th>
+                  <th>Interaction Access Level</th>
+                  <th>Query AI Analytics</th>
+                  <th>Execute System Config</th>
+                  <th>Approval Signature Required</th>
+                  <th>Guardrail Policy Enforcement</th>
+                </tr>
+              </thead>
+              <tbody id="settingsGovernanceTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+
+            <div style="display:flex;gap:14px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.06);">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#1D1D1F;cursor:pointer;">
+                <input type="checkbox" id="chkAutoAuditAi" checked style="accent-color:#0071E3;">
+                <span><b>Auto-Audit All AI Configurations:</b> Every AI action must create an immutable record in auditLogs.</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#1D1D1F;cursor:pointer;">
+                <input type="checkbox" id="chkRequireSignature" checked style="accent-color:#0071E3;">
+                <span><b>Mandatory Digital Sign-Off:</b> Configuration requests require actor ID and authorization note.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Cloud Storage Vault & Sync -->
           <div class="horizon-kpi-grid" style="grid-template-columns: repeat(2, 1fr);">
             <div class="m3-stat-card-dark">
               <span class="m3-stat-caption">Google Drive 5TB Media Vault</span>
@@ -2725,28 +3180,86 @@
               </div>
             </div>
           </div>
-          <div class="m3-lineage-card">
-            <div class="lineage-card-title">
-              <span class="ms-icon" style="color:var(--apple-blue);">smart_toy</span>
-              <span>Active Frontline Agentic Engine</span>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================================
+         AEGIS ADMINISTRATIVE GOVERNANCE & CONFIGURATION COPILOT DRAWER
+         ============================================================ -->
+    <div class="aegis-drawer-scrim" id="drawerAegis" onclick="if(event.target===this) closeAegisDrawer()">
+      <div class="aegis-drawer-panel">
+        <div class="aegis-drawer-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EBF4FF;color:#0071E3;display:flex;align-items:center;justify-content:center;">
+              <span class="ms-icon">shield</span>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:#1D1D1F;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="m3-tag-pill tag-ai-guide">Pax</span>
-                <span>Frontline Copilot · Multilingual Tagalog, Singlish, Malay sales capture (Gemini 2.5 Flash)</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#1D1D1F;display:flex;align-items:center;gap:6px;">
+                <span>Aegis Governance Copilot</span>
+                <span class="m3-tag-pill" style="background:#E8F8EE;color:#1B5E20;font-size:10px;">Gemini 2.5 Flash</span>
               </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="m3-tag-pill" style="background:#E8F8EE;color:#1B5E20;">Vera</span>
-                <span>Planogram & Shelf Vision Auditor · Compliance scoring & out-of-stock detector (Gemini 2.5 Pro)</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="m3-tag-pill" style="background:#E8DEF8;color:#4A4458;">Nexus</span>
-                <span>Regional Operations Orchestrator · Real-time multi-currency USD normalization & telemetry sync</span>
-              </div>
+              <div style="font-size:11px;color:#86868B;">Administrative Operations, Financial Mix & Policy Copilot</div>
+            </div>
+          </div>
+          <button onclick="closeAegisDrawer()" style="background:none;border:none;cursor:pointer;color:#86868B;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <!-- Role & Guardrail Context Bar -->
+        <div style="padding:8px 20px;background:#FBFBFD;border-bottom:1px solid rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between;font-size:11.5px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#86868B;">Active Persona Role:</span>
+            <b id="aegisDrawerRoleBadge" style="background:#EBF4FF;color:#0071E3;padding:2px 8px;border-radius:6px;font-weight:600;">company_admin</b>
+          </div>
+          <div id="aegisDrawerGuardrailNotice" style="color:#1B5E20;display:flex;align-items:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:14px;">verified_user</span> Config Execution Authorized
+          </div>
+        </div>
+
+        <!-- Quick Query / Command Chips -->
+        <div class="aegis-quick-chips">
+          <button type="button" class="btn-aegis-chip" onclick="sendAegisQuickPrompt('What is our payment mix and store performance today?')">
+            <span class="ms-icon sm" style="font-size:13px;">analytics</span> Payment Mix & Quotas
+          </button>
+          <button type="button" class="btn-aegis-chip" onclick="sendAegisQuickPrompt('Show recent governance & audit log alerts')">
+            <span class="ms-icon sm" style="font-size:13px;">history_edu</span> Audit Integrity
+          </button>
+          <button type="button" class="btn-aegis-chip" onclick="sendAegisQuickPrompt('Enable 24_months payment terms for Home Credit')">
+            <span class="ms-icon sm" style="font-size:13px;">handshake</span> 24m Home Credit
+          </button>
+          <button type="button" class="btn-aegis-chip" onclick="sendAegisQuickPrompt('Check store compliance and planogram scores')">
+            <span class="ms-icon sm" style="font-size:13px;">photo_camera</span> Vera Audits
+          </button>
+        </div>
+
+        <!-- Message Thread -->
+        <div class="aegis-chat-thread" id="aegisChatThread">
+          <!-- Initial Welcome Message from Aegis -->
+          <div class="aegis-msg-bubble aegis">
+            <b>🛡️ Aegis Enterprise Copilot Active</b>
+            <div style="margin-top:6px;font-size:12.5px;color:#48484A;line-height:1.5;">
+              I have full operational awareness across your enterprise retail operations, including real-time fast-sale transaction streams, payment settlement channels (Cash, Credit Card, Home Credit, E-Wallets), and Vera optical planograms.<br><br>
+              Authorized administrators can issue configuration directives (such as altering payment terms, updating store targets, or tightening guardrails). All actions are recorded with digital approvals in the immutable audit trail.
             </div>
           </div>
         </div>
-      </main>
+
+        <!-- Footer / Input Form -->
+        <form class="aegis-drawer-footer" onsubmit="event.preventDefault(); submitAegisMessage();">
+          <div class="aegis-approval-input-box" id="aegisSignatureBox">
+            <span class="ms-icon sm" style="color:#86868B;font-size:15px;">badge</span>
+            <input type="text" id="aegisSignatureInput" placeholder="Digital Approval Signature (e.g. LA-EXEC-991)" value="EXEC-ADMIN-AUTH">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="aegisChatInput" placeholder="Ask Aegis or issue a system configuration directive..." style="flex:1;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:10px 14px;font-size:13px;outline:none;" required>
+            <button type="submit" id="btnSendAegis" class="btn-commit-fsc" style="padding:0 18px;border-radius:12px;background:#0071E3;">
+              <span class="ms-icon sm">send</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- ============================================================
@@ -2852,6 +3365,134 @@
           <button class="btn-commit-fsc" onclick="saveAgentSkill()" style="margin-top:6px;">
             <span class="ms-icon sm">check</span> Save & Activate Skill on Field Force
           </button>
+        </div>
+      </div>
+    <!-- ============================================================
+         GLOBAL MODAL: CREATE / EDIT ORGANIZATIONAL NODE
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalOrgNode">
+      <div class="demo-modal-dialog" style="max-width: 600px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">account_tree</span>
+              <h3 style="font-size:18px;font-weight:700;color:#1D1D1F;" id="orgModalTitleHeader">Create Organizational Department / Unit</h3>
+            </div>
+            <p style="font-size:12.5px;color:#86868B;margin-top:2px;">
+              Configure hierarchical topology, assigned leader, sales targets, and retail store coverage.
+            </p>
+          </div>
+          <button onclick="closeOrgNodeModal()" style="background:transparent;border:none;color:#86868B;cursor:pointer;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <input type="hidden" id="orgModalNodeId" value="">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px;">
+          <div style="display:grid;grid-template-columns: 2fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Department / Unit Title</label>
+              <input type="text" id="orgModalTitle" placeholder="e.g. North Luzon Retail Operations" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;" required>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Node Level / Type</label>
+              <select id="orgModalType" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+                <option value="hq">Headquarters (HQ)</option>
+                <option value="region">Regional Hub</option>
+                <option value="area" selected>Area Cluster</option>
+                <option value="store">Store Territory</option>
+                <option value="team">Field Team</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns: 1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Parent in Hierarchy</label>
+              <select id="orgModalParent" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+                <option value="">[None - Top Level HQ]</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Assigned Department Lead</label>
+              <select id="orgModalLeader" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+                <option value="">[Unassigned]</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Daily Sales Quota Allocation ($)</label>
+            <input type="number" id="orgModalTarget" placeholder="e.g. 50000" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Assigned Store Network Branches</label>
+            <div id="orgModalStoreCheckboxes" style="display:grid;grid-template-columns: repeat(2, 1fr);gap:6px;max-height:120px;overflow-y:auto;background:#F9F9FB;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);">
+              <!-- Checkboxes dynamically rendered -->
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Scope Notes & Territory Focus</label>
+            <input type="text" id="orgModalNotes" placeholder="e.g. Oversees Metro Manila Tier-1 Mall Endcaps" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+          </div>
+
+          <div style="background:#F2F2F7;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;">
+            <span class="ms-icon sm" style="color:#0071E3;">verified</span>
+            <input type="text" id="orgModalSignature" placeholder="Digital Sign-Off (e.g. EXEC-ADMIN-AUTH)" value="EXEC-ADMIN-AUTH" style="background:transparent;border:none;outline:none;font-size:12px;flex:1;font-weight:600;">
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+            <button type="button" class="btn-fsc-option" onclick="closeOrgNodeModal()" style="padding:8px 16px;">Cancel</button>
+            <button type="button" class="btn-commit-fsc" onclick="saveOrgNode()" style="padding:8px 20px;background:#0071E3;">
+              <span class="ms-icon sm">save</span> Save & Commit to Audit Trail
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         GLOBAL MODAL: ASSIGN / TRANSFER STAFF TO ORG UNIT
+         ============================================================ -->
+    <div class="global-modal-scrim" id="modalAssignStaffNode">
+      <div class="demo-modal-dialog" style="max-width: 460px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="ms-icon" style="color:var(--apple-blue);">sync_alt</span>
+              <h3 style="font-size:17px;font-weight:700;color:#1D1D1F;">Transfer Staff to Org Unit</h3>
+            </div>
+            <p style="font-size:12px;color:#86868B;margin-top:2px;">
+              Assign frontline promoter or supervisor to a departmental cluster.
+            </p>
+          </div>
+          <button onclick="closeAssignStaffModal()" style="background:transparent;border:none;color:#86868B;cursor:pointer;padding:4px;">
+            <span class="ms-icon">close</span>
+          </button>
+        </div>
+
+        <input type="hidden" id="assignStaffUserId" value="">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+          <div style="background:#F9F9FB;padding:10px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);">
+            <div style="font-size:11px;color:#86868B;text-transform:uppercase;font-weight:700;">Personnel</div>
+            <b id="assignStaffUserName" style="font-size:14px;color:#1D1D1F;">Employee Name</b>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#1D1D1F;display:block;margin-bottom:4px;">Target Org Unit / Cluster</label>
+            <select id="assignStaffOrgNodeSelect" style="width:100%;padding:10px 12px;border:1px solid rgba(0,0,0,0.1);border-radius:10px;font-family:inherit;font-size:13px;">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+            <button type="button" class="btn-fsc-option" onclick="closeAssignStaffModal()" style="padding:8px 16px;">Cancel</button>
+            <button type="button" class="btn-commit-fsc" onclick="saveStaffOrgAssignment()" style="padding:8px 20px;background:#0071E3;">
+              <span class="ms-icon sm">check</span> Confirm Transfer
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3584,6 +4225,25 @@
       }
     }
 
+    let selectedPaymentMethod = 'cash';
+    let selectedPaymentTerms = 'straight';
+    let currentApprovalCode = '';
+
+    function selectFastSalePayment(method) {
+      selectedPaymentMethod = method;
+      if (method === 'cash' || method === 'e_wallet') {
+        selectedPaymentTerms = 'straight';
+      } else if (method === 'home_credit') {
+        if (selectedPaymentTerms === 'straight') selectedPaymentTerms = '12_months';
+      }
+      refreshFastSaleWidget();
+    }
+
+    function selectFastSaleTerms(term) {
+      selectedPaymentTerms = term;
+      refreshFastSaleWidget();
+    }
+
     function buildFastSaleInnerHtml(highlightProductId = null) {
       const allSaleItems = getAllActiveSaleItems();
       const isCartEmpty = (allSaleItems.length === 0);
@@ -3699,6 +4359,8 @@
         `;
       }
 
+      const methodLabel = selectedPaymentMethod.replace('_', ' ').toUpperCase();
+
       return `
         <div class="fsc-header">
           <div class="fsc-title">
@@ -3717,6 +4379,45 @@
         </div>
 
         ${bodyHtml}
+
+        <!-- Payment Method & Financing Terms Selection -->
+        <div class="fsc-payment-section">
+          <div class="fsc-payment-label">
+            <span>Payment Method</span>
+            <span style="font-weight:600;color:#0071E3;" id="lblSelectedPaymentDesc">${methodLabel}</span>
+          </div>
+          <div class="fsc-chips-row" id="fastSalePaymentMethodChips">
+            <button type="button" class="btn-pay-chip ${selectedPaymentMethod === 'cash' ? 'active' : ''}" onclick="selectFastSalePayment('cash')">
+              <span class="ms-icon sm" style="font-size:14px;">payments</span> Cash
+            </button>
+            <button type="button" class="btn-pay-chip ${selectedPaymentMethod === 'credit_card' ? 'active' : ''}" onclick="selectFastSalePayment('credit_card')">
+              <span class="ms-icon sm" style="font-size:14px;">credit_card</span> Credit Card
+            </button>
+            <button type="button" class="btn-pay-chip ${selectedPaymentMethod === 'home_credit' ? 'active' : ''}" onclick="selectFastSalePayment('home_credit')">
+              <span class="ms-icon sm" style="font-size:14px;">handshake</span> Home Credit
+            </button>
+            <button type="button" class="btn-pay-chip ${selectedPaymentMethod === 'e_wallet' ? 'active' : ''}" onclick="selectFastSalePayment('e_wallet')">
+              <span class="ms-icon sm" style="font-size:14px;">account_balance_wallet</span> E-Wallet
+            </button>
+          </div>
+
+          <div id="fastSaleTermsContainer" style="display:${selectedPaymentMethod === 'cash' || selectedPaymentMethod === 'e_wallet' ? 'none' : 'block'};">
+            <div class="fsc-payment-label" style="margin-top:4px;">
+              <span>Financing / Installment Terms</span>
+              <span style="font-size:10.5px;color:#0071E3;font-weight:600;">0% Interest Partner</span>
+            </div>
+            <div class="fsc-chips-row" id="fastSaleTermsChips">
+              <button type="button" class="btn-pay-chip ${selectedPaymentTerms === 'straight' ? 'active' : ''}" onclick="selectFastSaleTerms('straight')">Straight</button>
+              <button type="button" class="btn-pay-chip ${selectedPaymentTerms === '3_months' ? 'active' : ''}" onclick="selectFastSaleTerms('3_months')">3 Mos (0%)</button>
+              <button type="button" class="btn-pay-chip ${selectedPaymentTerms === '6_months' ? 'active' : ''}" onclick="selectFastSaleTerms('6_months')">6 Mos (0%)</button>
+              <button type="button" class="btn-pay-chip ${selectedPaymentTerms === '12_months' ? 'active' : ''}" onclick="selectFastSaleTerms('12_months')">12 Mos</button>
+              <button type="button" class="btn-pay-chip ${selectedPaymentTerms === '24_months' ? 'active' : ''}" onclick="selectFastSaleTerms('24_months')">24 Mos</button>
+            </div>
+            <div style="margin-top:6px;">
+              <input type="text" id="fastSaleApprovalCodeInput" class="fsc-approval-input" placeholder="Approval/Ref Code (e.g. AUTH-918234 or HC-88192)" value="${currentApprovalCode || ''}" oninput="currentApprovalCode = this.value">
+            </div>
+          </div>
+        </div>
 
         <div class="fsc-totals-footer">
           <span>Subtotal: <b id="fswTotalValue" style="color:#1D1D1F;">${currencySymbol}0</b></span>
@@ -3861,11 +4562,17 @@
             userId: currentUserId,
             storeId: currentStoreId,
             items,
+            paymentMethod: selectedPaymentMethod,
+            paymentTerms: selectedPaymentTerms,
+            approvalCode: currentApprovalCode || (selectedPaymentMethod !== 'cash' ? `AUTH-${Math.floor(100000 + Math.random() * 900000)}` : null),
           }),
         });
         const data = await res.json();
 
-        appendUserBubble(`Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale Stepper (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
+        const payDesc = selectedPaymentTerms !== 'straight' 
+          ? `[${selectedPaymentMethod.replace('_', ' ').toUpperCase()} · ${selectedPaymentTerms.replace('_', ' ')}]`
+          : `[${selectedPaymentMethod.replace('_', ' ').toUpperCase()}]`;
+        appendUserBubble(`Logged ${items.reduce((a,b)=>a+b.quantity,0)} items via Fast-Sale ${payDesc} (${currencySymbol}${data.totalSaleAmount.toLocaleString()})`);
         appendPaxBubble(data.paxMessage);
         updateKpiBanner(data.currentShiftTotal);
 
@@ -4040,7 +4747,10 @@
       returnToChatList();
     }
 
+    let currentViewMode = 'phone';
+
     function setViewMode(mode) {
+      currentViewMode = mode;
       const p = document.getElementById('phoneWrapper');
       const s = document.getElementById('supervisorWrapper');
       const a = document.getElementById('adminWrapper');
@@ -4079,7 +4789,7 @@
 
     function switchAdminNav(navKey) {
       currentAdminNav = navKey;
-      const navIds = ['overview', 'agents', 'tasks', 'stores', 'products', 'org', 'reports', 'settings'];
+      const navIds = ['overview', 'agents', 'tasks', 'stores', 'products', 'org', 'reports', 'auditTrail', 'settings'];
       
       navIds.forEach(k => {
         const btn = document.getElementById(`navItem${capitalize(k)}`);
@@ -4096,8 +4806,9 @@
         stores: ['storefront', 'Retail Branch Network & Geofences', 'GPS Arrival Geofencing & 360° Store Dossier Inspection'],
         products: ['inventory_2', 'SKU Catalog & Fast-Sale Stepper Pins', '1-Tap Promo Pins, Barcodes, and Direct Promoter Commissions'],
         org: ['account_tree', 'Corporate Org Chart & Staff Roster', 'Multi-Tiered Management Topology & Frontline Language Preferences'],
-        reports: ['description', 'Executive Operational Reports & Audit Logs', 'Gemini-Synthesized Management Compliance Digests'],
-        settings: ['settings', 'Enterprise Cloud & Integration Settings', 'Google Drive 5TB Media Vault & Bidirectional Sheets Link'],
+        reports: ['description', 'Executive Operational Reports', 'Gemini-Synthesized Management Compliance Digests'],
+        auditTrail: ['history_edu', 'Full Cross-Module Audit Trail & Security Ledger', 'Immutable Multi-Module Operation History, Approvals & AI Guardrail Events'],
+        settings: ['tune', 'Payment Channels & AI Governance Guardrails', 'Payment Methods, Installment Terms & Role-Based AI Copilot Permissions'],
       };
 
       const meta = titleMap[navKey] || titleMap.overview;
@@ -4109,6 +4820,8 @@
       else if (navKey === 'tasks') loadTasksData();
       else if (navKey === 'org') loadOrgData();
       else if (navKey === 'reports') loadReportsData();
+      else if (navKey === 'auditTrail') loadAuditTrailData();
+      else if (navKey === 'settings') loadSettingsAndGovernanceData();
     }
 
     function capitalize(s) {
@@ -4127,6 +4840,7 @@
           loadStoresAndProducts(),
           loadAgentsData(),
           loadTasksData(),
+          loadAuditTrailData(),
         ]);
       } catch (err) {
         console.error('Failed to load admin console data:', err);
@@ -4157,6 +4871,32 @@
         document.getElementById('kpiOverviewCompliance').innerText = `${m.avgCompliance || 92}%`;
         document.getElementById('kpiOverviewStaff').innerText = `${m.activeStaffCount || 3} / ${m.activeStaffCount || 3}`;
         document.getElementById('kpiOverviewEscalated').innerText = m.escalatedCount || 0;
+
+        // 3. Financial Settlement & Payment Methods Mix
+        const pGrid = document.getElementById('overviewPaymentMixGrid');
+        if (pGrid && m.paymentBreakdown) {
+          pGrid.innerHTML = '';
+          const pb = m.paymentBreakdown;
+          const methods = [
+            { key: 'cash', icon: 'payments', label: 'Cash', color: '#1B5E20' },
+            { key: 'credit_card', icon: 'credit_card', label: 'Credit Card', color: '#0071E3' },
+            { key: 'home_credit', icon: 'handshake', label: 'Home Credit (0% APR)', color: '#FF9500' },
+            { key: 'e_wallet', icon: 'account_balance_wallet', label: 'E-Wallet', color: '#5856D6' },
+          ];
+          methods.forEach(item => {
+            const row = pb[item.key] || { count: 0, total: 0 };
+            pGrid.innerHTML += `
+              <div class="m3-stat-card-dark" style="padding:14px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="ms-icon sm" style="color:${item.color};font-size:16px;">${item.icon}</span>
+                  <span class="m3-stat-caption">${item.label}</span>
+                </div>
+                <span class="m3-stat-num" style="font-size:22px;margin-top:4px;">$${Number(row.total).toLocaleString()}</span>
+                <span class="m3-stat-trend" style="color:#86868B;font-size:11px;">${row.count} transactions settled</span>
+              </div>
+            `;
+          });
+        }
       } catch (err) {
         console.warn('Analytics summary fallback:', err);
       }
@@ -4462,9 +5202,15 @@
         const txEl = document.getElementById('d360TxList');
         txEl.innerHTML = '';
         (data.recentTransactions || []).forEach(t => {
+          const payLabel = t.paymentMethod 
+            ? `<span style="font-size:10px;background:#EBF4FF;color:#0071E3;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:6px;">${t.paymentMethod.replace('_', ' ').toUpperCase()}${t.paymentTerms && t.paymentTerms !== 'straight' ? ' · ' + t.paymentTerms.replace('_', ' ') : ''}</span>`
+            : '';
           txEl.innerHTML += `
-            <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
-              <span>${t.quantity}x Units (${t.captureMode})</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
+              <div>
+                <span>${t.quantity}x Units (${t.captureMode})</span>
+                ${payLabel}
+              </div>
               <b style="color:#1D1D1F;">${t.currency} ${Number(t.totalAmount).toLocaleString()}</b>
             </div>
           `;
@@ -4495,29 +5241,378 @@
       document.getElementById('drawerStore360').classList.remove('active');
     }
 
+    // ============================================================
+    // 10. ORGANIZATIONAL TOPOLOGY & FULL CRUD LOGIC
+    // ============================================================
+    let cachedOrgChartData = null;
+
     async function loadOrgData() {
       try {
         const res = await fetch(`/api/admin/${currentWorkspaceId}/org-chart`);
         const data = await res.json();
-        const container = document.getElementById('orgChartTreeContainer');
-        container.innerHTML = '';
+        cachedOrgChartData = data;
 
-        (data.nodes || []).forEach(n => {
-          const indent = n.parentId ? 'margin-left: 24px;' : '';
-          const icon = n.nodeType === 'hq' ? 'domain' : 'hub';
-          container.innerHTML += `
-            <div class="org-tree-node" style="${indent}">
-              <span class="ms-icon sm" style="color:var(--apple-blue);">${icon}</span>
-              <div style="flex:1;">
-                <b style="color:#1D1D1F;font-size:13.5px;">${n.title}</b>
-                <div style="font-size:11.5px;color:#86868B;">Lead: <b>${n.leaderName}</b> (${n.leaderRole}) · ${n.memberCount} members</div>
+        const nodes = data.nodes || [];
+        const users = data.users || [];
+        const stores = data.stores || [];
+
+        // 1. Update KPI Summary Chips
+        const elTotalNodes = document.getElementById('orgKpiTotalNodes');
+        const elLeaders = document.getElementById('orgKpiLeaders');
+        const elTotalStaff = document.getElementById('orgKpiTotalStaff');
+        const elTotalStores = document.getElementById('orgKpiTotalStores');
+
+        if (elTotalNodes) elTotalNodes.innerText = nodes.length;
+        if (elLeaders) elLeaders.innerText = nodes.filter(n => n.leaderUserId).length;
+        if (elTotalStaff) elTotalStaff.innerText = data.totalStaff || users.length;
+        if (elTotalStores) elTotalStores.innerText = data.totalStores || stores.length;
+
+        // 2. Build Hierarchical Tree Container
+        const container = document.getElementById('orgChartTreeContainer');
+        if (container) {
+          container.innerHTML = '';
+          if (nodes.length === 0) {
+            container.innerHTML = `
+              <div style="text-align:center;padding:32px;background:#FBFBFD;border-radius:12px;border:1px dashed rgba(0,0,0,0.1);">
+                <span class="ms-icon" style="font-size:32px;color:#86868B;">account_tree</span>
+                <div style="font-weight:600;color:#1D1D1F;margin-top:8px;">No organizational nodes yet</div>
+                <div style="font-size:12px;color:#86868B;margin-top:2px;">Click "+ Add Department / Node" to build your enterprise topology.</div>
               </div>
-              <span class="m3-tag-pill" style="background:#EBF4FF;color:#0071E3;font-size:11px;font-weight:600;text-transform:uppercase;">${n.nodeType}</span>
-            </div>
-          `;
-        });
+            `;
+          } else {
+            // Sort into tree hierarchy (root nodes first, then their children recursively)
+            const roots = nodes.filter(n => !n.parentId || !nodes.some(p => p.id === n.parentId));
+            const childMap = new Map();
+            nodes.forEach(n => {
+              if (n.parentId) {
+                if (!childMap.has(n.parentId)) childMap.set(n.parentId, []);
+                childMap.get(n.parentId).push(n);
+              }
+            });
+
+            function renderNodeAndChildren(node, level = 0) {
+              const indentPx = level * 28;
+              const typeIcons = {
+                hq: 'domain',
+                region: 'hub',
+                area: 'corporate_fare',
+                store: 'storefront',
+                team: 'groups',
+              };
+              const typeColors = {
+                hq: 'background:#EBF4FF;color:#0071E3;',
+                region: 'background:#F3E8FF;color:#6B21A8;',
+                area: 'background:#E8F8EE;color:#1B5E20;',
+                store: 'background:#FFF8E1;color:#B25E00;',
+                team: 'background:#FCE8E6;color:#C5221F;',
+              };
+
+              const icon = typeIcons[node.nodeType] || 'hub';
+              const typeBadge = typeColors[node.nodeType] || 'background:#F2F2F7;color:#86868B;';
+              const meta = node.metadata || {};
+              const storesList = node.assignedStores || [];
+              const quotaStr = meta.targetQuota ? `$${Number(meta.targetQuota).toLocaleString()}` : '';
+
+              const storePills = storesList.map(s => `
+                <span style="font-size:10.5px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);color:#1D1D1F;padding:2px 6px;border-radius:4px;font-weight:500;">
+                  ${escapeHtml(s.name)} (${escapeHtml(s.code)})
+                </span>
+              `).join('');
+
+              const treeConnector = level > 0 
+                ? `<div style="position:absolute;left:-16px;top:20px;width:14px;height:1px;background:#0071E3;"></div>
+                   <div style="position:absolute;left:-16px;top:-10px;width:1px;height:31px;background:#0071E3;"></div>` 
+                : '';
+
+              container.innerHTML += `
+                <div style="position:relative;margin-left:${indentPx}px;">
+                  ${treeConnector}
+                  <div class="org-tree-node" style="padding:12px 16px;border-radius:12px;background:#FBFBFD;border:1px solid rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;">
+                      <div style="width:38px;height:38px;border-radius:10px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;color:#0071E3;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                        <span class="ms-icon">${icon}</span>
+                      </div>
+                      <div style="flex:1;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                          <b style="color:#1D1D1F;font-size:14px;">${escapeHtml(node.title)}</b>
+                          <span class="m3-tag-pill" style="${typeBadge}font-size:10px;font-weight:700;text-transform:uppercase;">${node.nodeType}</span>
+                          ${quotaStr ? `<span style="font-size:11px;background:#E8F8EE;color:#1B5E20;font-weight:600;padding:1px 6px;border-radius:4px;">Quota: ${quotaStr}</span>` : ''}
+                        </div>
+                        <div style="font-size:11.5px;color:#86868B;margin-top:3px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                          <span>Lead: <b style="color:#1D1D1F;">${escapeHtml(node.leaderName)}</b> ${node.leaderRole ? `(${escapeHtml(node.leaderRole)})` : ''}</span>
+                          <span>•</span>
+                          <span><b>${node.memberCount || 0}</b> active staff</span>
+                          ${meta.notes ? `<span>• <i style="color:#48484A;">${escapeHtml(meta.notes)}</i></span>` : ''}
+                        </div>
+                        ${storesList.length > 0 ? `
+                          <div style="display:flex;align-items:center;gap:4px;margin-top:6px;flex-wrap:wrap;">
+                            <span style="font-size:10.5px;color:#86868B;font-weight:600;">Covered Branches:</span>
+                            ${storePills}
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <button type="button" class="btn-fsc-option" onclick="openOrgNodeModal(null, '${node.id}')" title="Add sub-node" style="padding:4px 9px;font-size:11.5px;border:none;background:#EBF4FF;color:#0071E3;">
+                        <span class="ms-icon sm" style="font-size:13px;">add</span> Sub-Node
+                      </button>
+                      <button type="button" class="btn-fsc-option" onclick="openOrgNodeModal('${node.id}')" title="Edit department" style="padding:4px 9px;font-size:11.5px;border:none;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);">
+                        <span class="ms-icon sm" style="font-size:13px;">edit</span>
+                      </button>
+                      <button type="button" class="btn-fsc-option" onclick="deleteOrgNode('${node.id}', '${escapeHtml(node.title)}')" title="Delete department" style="padding:4px 8px;font-size:11.5px;border:none;background:#FFFFFF;color:#D32F2F;border:1px solid rgba(0,0,0,0.1);">
+                        <span class="ms-icon sm" style="font-size:13px;">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              const children = childMap.get(node.id) || [];
+              children.forEach(c => renderNodeAndChildren(c, level + 1));
+            }
+
+            roots.forEach(r => renderNodeAndChildren(r, 0));
+          }
+        }
+
+        // 3. Render Staff Members Roster with Department Node Assignment
+        const uBody = document.getElementById('adminTableUsersBody');
+        if (uBody) {
+          uBody.innerHTML = '';
+          users.forEach(u => {
+            const roleBadge = u.role === 'supervisor' ? 'background:#E8DEF8;color:#4A4458;' : 'background:#EBF4FF;color:#0071E3;';
+            // Find which node this user leads or belongs to
+            const leadingNode = nodes.find(n => n.leaderUserId === u.id);
+            const deptText = leadingNode ? `Leader: ${leadingNode.title}` : (u.orgNodeTitle || 'Regional Field Operations');
+
+            uBody.innerHTML += `
+              <tr>
+                <td>
+                  <b style="color:#1D1D1F;font-weight:600;">${escapeHtml(u.name)}</b>
+                  <div style="font-size:11px;color:#86868B;">${escapeHtml(u.email)}</div>
+                </td>
+                <td><span style="${roleBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize;">${escapeHtml(u.role)}</span></td>
+                <td style="color:#1D1D1F;font-weight:500;">${escapeHtml(u.storeName || 'Multi-Store Overseer')}</td>
+                <td>
+                  <span style="background:#F2F2F7;color:#1D1D1F;padding:3px 8px;border-radius:6px;font-size:11.5px;font-weight:600;">
+                    ${escapeHtml(deptText)}
+                  </span>
+                </td>
+                <td><span style="background:#F2F2F7;padding:2px 7px;border-radius:4px;font-size:11.5px;font-family:'JetBrains Mono';">${escapeHtml(u.preferredLanguage || 'en-SG')}</span></td>
+                <td><span style="background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">Active</span></td>
+                <td>
+                  <button type="button" class="btn-fsc-option" onclick="openAssignStaffModal('${u.id}', '${escapeHtml(u.name)}')" style="padding:4px 10px;font-size:11px;border:none;background:#EBF4FF;color:#0071E3;">
+                    <span class="ms-icon sm" style="font-size:12px;">sync_alt</span> Transfer
+                  </button>
+                </td>
+              </tr>
+            `;
+          });
+        }
       } catch (err) {
         console.error('Error loading org chart:', err);
+      }
+    }
+
+    // Modal: Open Create / Edit Org Node
+    function openOrgNodeModal(nodeId = null, defaultParentId = null) {
+      if (!cachedOrgChartData) return;
+      const nodes = cachedOrgChartData.nodes || [];
+      const users = cachedOrgChartData.users || [];
+      const stores = cachedOrgChartData.stores || [];
+
+      document.getElementById('orgModalNodeId').value = nodeId || '';
+      const headerEl = document.getElementById('orgModalTitleHeader');
+      if (headerEl) {
+        headerEl.innerText = nodeId ? 'Edit Organizational Node' : 'Create Organizational Department / Unit';
+      }
+
+      // Populate Parent Dropdown
+      const parentSel = document.getElementById('orgModalParent');
+      parentSel.innerHTML = '<option value="">[None - Top Level HQ]</option>';
+      nodes.forEach(n => {
+        if (n.id !== nodeId) { // Prevent selecting itself
+          const opt = document.createElement('option');
+          opt.value = n.id;
+          opt.innerText = `${n.title} (${n.nodeType.toUpperCase()})`;
+          parentSel.appendChild(opt);
+        }
+      });
+
+      // Populate Leader Dropdown
+      const leaderSel = document.getElementById('orgModalLeader');
+      leaderSel.innerHTML = '<option value="">[Unassigned]</option>';
+      users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.innerText = `${u.name} (${u.role.toUpperCase()})`;
+        leaderSel.appendChild(opt);
+      });
+
+      // Populate Store Checkboxes
+      const storeContainer = document.getElementById('orgModalStoreCheckboxes');
+      storeContainer.innerHTML = '';
+      stores.forEach(s => {
+        storeContainer.innerHTML += `
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#1D1D1F;cursor:pointer;">
+            <input type="checkbox" class="chk-org-store" value="${s.id}" style="accent-color:#0071E3;">
+            <span>${escapeHtml(s.name)} (${escapeHtml(s.storeCode)})</span>
+          </label>
+        `;
+      });
+
+      if (nodeId) {
+        const current = nodes.find(n => n.id === nodeId);
+        if (current) {
+          document.getElementById('orgModalTitle').value = current.title || '';
+          document.getElementById('orgModalType').value = current.nodeType || 'area';
+          document.getElementById('orgModalParent').value = current.parentId || '';
+          document.getElementById('orgModalLeader').value = current.leaderUserId || '';
+          const meta = current.metadata || {};
+          document.getElementById('orgModalTarget').value = meta.targetQuota || '';
+          document.getElementById('orgModalNotes').value = meta.notes || '';
+
+          const assignedStoreIds = meta.assignedStoreIds || [];
+          document.querySelectorAll('.chk-org-store').forEach(chk => {
+            chk.checked = assignedStoreIds.includes(chk.value);
+          });
+        }
+      } else {
+        document.getElementById('orgModalTitle').value = '';
+        document.getElementById('orgModalType').value = 'area';
+        document.getElementById('orgModalParent').value = defaultParentId || '';
+        document.getElementById('orgModalLeader').value = '';
+        document.getElementById('orgModalTarget').value = '';
+        document.getElementById('orgModalNotes').value = '';
+        document.querySelectorAll('.chk-org-store').forEach(chk => chk.checked = false);
+      }
+
+      document.getElementById('modalOrgNode').classList.add('active');
+    }
+
+    function closeOrgNodeModal() {
+      document.getElementById('modalOrgNode').classList.remove('active');
+    }
+
+    async function saveOrgNode() {
+      const nodeId = document.getElementById('orgModalNodeId').value;
+      const title = document.getElementById('orgModalTitle').value.trim();
+      if (!title) return alert('Please enter a department / unit title');
+
+      const nodeType = document.getElementById('orgModalType').value;
+      const parentId = document.getElementById('orgModalParent').value || null;
+      const leaderUserId = document.getElementById('orgModalLeader').value || null;
+      const targetQuota = parseFloat(document.getElementById('orgModalTarget').value) || 0;
+      const notes = document.getElementById('orgModalNotes').value.trim();
+      const approvalSignature = document.getElementById('orgModalSignature').value.trim() || 'EXEC-ADMIN-AUTH';
+
+      const assignedStoreIds = [];
+      document.querySelectorAll('.chk-org-store:checked').forEach(chk => assignedStoreIds.push(chk.value));
+
+      const payload = {
+        title,
+        nodeType,
+        parentId,
+        leaderUserId,
+        targetQuota,
+        assignedStoreIds,
+        notes,
+        actorId: currentUserId,
+        approvalSignature,
+      };
+
+      try {
+        if (nodeId) {
+          // Update (PUT)
+          const res = await fetch(`/api/admin/${currentWorkspaceId}/org-nodes/${nodeId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+          showToastNotification(`✓ Updated department "${title}" and logged to audit trail!`);
+        } else {
+          // Create (POST)
+          const res = await fetch(`/api/admin/${currentWorkspaceId}/org-nodes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+          showToastNotification(`✓ Created department "${title}" and logged to audit trail!`);
+        }
+
+        closeOrgNodeModal();
+        await loadOrgData();
+        if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to save org node: ' + err.message);
+      }
+    }
+
+    async function deleteOrgNode(nodeId, title) {
+      if (!confirm(`Are you sure you want to delete "${title}"? Any sub-nodes will be safely re-parented to keep the organizational hierarchy intact.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/org-nodes/${nodeId}?actorId=${currentUserId}&approvalSignature=EXEC-ADMIN-AUTH`, {
+          method: 'DELETE',
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        showToastNotification(`✓ Deleted "${title}" and logged to audit trail.`);
+        await loadOrgData();
+        if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to delete org node: ' + err.message);
+      }
+    }
+
+    function openAssignStaffModal(userId, userName) {
+      if (!cachedOrgChartData) return;
+      document.getElementById('assignStaffUserId').value = userId;
+      document.getElementById('assignStaffUserName').innerText = userName;
+
+      const sel = document.getElementById('assignStaffOrgNodeSelect');
+      sel.innerHTML = '';
+      (cachedOrgChartData.nodes || []).forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n.id;
+        opt.innerText = `${n.title} (${n.nodeType.toUpperCase()})`;
+        sel.appendChild(opt);
+      });
+
+      document.getElementById('modalAssignStaffNode').classList.add('active');
+    }
+
+    function closeAssignStaffModal() {
+      document.getElementById('modalAssignStaffNode').classList.remove('active');
+    }
+
+    async function saveStaffOrgAssignment() {
+      const userId = document.getElementById('assignStaffUserId').value;
+      const nodeId = document.getElementById('assignStaffOrgNodeSelect').value;
+      if (!nodeId) return;
+
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/org-nodes/${nodeId}/assign-staff`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, actorId: currentUserId, approvalSignature: 'EXEC-ADMIN-AUTH' }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        showToastNotification('✓ Staff member reassigned to new department!');
+        closeAssignStaffModal();
+        await loadOrgData();
+        if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to assign staff: ' + err.message);
       }
     }
 
@@ -4883,6 +5978,485 @@
       } catch (err) {
         alert('Failed to delete demo: ' + err.message);
       }
+    }
+
+    // ============================================================
+    // 12. FULL CROSS-MODULE AUDIT TRAIL & SECURITY LEDGER
+    // ============================================================
+    let currentAuditFilterModule = 'all';
+
+    async function filterAuditByModule(mod) {
+      currentAuditFilterModule = mod;
+      const pills = document.querySelectorAll('#auditModuleFilterPills .audit-filter-pill');
+      pills.forEach(p => {
+        p.classList.remove('active');
+        const onclickAttr = p.getAttribute('onclick') || '';
+        if ((mod === 'all' && onclickAttr.includes("'all'")) || onclickAttr.includes(`'${mod}'`)) {
+          p.classList.add('active');
+        }
+      });
+      await loadAuditTrailData(mod);
+    }
+
+    async function loadAuditTrailData(mod = currentAuditFilterModule) {
+      try {
+        const url = mod && mod !== 'all' 
+          ? `/api/admin/${currentWorkspaceId}/audit-logs?module=${mod}&limit=100`
+          : `/api/admin/${currentWorkspaceId}/audit-logs?limit=100`;
+        const res = await fetch(url);
+        const logs = await res.json();
+
+        const countEl = document.getElementById('auditTableCount');
+        if (countEl) countEl.innerText = `${logs.length} immutable records logged`;
+
+        const titleEl = document.getElementById('auditTableTitle');
+        if (titleEl) {
+          titleEl.innerText = mod && mod !== 'all' 
+            ? `Immutable Audit Log Entries [Module: ${mod.toUpperCase()}]`
+            : 'Immutable Cross-Module Enterprise Audit Ledger';
+        }
+
+        const tbody = document.getElementById('auditTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(logs) || logs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:#86868B;">No audit trail events found for this filter.</td></tr>`;
+          return;
+        }
+
+        const moduleBadgeColors = {
+          sales: 'background:#E8F8EE;color:#1B5E20;',
+          ai_governance: 'background:#FFF8E1;color:#B25E00;',
+          config: 'background:#EBF4FF;color:#0071E3;',
+          tasks: 'background:#F3E8FF;color:#6B21A8;',
+          stores: 'background:#E6F4EA;color:#137333;',
+          products: 'background:#FCE8E6;color:#C5221F;',
+          users: 'background:#F1F3F4;color:#3C4043;',
+          general: 'background:#F2F2F7;color:#6E6E73;',
+        };
+
+        logs.forEach((l, idx) => {
+          const d = new Date(l.timestamp);
+          const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + 
+            ' · ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          const modBadge = moduleBadgeColors[l.module] || moduleBadgeColors.general;
+          const agentBadge = l.aiAgentId 
+            ? `<span style="background:#EBF4FF;color:#0071E3;font-size:10.5px;padding:2px 6px;border-radius:4px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><span class="ms-icon sm" style="font-size:11px;">shield</span> Aegis Copilot</span>` 
+            : '<span style="color:#86868B;font-size:11px;">Frontline / Staff</span>';
+          
+          let approvalBadge = `<span style="background:#F2F2F7;color:#6E6E73;font-size:10.5px;padding:2px 6px;border-radius:4px;">Standard</span>`;
+          if (l.approvalStatus === 'approved') {
+            approvalBadge = `<span style="background:#E8F8EE;color:#1B5E20;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Approved</span>`;
+          } else if (l.approvalStatus === 'blocked_guardrail') {
+            approvalBadge = `<span style="background:#FDE8E8;color:#9B1C1C;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;">Blocked</span>`;
+          }
+
+          const diffId = `auditDiff_${l.id || idx}`;
+          let diffHtml = '';
+          if (l.diff && Object.keys(l.diff).length > 0) {
+            const jsonStr = JSON.stringify(l.diff, null, 2);
+            diffHtml = `
+              <button type="button" class="btn-fsc-option" onclick="toggleAuditDiff('${diffId}')" style="padding:2px 8px;font-size:10.5px;background:#F2F2F7;border:none;margin-top:4px;">
+                <span class="ms-icon sm" style="font-size:12px;">code</span> View Diff
+              </button>
+              <pre id="${diffId}" style="display:none;font-size:10.5px;background:#1D1D1F;color:#70C0FF;padding:8px 10px;border-radius:6px;max-width:320px;overflow:auto;margin:4px 0 0 0;font-family:'JetBrains Mono';line-height:1.35;">${escapeHtml(jsonStr)}</pre>
+            `;
+          }
+
+          tbody.innerHTML += `
+            <tr>
+              <td style="font-family:'JetBrains Mono';font-size:11px;color:#6E6E73;white-space:nowrap;">${timeStr}</td>
+              <td><span style="${modBadge}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;">${l.module || 'general'}</span></td>
+              <td>
+                <b style="color:#1D1D1F;font-size:12.5px;">${l.action}</b>
+                <div style="font-size:11px;color:#86868B;">Resource: <span style="font-family:'JetBrains Mono';">${l.resource || '—'}</span></div>
+              </td>
+              <td>
+                <div style="font-weight:600;color:#1D1D1F;font-size:12px;">${l.userName || l.userId || 'System'}</div>
+                <div style="font-size:10.5px;color:#86868B;text-transform:capitalize;">${l.userRole || 'actor'}</div>
+              </td>
+              <td>
+                <div>${approvalBadge}</div>
+                <div style="font-size:10px;color:#86868B;font-family:'JetBrains Mono';margin-top:2px;">${l.approvedBy ? `Auth: ${l.approvedBy}` : 'Self / Fast-Sale'}</div>
+              </td>
+              <td>${agentBadge}</td>
+              <td><span style="font-size:11px;font-weight:600;color:${l.status === 'success' ? '#1B5E20' : '#9B1C1C'};">${l.status || 'success'}</span></td>
+              <td style="font-size:11.5px;color:#48484A;max-width:280px;">
+                <div>${l.details || '—'}</div>
+                ${diffHtml}
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Failed to load audit trail:', err);
+      }
+    }
+
+    function toggleAuditDiff(diffId) {
+      const el = document.getElementById(diffId);
+      if (el) {
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    // ============================================================
+    // 13. PAYMENT SETTINGS & AI GOVERNANCE MATRIX LOGIC
+    // ============================================================
+    let activePaymentMethodsConfig = null;
+    let activeGovernanceConfig = null;
+
+    async function loadSettingsAndGovernanceData() {
+      try {
+        const [payRes, govRes] = await Promise.all([
+          fetch(`/api/admin/${currentWorkspaceId}/settings/payment`),
+          fetch(`/api/admin/${currentWorkspaceId}/settings/governance`),
+        ]);
+
+        activePaymentMethodsConfig = await payRes.json();
+        activeGovernanceConfig = await govRes.json();
+
+        // 1. Render Payment Methods List
+        const mList = document.getElementById('settingsPaymentMethodsList');
+        if (mList && activePaymentMethodsConfig.methods) {
+          mList.innerHTML = '';
+          activePaymentMethodsConfig.methods.forEach(m => {
+            mList.innerHTML += `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:10px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:34px;height:34px;border-radius:8px;background:#EBF4FF;color:#0071E3;display:flex;align-items:center;justify-content:center;">
+                    <span class="ms-icon sm">${m.icon || 'payments'}</span>
+                  </div>
+                  <div>
+                    <b style="font-size:13px;color:#1D1D1F;">${m.label}</b>
+                    <div style="font-size:11px;color:#86868B;">
+                      Channel: <span style="font-family:'JetBrains Mono';">${m.id}</span> · ${m.requiresApproval ? '<span style="color:#0071E3;font-weight:600;">Requires Approval Ref</span>' : 'Instant Cash'}
+                    </div>
+                  </div>
+                </div>
+                <label class="apple-switch">
+                  <input type="checkbox" id="chkPayMethod_${m.id}" ${m.enabled ? 'checked' : ''}>
+                  <span class="apple-slider"></span>
+                </label>
+              </div>
+            `;
+          });
+        }
+
+        // 2. Render Payment Financing Terms List
+        const tList = document.getElementById('settingsPaymentTermsList');
+        if (tList && activePaymentMethodsConfig.terms) {
+          tList.innerHTML = '';
+          activePaymentMethodsConfig.terms.forEach(t => {
+            tList.innerHTML += `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:10px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:34px;height:34px;border-radius:8px;background:#FFF8E1;color:#FF9500;display:flex;align-items:center;justify-content:center;">
+                    <span class="ms-icon sm">schedule</span>
+                  </div>
+                  <div>
+                    <b style="font-size:13px;color:#1D1D1F;">${t.label}</b>
+                    <div style="font-size:11px;color:#86868B;">
+                      Term Code: <span style="font-family:'JetBrains Mono';">${t.id}</span> · ${t.interestRate === 0 ? '<span style="color:#34C759;font-weight:600;">0% APR Partner</span>' : 'APR: ' + t.interestRate + '%'}
+                    </div>
+                  </div>
+                </div>
+                <label class="apple-switch">
+                  <input type="checkbox" id="chkPayTerm_${t.id}" ${t.enabled ? 'checked' : ''}>
+                  <span class="apple-slider"></span>
+                </label>
+              </div>
+            `;
+          });
+        }
+
+        // 3. Render AI Governance Matrix
+        const gBody = document.getElementById('settingsGovernanceTableBody');
+        if (gBody && activeGovernanceConfig.roles) {
+          gBody.innerHTML = '';
+          activeGovernanceConfig.roles.forEach(r => {
+            const roleBadgeStyle = r.role === 'super_admin' || r.role === 'company_admin'
+              ? 'background:#EBF4FF;color:#0071E3;'
+              : r.role === 'supervisor'
+              ? 'background:#E8DEF8;color:#4A4458;'
+              : 'background:#F2F2F7;color:#86868B;';
+
+            const levelLabel = r.role === 'promoter' 
+              ? 'Level 0 (Field Restrict)' 
+              : r.role === 'supervisor' 
+              ? 'Level 1 (Telemetry & Dispatch)' 
+              : 'Level 2 (Full System Admin)';
+
+            gBody.innerHTML += `
+              <tr>
+                <td>
+                  <b style="color:#1D1D1F;font-size:13px;">${r.label}</b>
+                  <div style="font-size:11px;color:#86868B;font-family:'JetBrains Mono';">${r.role}</div>
+                </td>
+                <td>
+                  <span style="${roleBadgeStyle}padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">
+                    ${levelLabel}
+                  </span>
+                </td>
+                <td>
+                  <label class="apple-switch">
+                    <input type="checkbox" id="chkGovQuery_${r.role}" ${r.canQueryAI ? 'checked' : ''}>
+                    <span class="apple-slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <label class="apple-switch">
+                    <input type="checkbox" id="chkGovConfig_${r.role}" ${r.canExecuteConfig ? 'checked' : ''}>
+                    <span class="apple-slider"></span>
+                  </label>
+                </td>
+                <td>
+                  <span style="font-size:11.5px;color:${r.requiresApprovalSignoff ? '#1B5E20' : '#86868B'};font-weight:600;">
+                    ${r.requiresApprovalSignoff ? 'Mandatory (HMAC)' : 'Not Required'}
+                  </span>
+                </td>
+                <td>
+                  <span style="background:${r.canExecuteConfig ? '#E8F8EE' : '#FFF8E1'};color:${r.canExecuteConfig ? '#1B5E20' : '#B25E00'};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;">
+                    ${r.canExecuteConfig ? 'Config Authorized' : r.canQueryAI ? 'Telemetry Only' : 'Blocked (Guardrail)'}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+        // Checkboxes for global governance flags
+        const chkAuto = document.getElementById('chkAutoAuditAi');
+        const chkSig = document.getElementById('chkRequireSignature');
+        if (chkAuto) chkAuto.checked = !!activeGovernanceConfig.autoAuditAllAI;
+        if (chkSig) chkSig.checked = !!activeGovernanceConfig.requireDigitalSignature;
+
+      } catch (err) {
+        console.error('Failed to load settings & governance:', err);
+      }
+    }
+
+    async function savePaymentConfigFromUI() {
+      if (!activePaymentMethodsConfig) return;
+      try {
+        const updatedMethods = activePaymentMethodsConfig.methods.map(m => {
+          const chk = document.getElementById(`chkPayMethod_${m.id}`);
+          return { ...m, enabled: chk ? chk.checked : m.enabled };
+        });
+
+        const updatedTerms = activePaymentMethodsConfig.terms.map(t => {
+          const chk = document.getElementById(`chkPayTerm_${t.id}`);
+          return { ...t, enabled: chk ? chk.checked : t.enabled };
+        });
+
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/settings/payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            methods: updatedMethods,
+            terms: updatedTerms,
+            defaultMethod: activePaymentMethodsConfig.defaultMethod || 'cash',
+          }),
+        });
+        const data = await res.json();
+        showToastNotification('✓ Payment channels and financing terms policy saved!');
+        await loadSettingsAndGovernanceData();
+        await loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to save payment configuration: ' + err.message);
+      }
+    }
+
+    async function saveGovernanceFromUI() {
+      if (!activeGovernanceConfig) return;
+      try {
+        const updatedRoles = activeGovernanceConfig.roles.map(r => {
+          const chkQ = document.getElementById(`chkGovQuery_${r.role}`);
+          const chkC = document.getElementById(`chkGovConfig_${r.role}`);
+          return {
+            ...r,
+            canQueryAI: chkQ ? chkQ.checked : r.canQueryAI,
+            canExecuteConfig: chkC ? chkC.checked : r.canExecuteConfig,
+          };
+        });
+
+        const chkAuto = document.getElementById('chkAutoAuditAi');
+        const chkSig = document.getElementById('chkRequireSignature');
+
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/settings/governance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roles: updatedRoles,
+            autoAuditAllAI: chkAuto ? chkAuto.checked : true,
+            requireDigitalSignature: chkSig ? chkSig.checked : true,
+          }),
+        });
+        const data = await res.json();
+        showToastNotification('✓ AI Copilot guardrail permissions & audit policy saved!');
+        await loadSettingsAndGovernanceData();
+        await loadAuditTrailData();
+      } catch (err) {
+        alert('Failed to save governance policy: ' + err.message);
+      }
+    }
+
+    // ============================================================
+    // 14. AEGIS ENTERPRISE GOVERNANCE & CONFIGURATION COPILOT
+    // ============================================================
+    function openAegisDrawer() {
+      const role = currentViewMode === 'supervisor' 
+        ? 'supervisor' 
+        : currentViewMode === 'admin' 
+        ? 'company_admin' 
+        : 'promoter';
+
+      const roleBadge = document.getElementById('aegisDrawerRoleBadge');
+      if (roleBadge) {
+        roleBadge.innerText = role;
+        roleBadge.style.background = role === 'company_admin' ? '#EBF4FF' : role === 'supervisor' ? '#E8DEF8' : '#F2F2F7';
+        roleBadge.style.color = role === 'company_admin' ? '#0071E3' : role === 'supervisor' ? '#4A4458' : '#86868B';
+      }
+
+      const guardrailEl = document.getElementById('aegisDrawerGuardrailNotice');
+      if (guardrailEl) {
+        if (role === 'company_admin' || role === 'super_admin') {
+          guardrailEl.innerHTML = '<span class="ms-icon sm" style="font-size:14px;color:#1B5E20;">verified_user</span> Config Execution Authorized (HMAC Sign-Off)';
+          guardrailEl.style.color = '#1B5E20';
+        } else if (role === 'supervisor') {
+          guardrailEl.innerHTML = '<span class="ms-icon sm" style="font-size:14px;color:#B25E00;">info</span> Diagnostics & Telemetry Only (Config Blocked by Guardrail)';
+          guardrailEl.style.color = '#B25E00';
+        } else {
+          guardrailEl.innerHTML = '<span class="ms-icon sm" style="font-size:14px;color:#D32F2F;">block</span> Promoters Blocked from Administrative AI';
+          guardrailEl.style.color = '#D32F2F';
+        }
+      }
+
+      const drawer = document.getElementById('drawerAegis');
+      if (drawer) {
+        drawer.classList.add('active');
+        setTimeout(() => {
+          const input = document.getElementById('aegisChatInput');
+          if (input) input.focus();
+        }, 150);
+      }
+    }
+
+    function closeAegisDrawer() {
+      const drawer = document.getElementById('drawerAegis');
+      if (drawer) drawer.classList.remove('active');
+    }
+
+    function sendAegisQuickPrompt(prompt) {
+      const input = document.getElementById('aegisChatInput');
+      if (input) {
+        input.value = prompt;
+        submitAegisMessage();
+      }
+    }
+
+    async function submitAegisMessage() {
+      const inputEl = document.getElementById('aegisChatInput');
+      const msg = inputEl ? inputEl.value.trim() : '';
+      if (!msg) return;
+
+      const sigEl = document.getElementById('aegisSignatureInput');
+      const approvalCode = sigEl ? sigEl.value.trim() : 'EXEC-AUTH';
+
+      const thread = document.getElementById('aegisChatThread');
+      const role = currentViewMode === 'supervisor' 
+        ? 'supervisor' 
+        : currentViewMode === 'admin' 
+        ? 'company_admin' 
+        : 'promoter';
+
+      // 1. Append User Message
+      thread.innerHTML += `
+        <div class="aegis-msg-bubble user">
+          <b>You (${role.toUpperCase()})</b>
+          <div style="margin-top:4px;line-height:1.45;">${escapeHtml(msg)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:4px;">Digital Signature: ${escapeHtml(approvalCode)}</div>
+        </div>
+      `;
+      inputEl.value = '';
+      thread.scrollTop = thread.scrollHeight;
+
+      // 2. Typing indicator
+      const typingId = `aegisTyping_${Date.now()}`;
+      thread.innerHTML += `
+        <div class="aegis-msg-bubble aegis" id="${typingId}">
+          <span class="ms-icon sm" style="animation:spin 0.8s linear infinite;color:#0071E3;">sync</span>
+          <span style="margin-left:6px;font-size:12px;color:#86868B;">Aegis Copilot analyzing operational telemetry & evaluating guardrails...</span>
+        </div>
+      `;
+      thread.scrollTop = thread.scrollHeight;
+
+      try {
+        const res = await fetch(`/api/admin/${currentWorkspaceId}/aegis/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: msg,
+            userRole: role,
+            userId: currentUserId,
+            userName: role === 'supervisor' ? 'Regional Area Supervisor' : 'Enterprise Admin',
+            approvalCode: approvalCode,
+          }),
+        });
+
+        const data = await res.json();
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        let statusPill = '';
+        if (data.configUpdated) {
+          statusPill = `
+            <div style="display:inline-flex;align-items:center;gap:4px;background:#E8F8EE;color:#1B5E20;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;margin-bottom:6px;">
+              <span class="ms-icon sm" style="font-size:13px;">check_circle</span> SYSTEM CONFIGURATION APPLIED & IMMUTABLE AUDIT LOGGED
+            </div>
+          `;
+          showToastNotification('✓ Aegis configured system settings & recorded digital approval signature!');
+          if (typeof loadSettingsAndGovernanceData === 'function') loadSettingsAndGovernanceData();
+          if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
+          if (typeof loadAnalyticsSummary === 'function') loadAnalyticsSummary();
+        } else if (data.guardrailBlocked) {
+          statusPill = `
+            <div style="display:inline-flex;align-items:center;gap:4px;background:#FDE8E8;color:#9B1C1C;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;margin-bottom:6px;">
+              <span class="ms-icon sm" style="font-size:13px;">shield</span> GUARDRAIL BLOCKED: ROLE RESTRICTED FROM MUTATING SYSTEM
+            </div>
+          `;
+          if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
+        }
+
+        const auditNotice = data.auditLogId 
+          ? `<div style="font-size:10px;color:#86868B;font-family:'JetBrains Mono';margin-top:6px;border-top:1px solid rgba(0,0,0,0.06);padding-top:4px;">Audit Log ID: ${data.auditLogId} · Actor: ${data.actor || 'Aegis'}</div>` 
+          : '';
+
+        thread.innerHTML += `
+          <div class="aegis-msg-bubble aegis">
+            ${statusPill}
+            <div style="line-height:1.5;font-size:12.5px;color:#1D1D1F;white-space:pre-wrap;">${data.reply || data.error}</div>
+            ${auditNotice}
+          </div>
+        `;
+        thread.scrollTop = thread.scrollHeight;
+      } catch (err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        thread.innerHTML += `
+          <div class="aegis-msg-bubble aegis" style="border-left:3px solid #D32F2F;">
+            <b style="color:#D32F2F;">Aegis Copilot Error</b>
+            <div style="font-size:12px;color:#48484A;margin-top:4px;">Failed to process request: ${err.message}</div>
+          </div>
+        `;
+        thread.scrollTop = thread.scrollHeight;
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     // ============================================================

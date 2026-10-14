@@ -136,6 +136,9 @@ export const salesTransactions = sqliteTable('sales_transactions', {
   captureMode: text('capture_mode').notNull().default('stepper'), // 'stepper' | 'barcode_cam' | 'receipt_ocr'
   receiptDriveId: text('receipt_drive_id'),                     // Pointer to Google Drive photo if receipt attached
   syncedToErp: integer('synced_to_erp', { mode: 'boolean' }).default(false),
+  paymentMethod: text('payment_method').default('cash'),       // 'cash' | 'credit_card' | 'home_credit' | 'e_wallet' | 'bnpl'
+  paymentTerms: text('payment_terms').default('straight'),     // 'straight' | '3_months' | '6_months' | '12_months' | '24_months'
+  approvalCode: text('approval_code'),                          // Card/Financing authorization reference
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
 
@@ -211,6 +214,10 @@ export const auditLogs = sqliteTable('audit_logs', {
   resourceType: text('resource_type').notNull(),                 // "user", "store", "product", "promotion", "shift"
   resourceId: text('resource_id'),
   details: text('details', { mode: 'json' }),                    // Diff / metadata before & after
+  module: text('module').notNull().default('general'),           // 'sales' | 'products' | 'stores' | 'agents' | 'tasks' | 'users' | 'config' | 'ai_governance'
+  approvalStatus: text('approval_status').default('approved'),   // 'approved' | 'pending' | 'auto_approved'
+  approvedBy: text('approved_by'),                               // Approver name / role signature
+  aiAgentId: text('ai_agent_id'),                                // ID of AI Agent assisting or executing
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
