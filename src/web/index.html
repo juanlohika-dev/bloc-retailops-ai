@@ -1253,6 +1253,175 @@
     }
 
     /* ============================================================
+       MOBILE BOTTOM NAVIGATION BAR (Apple HIG / Material 3 Precision)
+       ============================================================ */
+    .m3-phone-bottom-nav {
+      height: 56px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 10px;
+      flex-shrink: 0;
+      z-index: 90;
+    }
+    .phone-nav-tab {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #8E8E93;
+      cursor: pointer;
+      transition: color 0.15s, transform 0.1s;
+      position: relative;
+    }
+    .phone-nav-tab:active {
+      transform: scale(0.95);
+    }
+    .phone-nav-tab.active {
+      color: #0071E3;
+    }
+    .nav-tab-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+    }
+    .nav-tab-icon-wrap .ms-icon {
+      font-size: 22px;
+      transition: transform 0.2s;
+    }
+    .phone-nav-tab.active .nav-tab-icon-wrap .ms-icon {
+      font-variation-settings: 'FILL' 1;
+      transform: translateY(-1px);
+    }
+    .nav-tab-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: -0.1px;
+    }
+    .phone-nav-tab.active .nav-tab-label {
+      font-weight: 700;
+    }
+    .nav-tab-pill-badge {
+      position: absolute;
+      top: -3px;
+      right: -16px;
+      background: #0071E3;
+      color: #FFFFFF;
+      font-size: 8.5px;
+      font-weight: 750;
+      padding: 1px 5px;
+      border-radius: 999px;
+      line-height: 1.2;
+      box-shadow: 0 1px 3px rgba(0, 113, 227, 0.3);
+      white-space: nowrap;
+    }
+    .nav-tab-badge {
+      position: absolute;
+      top: -2px;
+      right: -8px;
+      background: #FF3B30;
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 750;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pax In-Chat Route Assistant Cards */
+    .pax-route-bubble-card {
+      background: #FFFFFF;
+      border: 1.5px solid rgba(0, 113, 227, 0.25);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin: 8px 0 4px;
+      box-shadow: 0 2px 10px rgba(0, 113, 227, 0.08);
+      width: 100%;
+    }
+    .pax-route-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .pax-route-stop-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: #F8F9FA;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-size: 11.5px;
+    }
+    .pax-route-stop-pill.active {
+      background: #EBF4FF;
+      border-color: #0071E3;
+    }
+    .pax-route-stop-pill.next {
+      background: #FFF8E1;
+      border-color: #FF9500;
+    }
+    .pax-route-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .btn-pax-route-action {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 113, 227, 0.3);
+      color: #0071E3;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .btn-pax-route-action:hover {
+      background: #0071E3;
+      color: #FFFFFF;
+    }
+    .btn-pax-route-action.primary {
+      background: #0071E3;
+      color: #FFFFFF;
+      border-color: #0071E3;
+    }
+    .btn-pax-route-action.primary:hover {
+      background: #005BB5;
+    }
+    .btn-pax-route-action.danger {
+      border-color: rgba(211, 47, 47, 0.3);
+      color: #D32F2F;
+    }
+    .btn-pax-route-action.danger:hover {
+      background: #D32F2F;
+      color: #FFFFFF;
+    }
+
+    /* ============================================================
        MODAL 1: SKU SEARCH DRAWER (Apple Bottom Sheet & Refined Buttons)
        ============================================================ */
     .m3-sheet-scrim {
@@ -2371,9 +2540,16 @@
             </div>
           </div>
 
-          <!-- FRONT-LINE ATTENDANCE & ROVING MULTI-STORE COMMAND CARD -->
-          <div id="mobileAttendanceCard" style="margin: 8px 14px 12px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <!-- Rendered dynamically by renderMobileShiftCard() -->
+          <!-- SLIM OPERATIONAL STATUS CAPSULE (~32px) - MESSAGING FIRST FOCUS -->
+          <div id="mobileQuickStatusPill" onclick="switchMobileNav('route')" style="margin: 6px 14px 6px; padding: 6px 12px; background: #F2F4F7; border: 1px solid rgba(0,0,0,0.06); border-radius: 999px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.15s; flex-shrink: 0;" title="Tap to view today's complete itinerary">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #1D1D1F; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <span class="ms-icon sm" id="pillStatusIcon" style="color: #0071E3; font-size: 15px;">route</span>
+              <span id="txtQuickStatusPill">Stop 3/8: SM Aura Premier · On Site</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: #0071E3; flex-shrink: 0;">
+              <span id="txtPillActionLabel">Route</span>
+              <span class="ms-icon sm" style="font-size: 14px;">chevron_right</span>
+            </div>
           </div>
 
           <div class="m3-threads-stream" id="chatsContainer">
@@ -2584,6 +2760,81 @@
             </button>
           </div>
         </div>
+
+        <!-- ======================================================
+             SCREEN 3: DEDICATED DAILY ROUTE & STORE HUB
+             ====================================================== -->
+        <div class="m3-view-container hidden" id="screenDailyRoute">
+          <div class="m3-chats-header" style="background: rgba(255,255,255,0.95);">
+            <div class="chats-headline-bar">
+              <span class="m3-title-large" id="lblRouteViewTitle">Daily Route</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span class="m3-tag-pill" id="lblRouteFleetBadge" style="background:#F3E8FF;color:#6B21A8;border:none;font-weight:700;">
+                  <span class="ms-icon sm" style="font-size:12px;margin-right:3px;">electric_bolt</span> AI OPTIMIZED
+                </span>
+                <button type="button" class="m3-icon-btn" onclick="triggerPaxRouteOptimization()" title="Re-optimize route for traffic" style="width:30px;height:30px;background:#EBF4FF;border-radius:50%;display:grid;place-items:center;border:none;cursor:pointer;">
+                  <span class="ms-icon sm" style="color:#0071E3;">autorenew</span>
+                </button>
+              </div>
+            </div>
+            <div style="font-size:11.5px;color:var(--m3-on-surface-variant);margin-top:2px;" id="lblRouteSubtitle">
+              Metro Manila Field Fleet · 8 Scheduled Retail Stops
+            </div>
+          </div>
+
+          <div style="flex:1;overflow-y:auto;padding:12px 14px;" id="routeDedicatedContainer">
+            <!-- Rendered dynamically by renderDedicatedRouteScreen() -->
+          </div>
+        </div>
+
+        <!-- ======================================================
+             SCREEN 4: STORE DIGITAL AUDITS & SURVEYS HUB
+             ====================================================== -->
+        <div class="m3-view-container hidden" id="screenSurveysHub">
+          <div class="m3-chats-header" style="background: rgba(255,255,255,0.95);">
+            <div class="chats-headline-bar">
+              <span class="m3-title-large">Surveys</span>
+              <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="background:#0071E3;color:#fff;padding:5px 12px;font-size:11.5px;font-weight:600;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:14px;">add</span> New Form
+              </button>
+            </div>
+            <div style="font-size:11.5px;color:var(--m3-on-surface-variant);margin-top:2px;">
+              Digital Branch Audits & Field Questionnaires
+            </div>
+          </div>
+
+          <div style="flex:1;overflow-y:auto;padding:12px 14px;" id="surveysHubContainer">
+            <!-- Dynamic Survey Forms & Recent Submissions -->
+          </div>
+        </div>
+
+        <!-- ======================================================
+             MOBILE BOTTOM NAVIGATION BAR (Apple HIG / Material 3)
+             ====================================================== -->
+        <nav class="m3-phone-bottom-nav" id="mobileBottomNav">
+          <button type="button" class="phone-nav-tab active" id="btnNavChats" onclick="switchMobileNav('chats')">
+            <div class="nav-tab-icon-wrap">
+              <span class="ms-icon">chat_bubble</span>
+              <span class="nav-tab-badge" id="navBadgeChats" style="display:none;">3</span>
+            </div>
+            <span class="nav-tab-label">Chats</span>
+          </button>
+
+          <button type="button" class="phone-nav-tab" id="btnNavRoute" onclick="switchMobileNav('route')">
+            <div class="nav-tab-icon-wrap">
+              <span class="ms-icon" id="navIconRoute">route</span>
+              <span class="nav-tab-pill-badge" id="navPillRoute">Stop 3/8</span>
+            </div>
+            <span class="nav-tab-label" id="navLabelRoute">Route (8)</span>
+          </button>
+
+          <button type="button" class="phone-nav-tab" id="btnNavSurveys" onclick="switchMobileNav('surveys')">
+            <div class="nav-tab-icon-wrap">
+              <span class="ms-icon">assignment</span>
+            </div>
+            <span class="nav-tab-label">Surveys</span>
+          </button>
+        </nav>
 
       </div>
     </div>
@@ -4841,33 +5092,147 @@
       const stream = document.getElementById('activeChatStream');
       stream.innerHTML = '';
 
-      const isSarah = currentUserId === 'usr-sarah-sg';
-      const greeting = isSarah
-        ? "Morning Sarah! Checked in at FairPrice VivoCity. Today's quota is SGD $1,200. Focus is the 55\" OLED Smart TV. Choose an action below or tap Fast-Sale when ready!"
-        : "Magandang umaga, Liza! Naka-check in ka na sa SM Megamall. Quota natin today is ₱25,000. Let's push the Family Breakfast Bundle A! Choose an action below:";
+      const isMarco = currentUserId === 'usr-marco-ph';
+      if (isMarco) {
+        const greeting = "Magandang umaga, Marco! 🚀 You have an 8-store roving route across Metro Manila today.\n• On Site: Stop 3/8 · SM Aura Premier (GPS Verified)\n• Next: Glorietta 4 (ETA ~15 mins)\n• Quota: ₱15,000 | Focus: Family Breakfast Bundle A";
+        appendPaxBubbleWithActions(greeting, [
+          { label: 'directions_car', text: 'Where to Next?', action: "askPaxRouteQuestion('Where should I go next?')" },
+          { label: 'route', text: 'View 8-Store Route', action: "switchMobileNav('route')" },
+          { label: 'electric_bolt', text: 'AI Route Optimizer', action: "askPaxRouteQuestion('Optimize my route for traffic')", emerald: true },
+          { label: 'bolt', text: 'Fast-Sale', action: 'showFastSaleWidget()' },
+        ]);
+      } else {
+        const isSarah = currentUserId === 'usr-sarah-sg';
+        const greeting = isSarah
+          ? "Morning Sarah! Checked in at FairPrice VivoCity. Today's quota is SGD $1,200. Focus is the 55\" OLED Smart TV. Choose an action below or tap Fast-Sale when ready!"
+          : "Magandang umaga, Liza! Naka-check in ka na sa SM Megamall. Quota natin today is ₱25,000. Let's push the Family Breakfast Bundle A! Choose an action below:";
 
-      appendPaxBubbleWithActions(greeting, [
-        { label: 'bolt', text: '1-Tap Fast-Sale', action: 'showFastSaleWidget()' },
-        { label: 'search', text: 'Search SKU Catalog', action: 'openSkuSearchSheet()' },
-        { label: 'photo_camera', text: 'Vera Shelf Audit', action: 'openVeraAuditModal()', emerald: true },
-        { label: 'checklist', text: 'Shift Tasks & Guide', action: 'showTasksMilestoneCard()' },
-      ]);
+        appendPaxBubbleWithActions(greeting, [
+          { label: 'bolt', text: '1-Tap Fast-Sale', action: 'showFastSaleWidget()' },
+          { label: 'search', text: 'Search SKU Catalog', action: 'openSkuSearchSheet()' },
+          { label: 'photo_camera', text: 'Vera Shelf Audit', action: 'openVeraAuditModal()', emerald: true },
+          { label: 'checklist', text: 'Shift Tasks & Guide', action: 'showTasksMilestoneCard()' },
+        ]);
+      }
 
       try {
         const res = await fetch(`/api/pax/messages?userId=${currentUserId}`);
         const list = await res.json();
         if (Array.isArray(list) && list.length > 0) {
-          list.slice(-4).forEach(m => {
-            if (m.interactiveCardType === 'audit_card' || (m.message && m.message.includes('Task Dispatch'))) {
+          list.slice(-6).forEach(m => {
+            if (m.interactiveCardType === 'route_card' || m.interactiveCardType === 'route_optimized') {
+              appendPaxRouteInteractiveCard(m.message, m.metadata, m.interactiveCardType);
+            } else if (m.interactiveCardType === 'audit_card' || (m.message && m.message.includes('Task Dispatch'))) {
               appendDispatchedTaskCard(m);
             } else if (m.sender === 'user') {
               appendUserBubble(m.message);
+            } else if (m.sender === 'pax') {
+              appendPaxBubble(m.message);
             }
           });
         }
       } catch (err) {
         console.warn('Could not load extra pax messages:', err);
       }
+    }
+
+    function appendPaxRouteInteractiveCard(replyText, meta, cardType) {
+      const stream = document.getElementById('activeChatStream');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-packet-frame pax';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const isOpt = cardType === 'route_optimized';
+      const nextStop = meta?.nextStop;
+      const activeStop = meta?.activeStop;
+      const totalStops = meta?.totalStops || 8;
+      const completedCount = meta?.completedCount || 2;
+
+      let cardHtml = `
+        <div class="pax-route-bubble-card">
+          <div class="pax-route-card-header">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="ms-icon sm" style="color:#0071E3;">${isOpt ? 'electric_bolt' : 'route'}</span>
+              <b style="font-size:12.5px;color:#1D1D1F;">${isOpt ? '⚡ Route Re-Optimized by Pax AI' : '📍 Metro Manila Roving Route'}</b>
+            </div>
+            <span class="m3-tag-pill" style="background:#EBF4FF;color:#0071E3;font-size:10px;font-weight:700;">
+              ${completedCount}/${totalStops} VISITED
+            </span>
+          </div>
+      `;
+
+      if (activeStop) {
+        cardHtml += `
+          <div class="pax-route-stop-pill active">
+            <div>
+              <b style="color:#0071E3;font-size:10.5px;display:block;">CURRENT STOP ${activeStop.order || 3} OF ${totalStops}</b>
+              <span style="font-weight:700;color:#1D1D1F;font-size:12.5px;">${escapeHtml(activeStop.name || 'SM Aura Premier')}</span>
+              <div style="font-size:10px;color:#1B5E20;margin-top:2px;">● GPS Geofence Active</div>
+            </div>
+            <button type="button" onclick="performClockOut(null, '${activeStop.id}'); setTimeout(() => askPaxRouteQuestion('I just clocked out. Where next?'), 600);" class="btn-pax-route-action danger">
+              Clock Out
+            </button>
+          </div>
+        `;
+      }
+
+      if (nextStop) {
+        cardHtml += `
+          <div class="pax-route-stop-pill next">
+            <div>
+              <b style="color:#B25E00;font-size:10.5px;display:block;">NEXT STOP ${nextStop.order || 4} OF ${totalStops}</b>
+              <span style="font-weight:700;color:#1D1D1F;font-size:12.5px;">${escapeHtml(nextStop.name || 'Glorietta 4')}</span>
+              <div style="font-size:10px;color:#86868B;margin-top:2px;">ETA ~15 mins · ${nextStop.time || '01:30 PM'}</div>
+            </div>
+            <button type="button" onclick="performClockIn('${nextStop.storeId}', '${nextStop.id}'); setTimeout(() => askPaxRouteQuestion('Just arrived and checked in!'), 600);" class="btn-pax-route-action primary">
+              Check In
+            </button>
+          </div>
+        `;
+      }
+
+      if (isOpt && Array.isArray(meta?.reorderedVisits)) {
+        cardHtml += `
+          <div style="font-size:11px;font-weight:700;color:#1D1D1F;margin:8px 0 4px;display:flex;align-items:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:13px;color:#34C759;">verified</span>
+            Optimized Metro Manila Sequence (Saved ~35 mins):
+          </div>
+          <div style="max-height:120px;overflow-y:auto;background:#F9F9FB;border-radius:8px;padding:6px 8px;font-size:11px;">
+            ${meta.reorderedVisits.map(v => `
+              <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.03);">
+                <span><b>${v.order}.</b> ${escapeHtml(v.name)}</span>
+                <span style="color:${v.status === 'completed' ? '#1B5E20' : v.status === 'checked_in' ? '#0071E3' : '#86868B'};font-weight:600;">
+                  ${v.status === 'completed' ? '✓' : v.status === 'checked_in' ? 'On Site' : v.time || 'Pending'}
+                </span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      cardHtml += `
+          <div class="pax-route-actions-grid">
+            <button type="button" onclick="switchMobileNav('route')" class="btn-pax-route-action">
+              <span class="ms-icon sm" style="font-size:13px;">route</span> View Route Hub
+            </button>
+            <button type="button" onclick="triggerPaxRouteOptimization()" class="btn-pax-route-action">
+              <span class="ms-icon sm" style="font-size:13px;">bolt</span> AI Re-Optimize
+            </button>
+          </div>
+        </div>
+      `;
+
+      wrap.innerHTML = `
+        <div class="msg-author-tag">Pax · Frontline Copilot</div>
+        <div class="m3-bubble pax">
+          ${replyText}
+          <div class="bubble-meta-time">${time}</div>
+        </div>
+        ${cardHtml}
+      `;
+
+      stream.appendChild(wrap);
+      stream.scrollTop = stream.scrollHeight;
     }
 
     function appendDispatchedTaskCard(m) {
@@ -5078,7 +5443,12 @@
             body: JSON.stringify({ userId: currentUserId, message: msg })
           });
           const data = await res.json();
-          appendPaxBubble(data.reply);
+          if (data.interactiveCardType === 'route_card' || data.interactiveCardType === 'route_optimized') {
+            appendPaxRouteInteractiveCard(data.reply, data.cardMetadata, data.interactiveCardType);
+            renderMobileStatusPill();
+          } else {
+            appendPaxBubble(data.reply);
+          }
         } catch (err) {
           appendPaxBubble("Got your note! I'm tracking your shift. Tap Fast-Sale or Vera Shelf Audit anytime.");
         }
@@ -5691,6 +6061,7 @@
       currentUserId = userId;
       loadUserState();
       returnToChatList();
+      switchMobileNav('chats');
       if (typeof renderMobileShiftCard === 'function') renderMobileShiftCard();
     }
 
@@ -6521,9 +6892,53 @@ function tryAegisCommand(cmd) {
 let cachedItineraryData = null;
 let isRovingScheduleExpanded = true;
 
-async function renderMobileShiftCard() {
-  const card = document.getElementById('mobileAttendanceCard');
-  if (!card) return;
+let currentMobileNavTab = 'chats';
+
+function switchMobileNav(tabName) {
+  currentMobileNavTab = tabName;
+  const screenChatsList = document.getElementById('screenChatsList');
+  const screenActiveChat = document.getElementById('screenActiveChat');
+  const screenDailyRoute = document.getElementById('screenDailyRoute');
+  const screenSurveysHub = document.getElementById('screenSurveysHub');
+
+  const btnChats = document.getElementById('btnNavChats');
+  const btnRoute = document.getElementById('btnNavRoute');
+  const btnSurveys = document.getElementById('btnNavSurveys');
+
+  // Deactivate all nav tabs
+  btnChats?.classList.remove('active');
+  btnRoute?.classList.remove('active');
+  btnSurveys?.classList.remove('active');
+
+  // Hide all screens
+  screenChatsList?.classList.add('hidden');
+  screenActiveChat?.classList.add('hidden');
+  screenDailyRoute?.classList.add('hidden');
+  screenSurveysHub?.classList.add('hidden');
+
+  if (tabName === 'chats') {
+    btnChats?.classList.add('active');
+    screenChatsList?.classList.remove('hidden');
+    renderMobileStatusPill();
+  } else if (tabName === 'route') {
+    btnRoute?.classList.add('active');
+    screenDailyRoute?.classList.remove('hidden');
+    renderDedicatedRouteScreen();
+  } else if (tabName === 'surveys') {
+    btnSurveys?.classList.add('active');
+    screenSurveysHub?.classList.remove('hidden');
+    renderSurveysHubScreen();
+  }
+}
+
+async function renderMobileStatusPill() {
+  const pillText = document.getElementById('txtQuickStatusPill');
+  const pillIcon = document.getElementById('pillStatusIcon');
+  const pillAction = document.getElementById('txtPillActionLabel');
+  const lblRosterStore = document.getElementById('txtRosterStoreName');
+  const navPillRoute = document.getElementById('navPillRoute');
+  const navLabelRoute = document.getElementById('navLabelRoute');
+  const navIconRoute = document.getElementById('navIconRoute');
 
   try {
     const resState = await fetch(`/api/user/${currentUserId}/state`);
@@ -6531,6 +6946,74 @@ async function renderMobileShiftCard() {
     const isRoving = stData.employmentType === 'roving' || currentUserId === 'usr-marco-ph';
 
     if (isRoving) {
+      if (navLabelRoute) navLabelRoute.innerText = 'Route (8)';
+      if (navIconRoute) navIconRoute.innerText = 'route';
+
+      const resItin = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/itinerary`);
+      const itinData = await resItin.json();
+      cachedItineraryData = itinData;
+
+      const visits = itinData.visits || [];
+      const active = itinData.activeVisit;
+      const nextPending = visits.find(v => v.status === 'pending');
+
+      if (active && active.store) {
+        if (pillText) pillText.innerText = `Stop ${active.sequenceOrder}/8: ${active.store.name} · On Site`;
+        if (pillIcon) { pillIcon.innerText = 'pin_drop'; pillIcon.style.color = '#0071E3'; }
+        if (pillAction) pillAction.innerText = 'Route';
+        if (lblRosterStore) lblRosterStore.innerText = `Stop ${active.sequenceOrder}/8: ${active.store.name} (On Site)`;
+        if (navPillRoute) { navPillRoute.innerText = `Stop ${active.sequenceOrder}/8`; navPillRoute.style.background = '#0071E3'; }
+      } else if (nextPending && nextPending.store) {
+        if (pillText) pillText.innerText = `In Transit: Stop ${nextPending.sequenceOrder}/8: ${nextPending.store.name}`;
+        if (pillIcon) { pillIcon.innerText = 'directions_car'; pillIcon.style.color = '#FF9500'; }
+        if (pillAction) pillAction.innerText = 'Route';
+        if (lblRosterStore) lblRosterStore.innerText = `In Transit to Stop ${nextPending.sequenceOrder}/8: ${nextPending.store.name}`;
+        if (navPillRoute) { navPillRoute.innerText = `Stop ${nextPending.sequenceOrder}`; navPillRoute.style.background = '#FF9500'; }
+      } else {
+        if (pillText) pillText.innerText = 'All 8 Scheduled Stores Visited · Fleet Complete';
+        if (pillIcon) { pillIcon.innerText = 'verified'; pillIcon.style.color = '#34C759'; }
+        if (pillAction) pillAction.innerText = 'Route';
+        if (lblRosterStore) lblRosterStore.innerText = 'Roving Fleet · All 8 Stops Complete';
+        if (navPillRoute) { navPillRoute.innerText = '8/8 ✓'; navPillRoute.style.background = '#34C759'; }
+      }
+    } else {
+      // Stationary Rep (Liza Santos, Sarah Tan)
+      const st = stData.store;
+      const isShiftActive = stData.isClockedIn;
+      const storeName = st?.name || 'SM Megamall';
+
+      if (navLabelRoute) navLabelRoute.innerText = 'My Store';
+      if (navIconRoute) navIconRoute.innerText = 'storefront';
+      if (lblRosterStore) lblRosterStore.innerText = storeName;
+
+      if (pillText) pillText.innerText = `${storeName} · ${isShiftActive ? 'Shift Active (GPS Verified)' : 'Pending Check-In'}`;
+      if (pillIcon) { pillIcon.innerText = isShiftActive ? 'verified' : 'schedule'; pillIcon.style.color = isShiftActive ? '#34C759' : '#8E8E93'; }
+      if (pillAction) pillAction.innerText = 'Store';
+      if (navPillRoute) { navPillRoute.innerText = isShiftActive ? 'Active' : 'Pending'; navPillRoute.style.background = isShiftActive ? '#34C759' : '#8E8E93'; }
+    }
+  } catch (err) {
+    console.warn('Could not update status pill:', err);
+  }
+}
+
+async function renderDedicatedRouteScreen() {
+  const container = document.getElementById('routeDedicatedContainer');
+  if (!container) return;
+
+  try {
+    const resState = await fetch(`/api/user/${currentUserId}/state`);
+    const stData = await resState.json();
+    const isRoving = stData.employmentType === 'roving' || currentUserId === 'usr-marco-ph';
+
+    const lblTitle = document.getElementById('lblRouteViewTitle');
+    const lblSub = document.getElementById('lblRouteSubtitle');
+    const badgeFleet = document.getElementById('lblRouteFleetBadge');
+
+    if (isRoving) {
+      if (lblTitle) lblTitle.innerText = "Today's Daily Route";
+      if (lblSub) lblSub.innerText = 'Metro Manila Field Fleet · 8 Scheduled Retail Stops';
+      if (badgeFleet) { badgeFleet.style.display = 'inline-flex'; badgeFleet.innerHTML = '<span class="ms-icon sm" style="font-size:12px;margin-right:3px;">electric_bolt</span> AI OPTIMIZED'; }
+
       const resItin = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/itinerary`);
       const itinData = await resItin.json();
       cachedItineraryData = itinData;
@@ -6539,53 +7022,43 @@ async function renderMobileShiftCard() {
       const completed = itinData.completedCount || 0;
       const pct = itinData.completionPct || 0;
       const active = itinData.activeVisit;
-      const nextPendingStop = visits.find(v => v.status === 'pending');
+      const nextPending = visits.find(v => v.status === 'pending');
 
-      // Update phone top store label in real time
-      const lblStore = document.getElementById('txtRosterStoreName');
-      if (lblStore) {
-        if (active && active.store) {
-          lblStore.innerText = `Stop ${active.sequenceOrder}/8: ${active.store.name} (On Site)`;
-        } else if (nextPendingStop && nextPendingStop.store) {
-          lblStore.innerText = `In Transit to Stop ${nextPendingStop.sequenceOrder}/8: ${nextPendingStop.store.name}`;
-        } else {
-          lblStore.innerText = 'Roving Fleet · All 8 Stops Complete';
-        }
-      }
-
-      // Generate the 8 Stops Sequential Schedule HTML
-      const stopsTimelineHtml = visits.map(v => {
+      const stopsHtml = visits.map(v => {
         const isComp = v.status === 'completed';
         const isActive = v.status === 'checked_in';
-        const isNext = !active && nextPendingStop && nextPendingStop.id === v.id;
+        const isNext = !active && nextPending && nextPending.id === v.id;
         const stName = v.store ? v.store.name : 'Retail Branch';
+        const stCity = v.store ? v.store.city || 'Metro Manila' : 'Metro Manila';
 
         return `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:${isActive ? '#EBF4FF' : isComp ? '#F8FCF9' : isNext ? '#FFFBEB' : '#FFFFFF'};border:${isActive ? '1.5px solid #0071E3' : isNext ? '1px solid #FF9500' : '1px solid rgba(0,0,0,0.06)'};border-radius:10px;margin-bottom:5px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;border-radius:50%;background:${isComp ? '#E8F8EE' : isActive ? '#0071E3' : isNext ? '#FF9500' : '#F2F2F7'};color:${isComp ? '#1B5E20' : isActive ? '#FFF' : isNext ? '#FFF' : '#86868B'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:${isActive ? '#EBF4FF' : isComp ? '#F8FCF9' : isNext ? '#FFFBEB' : '#FFFFFF'};border:${isActive ? '1.5px solid #0071E3' : isNext ? '1px solid #FF9500' : '1px solid rgba(0,0,0,0.06)'};border-radius:12px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:${isComp ? '#E8F8EE' : isActive ? '#0071E3' : isNext ? '#FF9500' : '#F2F2F7'};color:${isComp ? '#1B5E20' : isActive ? '#FFF' : isNext ? '#FFF' : '#86868B'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">
                 ${isComp ? '✓' : v.sequenceOrder}
               </div>
               <div>
-                <b style="font-size:11.5px;color:#1D1D1F;display:block;">Stop ${v.sequenceOrder}: ${escapeHtml(stName)}</b>
-                <div style="font-size:10px;color:#86868B;display:flex;align-items:center;gap:4px;">
+                <b style="font-size:12.5px;color:#1D1D1F;display:block;">Stop ${v.sequenceOrder}: ${escapeHtml(stName)}</b>
+                <div style="font-size:10.5px;color:#86868B;display:flex;align-items:center;gap:4px;margin-top:1px;">
                   <span>${v.scheduledTime}</span>
                   <span>·</span>
-                  <span>${isComp ? '<span style="color:#1B5E20;font-weight:600;">Visited & Completed</span>' : isActive ? '<span style="color:#0071E3;font-weight:700;">Active On-Site</span>' : isNext ? '<span style="color:#FF9500;font-weight:700;">Next Destination</span>' : 'Pending'}</span>
+                  <span>${escapeHtml(stCity)}</span>
+                  <span>·</span>
+                  <span>${isComp ? '<b style="color:#1B5E20;">Completed</b>' : isActive ? '<b style="color:#0071E3;">Active On-Site</b>' : isNext ? '<b style="color:#FF9500;">Next Destination</b>' : 'Pending'}</span>
                 </div>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:4px;">
               ${isActive ? `
-                <button type="button" onclick="performClockOut(null, '${v.id}')" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                <button type="button" onclick="performClockOut(null, '${v.id}')" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">
                   Clock Out
                 </button>
               ` : isComp ? `
-                <span style="font-size:10px;color:#1B5E20;font-weight:700;display:flex;align-items:center;gap:2px;">
-                  <span class="ms-icon sm" style="font-size:12px;">done_all</span> Logged
+                <span style="font-size:11px;color:#1B5E20;font-weight:700;display:flex;align-items:center;gap:2px;">
+                  <span class="ms-icon sm" style="font-size:13px;">done_all</span> Logged
                 </span>
               ` : `
-                <button type="button" onclick="performClockIn('${v.storeId}', '${v.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                <button type="button" onclick="performClockIn('${v.storeId}', '${v.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,113,227,0.2);">
                   Check In
                 </button>
               `}
@@ -6594,142 +7067,224 @@ async function renderMobileShiftCard() {
         `;
       }).join('');
 
-      card.innerHTML = `
-        <!-- Roving Fleet Top Strip -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span class="ms-icon sm" style="color:#0071E3;">route</span>
-            <b style="font-size:13px;color:#1D1D1F;">8-Store Daily Route · Metro Manila Fleet</b>
-          </div>
-          <span style="font-size:10px;background:#F3E8FF;color:#6B21A8;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">ROVING FLEET</span>
-        </div>
-
-        <!-- Route Completion Bar -->
-        <div style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#86868B;margin-bottom:4px;">
+      container.innerHTML = `
+        <!-- Route Progress Meter -->
+        <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#86868B;margin-bottom:6px;">
             <span>Route Progress: <b>${completed} / ${visits.length} Stores Visited</b></span>
             <b style="color:#0071E3;">${pct}% Completed</b>
           </div>
-          <div style="height:6px;background:#E5E5EA;border-radius:999px;overflow:hidden;">
-            <div style="width:${pct}%;height:100%;background:#0071E3;border-radius:999px;transition:width 0.3s ease;"></div>
+          <div style="height:7px;background:#E5E5EA;border-radius:999px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg, #0071E3, #34C759);border-radius:999px;transition:width 0.3s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#86868B;margin-top:6px;">
+            <span>⚡ AI Traffic Sequencing: Active</span>
+            <span style="color:#1B5E20;font-weight:600;">Saved ~35 mins travel</span>
           </div>
         </div>
 
-        <!-- High-Prominence Active Store / Transit Banner -->
+        <!-- High-Prominence Active Store / In-Transit Hero Card -->
         ${active ? `
-          <div style="background:#E8F8EE;border:1.5px solid rgba(20,108,46,0.3);border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(20,108,46,0.06);">
-            <div>
-              <div style="font-size:10px;color:#1B5E20;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
-                <span class="ms-icon sm" style="font-size:13px;">pin_drop</span> CURRENTLY ON SITE (STOP ${active.sequenceOrder} OF ${visits.length})
+          <div style="background:#EBF4FF;border:1.5px solid #0071E3;border-radius:14px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,113,227,0.08);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <span style="font-size:10px;background:#0071E3;color:#FFF;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">CURRENTLY ON SITE · STOP ${active.sequenceOrder}/8</span>
+                <b style="font-size:15px;color:#1D1D1F;display:block;margin-top:4px;">${escapeHtml(active.store?.name || 'SM Aura Premier')}</b>
+                <div style="font-size:11px;color:#86868B;margin-top:2px;">${escapeHtml(active.store?.address || 'Bonifacio Global City')}</div>
+                <div style="font-size:11px;color:#1B5E20;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:3px;">
+                  <span class="ms-icon sm" style="font-size:13px;">verified</span> GPS Geofence Verified (${active.store?.geofenceRadiusMeters || 150}m radius)
+                </div>
               </div>
-              <b style="font-size:13px;color:#1D1D1F;display:block;margin-top:2px;">${escapeHtml(active.store?.name || 'Retail Branch')}</b>
-              <div style="font-size:10.5px;color:#1B5E20;margin-top:2px;display:flex;align-items:center;gap:3px;">
-                <span class="ms-icon sm" style="font-size:11px;">verified</span> GPS Geofence Verified (${active.store?.geofenceRadiusMeters || 150}m)
-              </div>
+              <button type="button" onclick="performClockOut(null, '${active.id}')" style="background:#FFFFFF;border:1.5px solid #D32F2F;color:#D32F2F;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(211,47,47,0.1);">
+                Clock Out
+              </button>
             </div>
-            <button type="button" onclick="performClockOut(null, '${active.id}')" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(211,47,47,0.1);">
-              Clock Out
-            </button>
+            <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,113,227,0.15);">
+              <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#FFFFFF;border:1px solid rgba(0,113,227,0.3);color:#0071E3;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:13px;">assignment</span> Branch Survey Form
+              </button>
+              <button type="button" onclick="openVeraAuditModal()" style="background:#FFFFFF;border:1px solid rgba(27,94,32,0.3);color:#1B5E20;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:13px;">photo_camera</span> Vera Audit
+              </button>
+            </div>
           </div>
-        ` : nextPendingStop ? `
-          <div style="background:#FFF8E1;border:1.5px solid rgba(178,94,0,0.3);border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(178,94,0,0.06);">
-            <div>
-              <div style="font-size:10px;color:#B25E00;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
-                <span class="ms-icon sm" style="font-size:13px;">directions_car</span> IN TRANSIT TO STOP ${nextPendingStop.sequenceOrder} OF ${visits.length}
+        ` : nextPending ? `
+          <div style="background:#FFF8E1;border:1.5px solid #FF9500;border-radius:14px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(255,149,0,0.1);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <span style="font-size:10px;background:#FF9500;color:#FFF;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">IN TRANSIT TO STOP ${nextPending.sequenceOrder}/8</span>
+                <b style="font-size:15px;color:#1D1D1F;display:block;margin-top:4px;">${escapeHtml(nextPending.store?.name || 'Retail Branch')}</b>
+                <div style="font-size:11px;color:#86868B;margin-top:2px;">${escapeHtml(nextPending.store?.address || 'Metro Manila')}</div>
+                <div style="font-size:11px;color:#B25E00;font-weight:600;margin-top:4px;">ETA: ~15 mins · Window: ${nextPending.scheduledTime}</div>
               </div>
-              <b style="font-size:13px;color:#1D1D1F;display:block;margin-top:2px;">${escapeHtml(nextPendingStop.store?.name || 'Retail Branch')}</b>
-              <div style="font-size:10.5px;color:#86868B;margin-top:2px;">ETA: 15 mins (Arrive within ${nextPendingStop.store?.geofenceRadiusMeters || 150}m to Check In)</div>
+              <button type="button" onclick="performClockIn('${nextPending.storeId}', '${nextPending.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,113,227,0.3);">
+                Check In
+              </button>
             </div>
-            <button type="button" onclick="performClockIn('${nextPendingStop.storeId}', '${nextPendingStop.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:6px 14px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,113,227,0.25);">
-              Check In
-            </button>
           </div>
         ` : `
-          <div style="background:#E8F8EE;border:1px solid rgba(20,108,46,0.2);border-radius:12px;padding:10px;margin-bottom:10px;text-align:center;">
-            <b style="font-size:12.5px;color:#1B5E20;">🎉 All 8 Scheduled Stores Completed for Today!</b>
-            <div style="font-size:11px;color:#86868B;margin-top:2px;">Full route itinerary audited and synchronizing to BigQuery.</div>
+          <div style="background:#E8F8EE;border:1px solid rgba(20,108,46,0.25);border-radius:14px;padding:14px;margin-bottom:12px;text-align:center;">
+            <b style="font-size:14px;color:#1B5E20;display:block;">🎉 All 8 Scheduled Stores Completed!</b>
+            <div style="font-size:11.5px;color:#86868B;margin-top:3px;">Full route itinerary audited and synchronized to corporate headquarters.</div>
           </div>
         `}
 
-        <!-- Integrated 8-Store Daily Route Timeline List Directly on Home Screen -->
-        <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:8px;margin-top:4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:11px;font-weight:700;color:#1D1D1F;display:flex;align-items:center;gap:4px;">
-              <span class="ms-icon sm" style="font-size:13px;color:#0071E3;">format_list_numbered</span>
+        <!-- Sequential Stops List -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <b style="font-size:12.5px;color:#1D1D1F;display:flex;align-items:center;gap:4px;">
+              <span class="ms-icon sm" style="color:#0071E3;font-size:15px;">format_list_numbered</span>
               Today's 8 Scheduled Stops
-            </span>
-            <button type="button" onclick="toggleRovingTimeline()" style="background:none;border:none;color:#0071E3;font-size:11px;font-weight:600;cursor:pointer;">
-              ${isRovingScheduleExpanded ? 'Hide ▲' : 'Show All ▼'}
+            </b>
+            <button type="button" onclick="triggerPaxRouteOptimization()" style="background:none;border:none;color:#0071E3;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px;">
+              <span class="ms-icon sm" style="font-size:13px;">bolt</span> Re-Optimize
             </button>
           </div>
-          <div id="rovingTimelineListWrapper" style="display:${isRovingScheduleExpanded ? 'block' : 'none'};max-height:175px;overflow-y:auto;padding-right:2px;">
-            ${stopsTimelineHtml}
+          <div>
+            ${stopsHtml}
           </div>
         </div>
 
-        <!-- Quick Action Buttons -->
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:14px;">assignment</span> Branch Survey Form
+        <!-- Quick AI Copilot Actions -->
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="button" onclick="askPaxRouteQuestion('Where should I go next?')" style="flex:1;background:#EBF4FF;color:#0071E3;border:1px solid rgba(0,113,227,0.2);border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+            <span class="ms-icon sm" style="font-size:15px;">smart_toy</span> Ask Pax in Chat
           </button>
-          <button type="button" onclick="openRovingItineraryModal()" style="background:#F2F2F7;color:#1D1D1F;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:14px;">map</span> Detailed Map
-          </button>
-          <button type="button" onclick="toggleEmploymentMode()" title="Switch persona between Stationary and Roving rep mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;cursor:pointer;">
-            <span class="ms-icon sm" style="font-size:14px;">sync</span>
+          <button type="button" onclick="triggerPaxRouteOptimization()" style="flex:1;background:#FFFFFF;color:#1D1D1F;border:1px solid rgba(0,0,0,0.1);border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+            <span class="ms-icon sm" style="font-size:15px;color:#0071E3;">autorenew</span> AI Sequence
           </button>
         </div>
       `;
     } else {
-      // Stationary Rep (Single Assigned Store)
+      // Stationary Rep (Liza Santos, Sarah Tan)
       const st = stData.store;
       const isShiftActive = stData.isClockedIn;
-      
-      const lblStore = document.getElementById('txtRosterStoreName');
-      if (lblStore) lblStore.innerText = st?.name || 'SM Megamall';
+      const storeName = st?.name || 'SM Megamall';
 
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span class="ms-icon sm" style="color:#0071E3;">storefront</span>
-            <b style="font-size:13px;color:#1D1D1F;">${escapeHtml(st?.name || 'SM Megamall')}</b>
+      if (lblTitle) lblTitle.innerText = storeName;
+      if (lblSub) lblSub.innerText = `${st?.address || 'Metro Manila'} · Assigned Store`;
+      if (badgeFleet) { badgeFleet.style.display = 'inline-flex'; badgeFleet.innerHTML = '<span class="ms-icon sm" style="font-size:12px;margin-right:3px;">storefront</span> STATIONARY REP'; }
+
+      container.innerHTML = `
+        <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <b style="font-size:14px;color:#1D1D1F;">${escapeHtml(storeName)}</b>
+            <span style="font-size:10px;background:#EBF4FF;color:#0071E3;font-weight:700;padding:2px 7px;border-radius:4px;">PRIMARY STORE</span>
           </div>
-          <span style="font-size:10px;background:#EBF4FF;color:#0071E3;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">STATIONARY REP</span>
+          <div style="font-size:11.5px;color:#86868B;margin-bottom:10px;">${escapeHtml(st?.address || 'Retail Floor')}</div>
+          
+          <div style="background:#F9F9FB;border:1px solid rgba(0,0,0,0.05);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:10.5px;color:#86868B;">Attendance Status</div>
+              <b style="font-size:12.5px;color:${isShiftActive ? '#1B5E20' : '#86868B'};display:flex;align-items:center;gap:4px;margin-top:2px;">
+                <span class="ms-icon sm" style="font-size:14px;color:${isShiftActive ? '#1B5E20' : '#86868B'};">${isShiftActive ? 'verified' : 'schedule'}</span>
+                ${isShiftActive ? 'Shift Active · GPS Verified (18m)' : 'Shift Pending Arrival'}
+              </b>
+            </div>
+            <button type="button" onclick="${isShiftActive ? 'performClockOut()' : `performClockIn('${st?.id}')`}" style="background:${isShiftActive ? '#FFFFFF' : '#0071E3'};color:${isShiftActive ? '#D32F2F' : '#FFFFFF'};border:${isShiftActive ? '1px solid rgba(0,0,0,0.1)' : 'none'};padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">
+              ${isShiftActive ? 'Clock Out' : 'Clock In (GPS)'}
+            </button>
+          </div>
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:10px;margin-bottom:10px;">
-          <div>
-            <div style="font-size:10.5px;color:#86868B;">Attendance Status</div>
-            <b style="font-size:12.5px;color:${isShiftActive ? '#1B5E20' : '#86868B'};display:flex;align-items:center;gap:4px;margin-top:2px;">
-              <span class="ms-icon sm" style="font-size:14px;color:${isShiftActive ? '#1B5E20' : '#86868B'};">${isShiftActive ? 'verified' : 'schedule'}</span>
-              ${isShiftActive ? 'Shift Active · GPS Verified (18m)' : 'Shift Pending Arrival'}
-            </b>
-          </div>
-          <button type="button" onclick="${isShiftActive ? 'performClockOut()' : `performClockIn('${st?.id}')`}" style="background:${isShiftActive ? '#FFFFFF' : '#0071E3'};color:${isShiftActive ? '#D32F2F' : '#FFFFFF'};border:${isShiftActive ? '1px solid rgba(0,0,0,0.1)' : 'none'};padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;">
-            ${isShiftActive ? 'Clock Out' : 'Clock In (GPS)'}
-          </button>
-        </div>
-
-        <div style="display:flex;gap:6px;">
-          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
             <span class="ms-icon sm" style="font-size:14px;">assignment</span> Branch Digital Surveys
           </button>
-          <button type="button" onclick="toggleEmploymentMode()" title="Switch to Roving multi-store route mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:8px 12px;font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:14px;">sync</span> Roving Mode
+          <button type="button" onclick="openVeraAuditModal()" style="flex:1;background:#F2F2F7;color:#1D1D1F;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">
+            <span class="ms-icon sm" style="font-size:14px;">photo_camera</span> Vera Audit
           </button>
         </div>
       `;
     }
   } catch (err) {
-    console.error('Failed to render mobile shift card:', err);
+    console.error('Failed to render dedicated route screen:', err);
   }
+}
+
+async function renderSurveysHubScreen() {
+  const container = document.getElementById('surveysHubContainer');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`/api/admin/${currentWorkspaceId}/surveys`);
+    const data = await res.json();
+    const surveyList = data.surveys || [];
+
+    const resSubs = await fetch(`/api/admin/${currentWorkspaceId}/surveys/submissions`);
+    const subsData = await resSubs.json();
+    const userSubs = (subsData.submissions || []).filter(s => s.submittedBy === currentUserId || s.userId === currentUserId);
+
+    container.innerHTML = `
+      <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:12px 14px;margin-bottom:12px;">
+        <b style="font-size:13px;color:#1D1D1F;display:block;margin-bottom:6px;">Available Digital Branch Audits</b>
+        ${surveyList.length === 0 ? '<p style="font-size:11.5px;color:#86868B;">No active surveys configured.</p>' : surveyList.map(s => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F9F9FB;border-radius:8px;margin-bottom:6px;">
+            <div>
+              <b style="font-size:12px;color:#1D1D1F;display:block;">${escapeHtml(s.title)}</b>
+              <div style="font-size:10.5px;color:#86868B;">${escapeHtml(s.category || 'General Audit')}</div>
+            </div>
+            <button type="button" onclick="openSurveyFillModalForCurrentStore('${s.id}')" style="background:#0071E3;color:#FFF;border:none;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              Start Survey
+            </button>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:12px 14px;">
+        <b style="font-size:13px;color:#1D1D1F;display:block;margin-bottom:6px;">Recent Submissions</b>
+        ${userSubs.length === 0 ? '<p style="font-size:11.5px;color:#86868B;">No survey submissions recorded yet today.</p>' : userSubs.slice(0, 5).map(sub => `
+          <div style="padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.04);font-size:11px;">
+            <div style="display:flex;justify-content:space-between;">
+              <b>${escapeHtml(sub.surveyTitle || 'Store Audit')}</b>
+              <span style="color:#1B5E20;font-weight:600;">✓ Submitted</span>
+            </div>
+            <div style="color:#86868B;font-size:10px;">${new Date(sub.submittedAt || sub.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (err) {
+    console.warn('Failed to load surveys:', err);
+  }
+}
+
+async function triggerPaxRouteOptimization() {
+  try {
+    showToastNotification('⚡ Pax AI is optimizing route for Metro Manila traffic...');
+    const res = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/itinerary/optimize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    showToastNotification('⚡ Route Re-Optimized! Saved ~35 mins travel time.');
+    await renderDedicatedRouteScreen();
+    await renderMobileStatusPill();
+  } catch (err) {
+    alert('Optimization error: ' + err.message);
+  }
+}
+
+function askPaxRouteQuestion(text) {
+  switchMobileNav('chats');
+  openChat('chat-pax');
+  const txt = document.getElementById('txtChatInput');
+  if (txt) {
+    txt.value = text;
+    sendCurrentChat();
+  }
+}
+
+async function renderMobileShiftCard() {
+  await renderMobileStatusPill();
+  await renderDedicatedRouteScreen();
 }
 
 function toggleRovingTimeline() {
   isRovingScheduleExpanded = !isRovingScheduleExpanded;
-  const wrapper = document.getElementById('rovingTimelineListWrapper');
-  if (wrapper) wrapper.style.display = isRovingScheduleExpanded ? 'block' : 'none';
-  renderMobileShiftCard();
+  renderDedicatedRouteScreen();
 }
 
 async function openRovingItineraryModal() {
@@ -6816,7 +7371,9 @@ function closeRovingItineraryModal() {
   document.getElementById('modalRovingItinerary').classList.remove('active');
 }
 
-async function performClockIn(storeId, isRoving = false, visitId = null) {
+async function performClockIn(storeId, isRovingOrVisit = false, visitIdParam = null) {
+  let isRoving = typeof isRovingOrVisit === 'boolean' ? isRovingOrVisit : true;
+  let visitId = typeof isRovingOrVisit === 'string' ? isRovingOrVisit : visitIdParam;
   try {
     const res = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/clock-in`, {
       method: 'POST',

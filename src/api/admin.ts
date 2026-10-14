@@ -9,6 +9,7 @@ import {
 } from '../db/schema.js';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { DemoGenerator } from '../agents/demo/index.js';
+import { PaxAgent } from '../agents/pax/index.js';
 import { COUNTRY_CURRENCY } from '../lib/currency.js';
 import { ai, MODELS } from '../integrations/google/gemini.js';
 
@@ -961,7 +962,14 @@ adminRouter.get('/admin/:ws/users/:id/itinerary', wrap(async (req, res) => {
   });
 }));
 
-// 2. Add ad-hoc store visit to today's roving route
+// 2. Pax AI Route Optimizer (Proximity & Traffic TSP heuristic)
+adminRouter.post('/admin/:ws/users/:id/itinerary/optimize', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const result = await PaxAgent.optimizeUserRoute(id);
+  res.json(result);
+}));
+
+// 3. Add ad-hoc store visit to today's roving route
 adminRouter.post('/admin/:ws/users/:id/itinerary/add', wrap(async (req, res) => {
   const { ws, id } = req.params;
   const b = req.body || {};
@@ -2165,54 +2173,69 @@ Output JSON only:
 
     // Handle Payment Methods or Terms change
     if (intentClassification.configDomain === 'payment_methods' || intentClassification.configDomain === 'payment_terms') {
-      const currentConfig = { ...paymentConfig };
       const targetEntity = (intentClassification.targetEntity || '').toLowerCase();
 
       if (intentClassification.configDomain === 'payment_methods') {
-        const existingMethod = currentConfig.paymentMethods.find((m: any) => m.id === targetEntity || m.label.toLowerCase().includes(targetEntity));
+        const allMethods = await db.select().from(paymentMethods).where(eq(paymentMethods.workspaceId, ws));
+        const existingMethod = allMethods.find(m => m.code.toLowerCase() === targetEntity || m.label.toLowerCase().includes(targetEntity));
         if (existingMethod) {
           const oldVal = existingMethod.enabled;
-          existingMethod.enabled = intentClassification.action !== 'disable';
-          appliedDiff = { method: existingMethod.id, previousEnabled: oldVal, newEnabled: existingMethod.enabled };
+          const newVal = intentClassification.action !== 'disable';
+          await db.update(paymentMethods).set({ enabled: newVal } as any).where(eq(paymentMethods.id, existingMethod.id));
+          appliedDiff = { method: existingMethod.code, previousEnabled: oldVal, newEnabled: newVal };
           configUpdated = true;
         } else if (intentClassification.action === 'add') {
-          const newId = targetEntity.replace(/\s+/g, '_');
-          const newMethod = {
-            id: newId,
+          const newCode = targetEntity.replace(/\s+/g, '_') || 'custom_payment';
+          const newMethodId = `pm-${newCode}-${ws}`;
+          await db.insert(paymentMethods).values({
+            id: newMethodId,
+            workspaceId: ws,
+            code: newCode,
             label: intentClassification.targetEntity || 'New Payment Method',
+            category: 'other',
             enabled: true,
             requiresApproval: true,
             allowedTerms: ['straight', '3_months', '6_months', '12_months'],
-          };
-          currentConfig.paymentMethods.push(newMethod);
-          appliedDiff = { addedMethod: newMethod };
+            displayOrder: allMethods.length + 1,
+            createdAt: new Date(),
+          } as any);
+          appliedDiff = { addedMethod: newCode, label: intentClassification.targetEntity };
           configUpdated = true;
         }
       } else if (intentClassification.configDomain === 'payment_terms') {
-        const existingTerm = currentConfig.paymentTerms.find((t: any) => t.id === targetEntity || t.label.toLowerCase().includes(targetEntity));
+        const allTerms = await db.select().from(paymentTerms).where(eq(paymentTerms.workspaceId, ws));
+        const existingTerm = allTerms.find(t => t.code.toLowerCase() === targetEntity || t.label.toLowerCase().includes(targetEntity));
         if (existingTerm) {
           const oldVal = existingTerm.enabled;
-          existingTerm.enabled = intentClassification.action !== 'disable';
-          appliedDiff = { term: existingTerm.id, previousEnabled: oldVal, newEnabled: existingTerm.enabled };
+          const newVal = intentClassification.action !== 'disable';
+          await db.update(paymentTerms).set({ enabled: newVal } as any).where(eq(paymentTerms.id, existingTerm.id));
+          appliedDiff = { term: existingTerm.code, previousEnabled: oldVal, newEnabled: newVal };
           configUpdated = true;
         } else if (intentClassification.action === 'add') {
-          const newId = targetEntity.replace(/\s+/g, '_');
-          const newTerm = {
-            id: newId,
+          const newCode = targetEntity.replace(/\s+/g, '_') || 'custom_term';
+          const newTermId = `term-${newCode}-${ws}`;
+          await db.insert(paymentTerms).values({
+            id: newTermId,
+            workspaceId: ws,
+            code: newCode,
             label: intentClassification.targetEntity || 'Custom Term',
+            months: 0,
+            interestRate: 0,
             enabled: true,
-          };
-          currentConfig.paymentTerms.push(newTerm);
-          appliedDiff = { addedTerm: newTerm };
+            displayOrder: allTerms.length + 1,
+            createdAt: new Date(),
+          } as any);
+          appliedDiff = { addedTerm: newCode, label: intentClassification.targetEntity };
           configUpdated = true;
         }
       }
 
       if (configUpdated) {
-        const newSettings = { ...settings, paymentConfig: currentConfig };
-        await db.update(workspaces).set({ settings: newSettings } as any).where(eq(workspaces.id, ws));
+        const updatedPaymentConfig = await getWorkspacePaymentConfig(ws);
+        const wsSettings = (workspace.settings as any) || {};
+        await db.update(workspaces).set({ settings: { ...wsSettings, paymentConfig: updatedPaymentConfig } } as any).where(eq(workspaces.id, ws));
       }
-      } else if (intentClassification.configDomain === 'store_quota') {
+    } else if (intentClassification.configDomain === 'store_quota') {
         // Update store daily target quota
         const storeMatch = storeList.find(s => s.name.toLowerCase().includes((intentClassification.targetEntity || '').toLowerCase()) || s.storeCode.toLowerCase().includes((intentClassification.targetEntity || '').toLowerCase()));
         if (storeMatch && intentClassification.targetValue) {
