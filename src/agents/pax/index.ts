@@ -1,6 +1,6 @@
 import { ai, MODELS } from '../../integrations/google/gemini.js';
 import { db } from '../../db/client.js';
-import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages, auditLogs, rovingStoreVisits, supportedLanguages } from '../../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, salesTransactions, chatMessages, auditLogs, rovingStoreVisits, supportedLanguages, surveys } from '../../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 
 export interface FastSaleItem {
@@ -131,6 +131,40 @@ export class PaxAgent {
   static getLanguageConfig(code?: string | null): LanguageMeta {
     const norm = this.normalizeLanguageCode(code);
     return SUPPORTED_LANGUAGES_MAP[norm] || SUPPORTED_LANGUAGES_MAP['en'];
+  }
+
+  /**
+   * Intelligently detects if the user is typing in a specific regional language (Language Mirroring)
+   */
+  static detectInputLanguage(text: string): string | null {
+    if (!text || text.trim().length === 0) return null;
+    const lower = text.toLowerCase();
+
+    // 1. Tagalog / Filipino patterns
+    // Matches interrogatives, particles, verbs, and syntax:
+    // e.g. "anong survey today na need gawin?", "saan ang rota?", "kumusta benta?"
+    const filipinoRegex = /\b(anong|ano|saan|san|kailan|paano|bakit|meron|mayron|wala|gawin|gagawin|ginawa|benta|bentahan|kumusta|kamusta|magkano|tindahan|ngayon|paki|po|opo|ba|na need|na dapat|ito|dito|iyon|doon|tayo|namin|natin|salamat|araw|oras|kita|kayo|ninyo|sila|kanila|lahat|meron ba|wala ba|sino)\b/i;
+    if (filipinoRegex.test(lower)) return 'fil';
+
+    // 2. Bahasa Melayu patterns
+    const malayRegex = /\b(apa|bila|bagaimana|mana|ada|tiada|tidak|tak|buat|terima kasih|khabar|berapa|jualan|kedai|hari ini|sila|boleh|kita|kami|semua|hentian|laluan|jadual|lawatan)\b/i;
+    if (malayRegex.test(lower)) return 'ms';
+
+    // 3. Vietnamese patterns
+    const vietnameseRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]|(\b(gi|nao|khi nao|o dau|lam sao|khong|cam on|bao nhieu|hom nay|khao sat|cua hang|don hang)\b)/i;
+    if (vietnameseRegex.test(lower)) return 'vi';
+
+    // 4. Urdu patterns
+    if (/[\u0600-\u06FF]/.test(text)) return 'ur';
+    const urduRomanRegex = /\b(kya|kab|kaise|kahan|kyun|hai|hain|shukriya|kitna|aaj|karna|store|survey|haddaf)\b/i;
+    if (urduRomanRegex.test(lower)) return 'ur';
+
+    // 5. Hindi patterns
+    if (/[\u0900-\u097F]/.test(text)) return 'hi';
+    const hindiRomanRegex = /\b(namaste|kya|kab|kaise|kahan|hai|hain|aaj|karna hai|bikri|lakshya)\b/i;
+    if (hindiRomanRegex.test(lower)) return 'hi';
+
+    return null;
   }
 
   /**
@@ -652,7 +686,14 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       timestamp: new Date(),
     } as any);
 
-    const lang = this.getLanguageConfig(user.preferredLanguage);
+    // Resolve active language:
+    // 1. Language Mirroring: If the user speaks in a detected language (e.g. Filipino "anong survey today na need gawin?"),
+    //    mirror their language immediately so the AI speaks their tongue!
+    // 2. Otherwise, fall back to the user's preferred language configured in App Settings (or default English).
+    const detectedInputLang = this.detectInputLanguage(userMessage);
+    const configuredUserLang = this.normalizeLanguageCode(user.preferredLanguage);
+    const activeLangCode = detectedInputLang || configuredUserLang || 'en';
+    const lang = this.getLanguageConfig(activeLangCode);
 
     const msgLower = userMessage.toLowerCase();
     const isLangChange = /(?:change|switch|set|palit|lipat|tukar|đổi|تبدیل|बदल)\s+(?:language|wika|bahasa|ngôn ngữ|زبان|भाषा)/i.test(msgLower) ||
@@ -661,6 +702,7 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
     const isOptimizeQuery = /optimi|traffic|reorder|ayusin|sequence|ayos|fastest|route order|susun|tối ưu/i.test(msgLower);
     const isRouteQuery = /next|store|where|saan|san|route|itinerary|puntahan|stop|stops|rota|bisi|visit|destinasi|lộ trình|منزل|स्टॉप/i.test(msgLower);
     const isTasksQuery = /task|gagawin|checklist|guide|todo|to\s*do|tugas|nhiệm vụ|کام|कार्य/i.test(msgLower);
+    const isSurveyQuery = /survey|sarvey|surbey|form|forms|tanong|checklist|pormularyo|khảo sát|kaji selidik|سروے|सर्वे/i.test(msgLower);
 
     let reply = '';
     let interactiveCardType: string | null = null;
@@ -754,24 +796,55 @@ Generate a short, energetic 1-sentence confirmation message praising the promote
       reply = lang.tasksChecklist;
       interactiveCardType = 'tasks_card';
     } else {
-      // General retail operations query via Gemini Flash
+      // General retail operations query & dynamic survey inquiries via Gemini Flash
       const activeStoreName = routeCtx?.isRoving
         ? (routeCtx.activeVisit?.store?.name || 'SM Aura Premier')
         : (routeCtx?.store?.name || 'Retail Branch');
+
+      // Check active surveys for user's workspace
+      let activeSurveys: any[] = [];
+      try {
+        activeSurveys = await db.select().from(surveys).where(
+          and(eq(surveys.workspaceId, user.workspaceId), eq(surveys.status, 'active'))
+        );
+      } catch (e) {}
 
       const prompt = `You are Pax, frontline retail operations copilot for Project BLOC.
 Promoter: ${user.name} (${routeCtx?.isRoving ? 'Roving Multi-Store Ambassador' : 'Stationary Sales Rep'})
 Current Store Location: ${activeStoreName}
 Shift Status: Active (${shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()} target` : 'Active'})
-Language Requirement: You MUST answer strictly in ${lang.name} (${lang.nativeName}). ${lang.promptInstruction}
+Active Surveys Scheduled Today: ${activeSurveys.length > 0 ? activeSurveys.map(s => `"${s.title}" (${s.surveyType})`).join(', ') : 'None scheduled for today'}
+Language Requirement: The user asked in ${lang.name} (${lang.nativeName}). You MUST answer strictly in natural, friendly ${lang.name} (${lang.nativeName}). ${lang.promptInstruction}
 User Said: "${userMessage}"
 
 Guidelines:
-- If asking about products or pricing: Give concise promotional guidance.
-- If asking about store operations: Keep answers practical and friendly.
+- If asking about surveys (e.g. "anong survey today na need gawin?" or "any surveys today?"):
+  * If no surveys are scheduled: clearly tell them in ${lang.name} that there are no special surveys required today, but remind them of their core frontline tasks: 1) Vera Shelf Camera Audit for planogram compliance, 2) Fast-Sale focus promo bundle logging, and 3) EOD shift checkout!
+  * If active surveys exist: state the survey title and advise them to tap the Surveys tab at the bottom to complete it.
+- If asking about products or pricing: Give concise promotional guidance in ${lang.name}.
+- If asking about store operations: Keep answers practical and friendly in ${lang.name}.
 - Length: 2 sentences max. Zero fluff.`;
 
-      reply = lang.morningGreeting(user.name, activeStoreName, shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()}` : 'daily target', 'Focus Promo');
+      let fallbackText = lang.morningGreeting(user.name, activeStoreName, shift ? `${shift.currency} ${shift.targetAmount.toLocaleString()}` : 'daily target', 'Focus Promo');
+      if (isSurveyQuery) {
+        if (activeLangCode === 'fil') {
+          fallbackText = activeSurveys.length > 0
+            ? `Kumusta, ${user.name}! May ${activeSurveys.length} active survey tayo ngayon: "${activeSurveys[0].title}". Buksan lang ang Surveys tab sa ibaba para sagutan!`
+            : `Kumusta, ${user.name}! Walang partikular na 'survey' na kailangan sagutan ngayon. Ang pangunahing checklist mo ay patakbuhin ang Vera Shelf Camera Audit para sa planogram compliance at mag-log ng focus promo sales gamit ang Fast-Sale bago mag-checkout!`;
+        } else if (activeLangCode === 'ms') {
+          fallbackText = activeSurveys.length > 0
+            ? `Hai, ${user.name}! Terdapat borang tinjauan aktif hari ini: "${activeSurveys[0].title}". Sila buka tab Tinjauan di bahagian bawah untuk melengkapkannya.`
+            : `Hai, ${user.name}! Tiada 'survey' khusus dijadualkan hari ini. Keutamaan anda ialah menjalankan Audit Rak Kamera Vera dan merekod jualan promosi sebelum daftar keluar!`;
+        } else if (activeLangCode === 'vi') {
+          fallbackText = activeSurveys.length > 0
+            ? `Chào ${user.name}! Hôm nay có bài khảo sát đang hoạt động: "${activeSurveys[0].title}". Nhấn vào tab Khảo sát bên dưới để thực hiện!`
+            : `Chào ${user.name}! Hôm nay không có bài khảo sát bắt buộc nào. Nhiệm vụ chính của bạn là thực hiện Kiểm tra Kệ hàng Vera và ghi nhận đơn hàng Fast-Sale trước khi kết thúc ca làm!`;
+        } else {
+          fallbackText = `No specific survey scheduled today! Your main priorities are running the Vera Shelf Camera Audit for planogram compliance and logging focus promo sales with Fast-Sale before checkout.`;
+        }
+      }
+
+      reply = fallbackText;
       try {
         const aiRes = await ai.models.generateContent({
           model: MODELS.FLASH,

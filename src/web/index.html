@@ -2839,6 +2839,27 @@
         </div>
 
         <!-- ======================================================
+             SCREEN 5: APP SETTINGS & LANGUAGE PREFERENCES HUB
+             ====================================================== -->
+        <div class="m3-view-container hidden" id="screenAppSettings">
+          <div class="m3-chats-header" style="background: rgba(255,255,255,0.95); border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <div class="chats-headline-bar">
+              <span class="m3-title-large">Settings</span>
+              <span class="m3-tag-pill" style="background:#E8F0FE;color:#0071E3;font-weight:700;">
+                <span class="ms-icon sm" style="font-size:12px;margin-right:2px;">tune</span> PREFERENCES
+              </span>
+            </div>
+            <div style="font-size:11.5px;color:var(--m3-on-surface-variant);margin-top:2px;">
+              Promoter Profile, Copilot Voice & Dialect
+            </div>
+          </div>
+
+          <div style="flex:1;overflow-y:auto;padding:12px 14px;" id="appSettingsContainer">
+            <!-- Dynamic Settings Content rendered by renderAppSettingsScreen() -->
+          </div>
+        </div>
+
+        <!-- ======================================================
              MOBILE BOTTOM NAVIGATION BAR (Apple HIG / Material 3)
              ====================================================== -->
         <nav class="m3-phone-bottom-nav" id="mobileBottomNav">
@@ -2863,6 +2884,13 @@
               <span class="ms-icon">assignment</span>
             </div>
             <span class="nav-tab-label">Surveys</span>
+          </button>
+
+          <button type="button" class="phone-nav-tab" id="btnNavSettings" onclick="switchMobileNav('settings')">
+            <div class="nav-tab-icon-wrap">
+              <span class="ms-icon">settings</span>
+            </div>
+            <span class="nav-tab-label">Settings</span>
           </button>
         </nav>
 
@@ -5176,6 +5204,10 @@
           closeLanguageModal();
           await loadUserState();
 
+          if (currentMobileNavTab === 'settings') {
+            await renderAppSettingsScreen();
+          }
+
           // Refresh morning briefing in chat if in Pax chat
           if (currentChatId === 'chat-pax') {
             const briefRes = await fetch('/api/pax/briefing', {
@@ -7070,21 +7102,25 @@ function switchMobileNav(tabName) {
   const screenActiveChat = document.getElementById('screenActiveChat');
   const screenDailyRoute = document.getElementById('screenDailyRoute');
   const screenSurveysHub = document.getElementById('screenSurveysHub');
+  const screenAppSettings = document.getElementById('screenAppSettings');
 
   const btnChats = document.getElementById('btnNavChats');
   const btnRoute = document.getElementById('btnNavRoute');
   const btnSurveys = document.getElementById('btnNavSurveys');
+  const btnSettings = document.getElementById('btnNavSettings');
 
   // Deactivate all nav tabs
   btnChats?.classList.remove('active');
   btnRoute?.classList.remove('active');
   btnSurveys?.classList.remove('active');
+  btnSettings?.classList.remove('active');
 
   // Hide all screens
   screenChatsList?.classList.add('hidden');
   screenActiveChat?.classList.add('hidden');
   screenDailyRoute?.classList.add('hidden');
   screenSurveysHub?.classList.add('hidden');
+  screenAppSettings?.classList.add('hidden');
 
   if (tabName === 'chats') {
     btnChats?.classList.add('active');
@@ -7098,6 +7134,10 @@ function switchMobileNav(tabName) {
     btnSurveys?.classList.add('active');
     screenSurveysHub?.classList.remove('hidden');
     renderSurveysHubScreen();
+  } else if (tabName === 'settings') {
+    btnSettings?.classList.add('active');
+    screenAppSettings?.classList.remove('hidden');
+    renderAppSettingsScreen();
   }
 }
 
@@ -7417,6 +7457,163 @@ async function renderSurveysHubScreen() {
   } catch (err) {
     console.warn('Failed to load surveys:', err);
   }
+}
+
+async function renderAppSettingsScreen() {
+  const container = document.getElementById('appSettingsContainer');
+  if (!container) return;
+
+  try {
+    // Ensure languages are loaded
+    if (!cachedLanguages || !cachedLanguages.length) {
+      await fetchSupportedLanguages();
+    }
+
+    // Get current active user info
+    let activeUser = {
+      id: currentUserId,
+      name: (typeof currentUserName !== 'undefined' && currentUserName) ? currentUserName : 'Frontline Staff',
+      role: 'promoter',
+      preferredLanguage: currentUserPreferredLanguage || 'en',
+      email: ''
+    };
+
+    try {
+      const res = await fetch(`/api/user/${currentUserId}/state`);
+      const st = await res.json();
+      if (st && st.user) {
+        activeUser = { ...activeUser, ...st.user };
+        if (st.user.preferredLanguage) {
+          currentUserPreferredLanguage = st.user.preferredLanguage;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not refresh user state in settings:', e);
+    }
+
+    const currentLangObj = (cachedLanguages || []).find(l => l.code === currentUserPreferredLanguage) || {
+      code: currentUserPreferredLanguage || 'en',
+      name: 'English',
+      nativeName: 'English',
+      flagEmoji: '🌐',
+      region: 'International'
+    };
+
+    const storeLabel = (document.getElementById('txtRosterStoreName')?.innerText || document.getElementById('lblStoreGcName')?.innerText || 'Assigned Retail Branch').replace(/^#\s*/, '');
+    const safeEscape = (typeof escapeHtml === 'function') ? escapeHtml : (t => String(t || ''));
+    const initials = (activeUser.name || 'FP').split(/\s+/).filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'FP';
+
+    container.innerHTML = `
+      <!-- User Profile Hero Card -->
+      <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg, #0071E3 0%, #34C759 100%);display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-weight:700;font-size:18px;box-shadow:0 2px 8px rgba(0,113,227,0.25);">
+          ${initials}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <b style="font-size:15px;color:#1D1D1F;">${safeEscape(activeUser.name || 'Retail Promoter')}</b>
+            <span style="font-size:10px;font-weight:700;color:#0071E3;background:#EBF4FF;padding:2px 6px;border-radius:999px;">ACTIVE</span>
+          </div>
+          <div style="font-size:11.5px;color:#86868B;margin-top:1px;">${safeEscape(activeUser.email || '')}</div>
+          <div style="font-size:11px;color:#0071E3;font-weight:600;margin-top:2px;">
+            <span class="ms-icon sm" style="font-size:11px;vertical-align:middle;">storefront</span>
+            ${safeEscape(storeLabel)}
+          </div>
+        </div>
+      </div>
+
+    <!-- Language & Dialect Preferences Section -->
+    <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="ms-icon" style="color:#0071E3;font-size:18px;">translate</span>
+          <b style="font-size:13.5px;color:#1D1D1F;">Language & Dialect</b>
+        </div>
+        <span style="font-size:11px;font-weight:600;color:#1B5E20;background:#E8F8EE;padding:2px 8px;border-radius:999px;">
+          ${currentLangObj.flagEmoji} ${currentLangObj.name}
+        </span>
+      </div>
+
+      <div style="font-size:11px;color:#6E6E73;line-height:1.45;background:#F8F9FA;padding:9px 11px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(0,0,0,0.04);">
+        <b style="color:#1D1D1F;">Smart Dialect Mirroring:</b> When you speak or ask questions in Filipino/Tagalog, Pax responds in Filipino. You can also select your primary language below.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        ${(cachedLanguages || []).map(lang => {
+          const isSelected = lang.code === currentUserPreferredLanguage;
+          return `
+            <div onclick="selectAppLanguage('${lang.code}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;cursor:pointer;transition:all 0.15s;border:1.5px solid ${isSelected ? '#0071E3' : 'rgba(0,0,0,0.06)'};background:${isSelected ? '#F0F7FF' : '#FFFFFF'};">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:22px;line-height:1;">${lang.flagEmoji}</span>
+                <div>
+                  <div style="font-size:13px;font-weight:${isSelected ? '700' : '600'};color:${isSelected ? '#0071E3' : '#1D1D1F'};">
+                    ${escapeHtml(lang.name)}
+                  </div>
+                  <div style="font-size:11px;color:#86868B;">
+                    ${escapeHtml(lang.nativeName)} · ${escapeHtml(lang.region)}
+                  </div>
+                </div>
+              </div>
+              <div>
+                ${isSelected ? '<span class="ms-icon" style="color:#0071E3;font-size:20px;">check_circle</span>' : '<span class="ms-icon" style="color:#C7C7CC;font-size:20px;">radio_button_unchecked</span>'}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Copilot AI Features & Automation -->
+    <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <span class="ms-icon" style="color:#34C759;font-size:18px;">smart_toy</span>
+        <b style="font-size:13.5px;color:#1D1D1F;">Autonomous Copilot Settings</b>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F9F9FB;border-radius:10px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#1D1D1F;">Real-Time Voice & Text Mirroring</div>
+            <div style="font-size:10.5px;color:#86868B;">Matches your natural Taglish or regional dialect</div>
+          </div>
+          <span style="font-size:10.5px;font-weight:700;color:#1B5E20;background:#E8F8EE;padding:2px 7px;border-radius:999px;">ALWAYS ON</span>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F9F9FB;border-radius:10px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#1D1D1F;">Shift Morning Briefings</div>
+            <div style="font-size:10.5px;color:#86868B;">Auto-delivers targets & focus promos at 9:00 AM</div>
+          </div>
+          <span style="font-size:10.5px;font-weight:700;color:#0071E3;background:#EBF4FF;padding:2px 7px;border-radius:999px;">ENABLED</span>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F9F9FB;border-radius:10px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#1D1D1F;">Vera Shelf Computer Vision</div>
+            <div style="font-size:10.5px;color:#86868B;">Planogram compliance and out-of-stock detector</div>
+          </div>
+          <span style="font-size:10.5px;font-weight:700;color:#0071E3;background:#EBF4FF;padding:2px 7px;border-radius:999px;">ENABLED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- System & Tenant Specs -->
+    <div style="text-align:center;padding:10px;color:#8E8E93;font-size:11px;">
+      <div>BLOC Retail Operations · Mobile Promoter OS</div>
+      <div style="font-size:10px;margin-top:2px;">Workspace ID: <code style="color:#0071E3;">${safeEscape(currentWorkspaceId)}</code> · DB Seed Verified</div>
+    </div>
+  `;
+  } catch (err) {
+    console.error('Settings render error:', err);
+    if (container) {
+      container.innerHTML = `<div style="padding:20px;text-align:center;color:#8E8E93;font-size:12px;">Failed to load settings. Retrying...</div>`;
+    }
+  }
+}
+
+async function selectAppLanguage(code) {
+  await changeActiveUserLanguage(code);
+  await renderAppSettingsScreen();
 }
 
 async function triggerPaxRouteOptimization() {
