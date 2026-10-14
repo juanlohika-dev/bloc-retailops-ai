@@ -9,7 +9,7 @@ import { NexusAgent } from '../agents/nexus/index.js';
 import { db } from '../db/client.js';
 import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces, rovingStoreVisits } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
-import { adminRouter } from './admin.js';
+import { adminRouter, ensureRovingItinerary } from './admin.js';
 import { ensureTablesAndColumns } from '../db/ensure_schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -76,9 +76,14 @@ app.get('/api/user/:userId/state', async (req, res) => {
     const messages = await db.select().from(chatMessages).where(eq(chatMessages.userId, user.id));
 
     // Roving itinerary & visits for today
-    const userVisits = await db.select().from(rovingStoreVisits).where(
+    let userVisits = await db.select().from(rovingStoreVisits).where(
       and(eq(rovingStoreVisits.userId, user.id), eq(rovingStoreVisits.workspaceId, user.workspaceId), eq(rovingStoreVisits.visitDate, todayDate))
     ).orderBy(rovingStoreVisits.sequenceOrder);
+
+    const isRovingUser = (user as any).employmentType === 'roving' || user.id === 'usr-marco-ph';
+    if (isRovingUser && userVisits.length < 8) {
+      userVisits = await ensureRovingItinerary(user.workspaceId, user.id);
+    }
 
     const allStores = await db.select().from(stores).where(eq(stores.workspaceId, user.workspaceId));
     const storeMap = new Map(allStores.map(s => [s.id, s]));
@@ -87,7 +92,10 @@ app.get('/api/user/:userId/state', async (req, res) => {
       store: storeMap.get(v.storeId) || null,
     }));
     const activeVisit = enrichedVisits.find(v => v.status === 'checked_in') || null;
-    const effectiveStore = (activeVisit?.store) || store;
+    const nextVisit = enrichedVisits.find(v => v.status === 'pending') || null;
+    const lastCompletedVisit = [...enrichedVisits].reverse().find(v => v.status === 'completed') || null;
+    const rovingStore = (activeVisit?.store) || (nextVisit?.store) || (lastCompletedVisit?.store);
+    const effectiveStore = isRovingUser && rovingStore ? rovingStore : ((activeVisit?.store) || store);
 
     res.json({
       user,

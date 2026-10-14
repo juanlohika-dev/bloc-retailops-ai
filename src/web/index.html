@@ -3826,15 +3826,39 @@
 
         <input type="hidden" id="surveyFillSurveyId" value="">
         <form id="surveyFillForm" onsubmit="event.preventDefault(); submitSurveyResponse();" style="display:flex;flex-direction:column;gap:14px;margin-top:14px;overflow-y:auto;max-height:calc(90vh - 170px);padding-right:4px;">
-          <!-- Respondent Identification Card -->
-          <div style="background:#F9F9FB;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.06);display:grid;grid-template-columns: 1fr 1fr;gap:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:#86868B;text-transform:uppercase;display:block;margin-bottom:3px;">Respondent Name</label>
-              <input type="text" id="surveyFillRespName" placeholder="Your Name or Customer Name" style="width:100%;padding:8px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12.5px;">
+          <!-- Respondent & Store Auto-Identification Banner -->
+          <div style="background:#F2F8FF;border:1px solid rgba(0,113,227,0.18);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#0071E3;color:#FFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;" id="surveyFillAvatarLetter">
+                  L
+                </div>
+                <div>
+                  <div style="font-size:10px;color:#0071E3;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:3px;">
+                    <span class="ms-icon sm" style="font-size:12px;">verified_user</span> Auto-Tagged Staff Identity
+                  </div>
+                  <b style="font-size:13px;color:#1D1D1F;" id="surveyFillStaffNameDisplay">Liza Santos (usr-liza-ph)</b>
+                </div>
+              </div>
+
+              <!-- Store Branch Auto-Tag -->
+              <div id="surveyFillStoreTagContainer">
+                <!-- Dynamically rendered based on stationary vs roving -->
+              </div>
             </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:#86868B;text-transform:uppercase;display:block;margin-bottom:3px;">Contact (Email / Mobile)</label>
-              <input type="text" id="surveyFillRespContact" placeholder="e.g. +63 917 000 0000" style="width:100%;padding:8px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12.5px;">
+
+            <!-- Customer Details (Shown ONLY for customer_feedback / VOC surveys) -->
+            <div id="surveyFillCustomerFieldsRow" style="display:none;border-top:1px dashed rgba(0,113,227,0.2);padding-top:8px;margin-top:2px;">
+              <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;">
+                <div>
+                  <label style="font-size:10.5px;font-weight:600;color:#86868B;display:block;margin-bottom:2px;">Customer Name (Optional)</label>
+                  <input type="text" id="surveyFillCustomerName" placeholder="e.g. Maria Santos" style="width:100%;padding:6px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12px;">
+                </div>
+                <div>
+                  <label style="font-size:10.5px;font-weight:600;color:#86868B;display:block;margin-bottom:2px;">Customer Mobile / Email (Optional)</label>
+                  <input type="text" id="surveyFillCustomerContact" placeholder="e.g. +63 917 555 1234" style="width:100%;padding:6px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12px;">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -6495,6 +6519,7 @@ function tryAegisCommand(cmd) {
 // ============================================================
 
 let cachedItineraryData = null;
+let isRovingScheduleExpanded = true;
 
 async function renderMobileShiftCard() {
   const card = document.getElementById('mobileAttendanceCard');
@@ -6514,25 +6539,75 @@ async function renderMobileShiftCard() {
       const completed = itinData.completedCount || 0;
       const pct = itinData.completionPct || 0;
       const active = itinData.activeVisit;
+      const nextPendingStop = visits.find(v => v.status === 'pending');
 
-      // Update phone top store label to active visit store if checked in
+      // Update phone top store label in real time
       const lblStore = document.getElementById('txtRosterStoreName');
-      if (lblStore && active && active.store) {
-        lblStore.innerText = active.store.name;
+      if (lblStore) {
+        if (active && active.store) {
+          lblStore.innerText = `Stop ${active.sequenceOrder}/8: ${active.store.name} (On Site)`;
+        } else if (nextPendingStop && nextPendingStop.store) {
+          lblStore.innerText = `In Transit to Stop ${nextPendingStop.sequenceOrder}/8: ${nextPendingStop.store.name}`;
+        } else {
+          lblStore.innerText = 'Roving Fleet · All 8 Stops Complete';
+        }
       }
 
+      // Generate the 8 Stops Sequential Schedule HTML
+      const stopsTimelineHtml = visits.map(v => {
+        const isComp = v.status === 'completed';
+        const isActive = v.status === 'checked_in';
+        const isNext = !active && nextPendingStop && nextPendingStop.id === v.id;
+        const stName = v.store ? v.store.name : 'Retail Branch';
+
+        return `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:${isActive ? '#EBF4FF' : isComp ? '#F8FCF9' : isNext ? '#FFFBEB' : '#FFFFFF'};border:${isActive ? '1.5px solid #0071E3' : isNext ? '1px solid #FF9500' : '1px solid rgba(0,0,0,0.06)'};border-radius:10px;margin-bottom:5px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:${isComp ? '#E8F8EE' : isActive ? '#0071E3' : isNext ? '#FF9500' : '#F2F2F7'};color:${isComp ? '#1B5E20' : isActive ? '#FFF' : isNext ? '#FFF' : '#86868B'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">
+                ${isComp ? '✓' : v.sequenceOrder}
+              </div>
+              <div>
+                <b style="font-size:11.5px;color:#1D1D1F;display:block;">Stop ${v.sequenceOrder}: ${escapeHtml(stName)}</b>
+                <div style="font-size:10px;color:#86868B;display:flex;align-items:center;gap:4px;">
+                  <span>${v.scheduledTime}</span>
+                  <span>·</span>
+                  <span>${isComp ? '<span style="color:#1B5E20;font-weight:600;">Visited & Completed</span>' : isActive ? '<span style="color:#0071E3;font-weight:700;">Active On-Site</span>' : isNext ? '<span style="color:#FF9500;font-weight:700;">Next Destination</span>' : 'Pending'}</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              ${isActive ? `
+                <button type="button" onclick="performClockOut(null, '${v.id}')" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                  Clock Out
+                </button>
+              ` : isComp ? `
+                <span style="font-size:10px;color:#1B5E20;font-weight:700;display:flex;align-items:center;gap:2px;">
+                  <span class="ms-icon sm" style="font-size:12px;">done_all</span> Logged
+                </span>
+              ` : `
+                <button type="button" onclick="performClockIn('${v.storeId}', '${v.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                  Check In
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
       card.innerHTML = `
+        <!-- Roving Fleet Top Strip -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div style="display:flex;align-items:center;gap:6px;">
             <span class="ms-icon sm" style="color:#0071E3;">route</span>
-            <b style="font-size:12.5px;color:#1D1D1F;">Roving Itinerary (${completed}/${visits.length} Stores)</b>
+            <b style="font-size:13px;color:#1D1D1F;">8-Store Daily Route · Metro Manila Fleet</b>
           </div>
-          <span style="font-size:10px;background:#F3E8FF;color:#6B21A8;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;">ROVING FLEET</span>
+          <span style="font-size:10px;background:#F3E8FF;color:#6B21A8;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">ROVING FLEET</span>
         </div>
 
+        <!-- Route Completion Bar -->
         <div style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;font-size:11px;color:#86868B;margin-bottom:4px;">
-            <span>Route Progress</span>
+            <span>Route Progress: <b>${completed} / ${visits.length} Stores Visited</b></span>
             <b style="color:#0071E3;">${pct}% Completed</b>
           </div>
           <div style="height:6px;background:#E5E5EA;border-radius:999px;overflow:hidden;">
@@ -6540,33 +6615,68 @@ async function renderMobileShiftCard() {
           </div>
         </div>
 
+        <!-- High-Prominence Active Store / Transit Banner -->
         ${active ? `
-          <div style="background:#E8F8EE;border:1px solid rgba(20,108,46,0.2);border-radius:10px;padding:8px 10px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="background:#E8F8EE;border:1.5px solid rgba(20,108,46,0.3);border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(20,108,46,0.06);">
             <div>
-              <div style="font-size:10.5px;color:#1B5E20;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
-                <span class="ms-icon sm" style="font-size:12px;">check_circle</span> CURRENTLY ON SITE (STOP ${active.sequenceOrder})
+              <div style="font-size:10px;color:#1B5E20;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:13px;">pin_drop</span> CURRENTLY ON SITE (STOP ${active.sequenceOrder} OF ${visits.length})
               </div>
-              <b style="font-size:12px;color:#1D1D1F;display:block;margin-top:2px;">${escapeHtml(active.store?.name || 'Retail Branch')}</b>
+              <b style="font-size:13px;color:#1D1D1F;display:block;margin-top:2px;">${escapeHtml(active.store?.name || 'Retail Branch')}</b>
+              <div style="font-size:10.5px;color:#1B5E20;margin-top:2px;display:flex;align-items:center;gap:3px;">
+                <span class="ms-icon sm" style="font-size:11px;">verified</span> GPS Geofence Verified (${active.store?.geofenceRadiusMeters || 150}m)
+              </div>
             </div>
-            <button type="button" onclick="performClockOut(null, '${active.id}')" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;color:#D32F2F;cursor:pointer;">
-              Check Out
+            <button type="button" onclick="performClockOut(null, '${active.id}')" style="background:#FFFFFF;border:1px solid #D32F2F;color:#D32F2F;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(211,47,47,0.1);">
+              Clock Out
+            </button>
+          </div>
+        ` : nextPendingStop ? `
+          <div style="background:#FFF8E1;border:1.5px solid rgba(178,94,0,0.3);border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(178,94,0,0.06);">
+            <div>
+              <div style="font-size:10px;color:#B25E00;font-weight:700;text-transform:uppercase;display:flex;align-items:center;gap:4px;">
+                <span class="ms-icon sm" style="font-size:13px;">directions_car</span> IN TRANSIT TO STOP ${nextPendingStop.sequenceOrder} OF ${visits.length}
+              </div>
+              <b style="font-size:13px;color:#1D1D1F;display:block;margin-top:2px;">${escapeHtml(nextPendingStop.store?.name || 'Retail Branch')}</b>
+              <div style="font-size:10.5px;color:#86868B;margin-top:2px;">ETA: 15 mins (Arrive within ${nextPendingStop.store?.geofenceRadiusMeters || 150}m to Check In)</div>
+            </div>
+            <button type="button" onclick="performClockIn('${nextPendingStop.storeId}', '${nextPendingStop.id}')" style="background:#0071E3;color:#FFFFFF;border:none;padding:6px 14px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,113,227,0.25);">
+              Check In
             </button>
           </div>
         ` : `
-          <div style="background:#FFF8E1;border:1px solid rgba(178,94,0,0.2);border-radius:10px;padding:8px 10px;margin-bottom:10px;font-size:11.5px;color:#B25E00;">
-            <b>Transit Mode:</b> Next stop is scheduled. Tap Check In below upon arriving within store geofence.
+          <div style="background:#E8F8EE;border:1px solid rgba(20,108,46,0.2);border-radius:12px;padding:10px;margin-bottom:10px;text-align:center;">
+            <b style="font-size:12.5px;color:#1B5E20;">🎉 All 8 Scheduled Stores Completed for Today!</b>
+            <div style="font-size:11px;color:#86868B;margin-top:2px;">Full route itinerary audited and synchronizing to BigQuery.</div>
           </div>
         `}
 
-        <div style="display:flex;gap:6px;">
-          <button type="button" onclick="openRovingItineraryModal()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:7px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:13px;">map</span> View 8-Store Route
+        <!-- Integrated 8-Store Daily Route Timeline List Directly on Home Screen -->
+        <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:8px;margin-top:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;font-weight:700;color:#1D1D1F;display:flex;align-items:center;gap:4px;">
+              <span class="ms-icon sm" style="font-size:13px;color:#0071E3;">format_list_numbered</span>
+              Today's 8 Scheduled Stops
+            </span>
+            <button type="button" onclick="toggleRovingTimeline()" style="background:none;border:none;color:#0071E3;font-size:11px;font-weight:600;cursor:pointer;">
+              ${isRovingScheduleExpanded ? 'Hide ▲' : 'Show All ▼'}
+            </button>
+          </div>
+          <div id="rovingTimelineListWrapper" style="display:${isRovingScheduleExpanded ? 'block' : 'none'};max-height:175px;overflow-y:auto;padding-right:2px;">
+            ${stopsTimelineHtml}
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:14px;">assignment</span> Branch Survey Form
           </button>
-          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="background:#F2F2F7;color:#1D1D1F;border:none;border-radius:8px;padding:7px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:13px;">fact_check</span> Audit Form
+          <button type="button" onclick="openRovingItineraryModal()" style="background:#F2F2F7;color:#1D1D1F;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:14px;">map</span> Detailed Map
           </button>
-          <button type="button" onclick="toggleEmploymentMode()" title="Switch to Stationary rep mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:7px 8px;font-size:11.5px;cursor:pointer;">
-            <span class="ms-icon sm" style="font-size:13px;">sync</span>
+          <button type="button" onclick="toggleEmploymentMode()" title="Switch persona between Stationary and Roving rep mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;cursor:pointer;">
+            <span class="ms-icon sm" style="font-size:14px;">sync</span>
           </button>
         </div>
       `;
@@ -6574,34 +6684,38 @@ async function renderMobileShiftCard() {
       // Stationary Rep (Single Assigned Store)
       const st = stData.store;
       const isShiftActive = stData.isClockedIn;
+      
+      const lblStore = document.getElementById('txtRosterStoreName');
+      if (lblStore) lblStore.innerText = st?.name || 'SM Megamall';
+
       card.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div style="display:flex;align-items:center;gap:6px;">
             <span class="ms-icon sm" style="color:#0071E3;">storefront</span>
-            <b style="font-size:12.5px;color:#1D1D1F;">${escapeHtml(st?.name || 'SM Megamall')}</b>
+            <b style="font-size:13px;color:#1D1D1F;">${escapeHtml(st?.name || 'SM Megamall')}</b>
           </div>
-          <span style="font-size:10px;background:#EBF4FF;color:#0071E3;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;">STATIONARY REP</span>
+          <span style="font-size:10px;background:#EBF4FF;color:#0071E3;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;">STATIONARY REP</span>
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:10px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F9F9FB;border:1px solid rgba(0,0,0,0.06);border-radius:10px;margin-bottom:10px;">
           <div>
-            <div style="font-size:11px;color:#86868B;">Attendance Status</div>
-            <b style="font-size:12px;color:${isShiftActive ? '#1B5E20' : '#86868B'};display:flex;align-items:center;gap:4px;margin-top:2px;">
-              <span class="ms-icon sm" style="font-size:13px;color:${isShiftActive ? '#1B5E20' : '#86868B'};">${isShiftActive ? 'verified' : 'schedule'}</span>
+            <div style="font-size:10.5px;color:#86868B;">Attendance Status</div>
+            <b style="font-size:12.5px;color:${isShiftActive ? '#1B5E20' : '#86868B'};display:flex;align-items:center;gap:4px;margin-top:2px;">
+              <span class="ms-icon sm" style="font-size:14px;color:${isShiftActive ? '#1B5E20' : '#86868B'};">${isShiftActive ? 'verified' : 'schedule'}</span>
               ${isShiftActive ? 'Shift Active · GPS Verified (18m)' : 'Shift Pending Arrival'}
             </b>
           </div>
-          <button type="button" onclick="${isShiftActive ? 'performClockOut()' : `performClockIn('${st?.id}')`}" style="background:${isShiftActive ? '#FFFFFF' : '#0071E3'};color:${isShiftActive ? '#D32F2F' : '#FFFFFF'};border:${isShiftActive ? '1px solid rgba(0,0,0,0.1)' : 'none'};padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;">
+          <button type="button" onclick="${isShiftActive ? 'performClockOut()' : `performClockIn('${st?.id}')`}" style="background:${isShiftActive ? '#FFFFFF' : '#0071E3'};color:${isShiftActive ? '#D32F2F' : '#FFFFFF'};border:${isShiftActive ? '1px solid rgba(0,0,0,0.1)' : 'none'};padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;">
             ${isShiftActive ? 'Clock Out' : 'Clock In (GPS)'}
           </button>
         </div>
 
         <div style="display:flex;gap:6px;">
-          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:7px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:13px;">fact_check</span> Branch Digital Surveys
+          <button type="button" onclick="openSurveyFillModalForCurrentStore()" style="flex:1;background:#EBF4FF;color:#0071E3;border:none;border-radius:8px;padding:8px 10px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:14px;">assignment</span> Branch Digital Surveys
           </button>
-          <button type="button" onclick="toggleEmploymentMode()" title="Switch to Roving multi-store route mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:7px 10px;font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-            <span class="ms-icon sm" style="font-size:13px;">sync</span> Roving Mode
+          <button type="button" onclick="toggleEmploymentMode()" title="Switch to Roving multi-store route mode" style="background:#F2F2F7;color:#86868B;border:none;border-radius:8px;padding:8px 12px;font-size:11.5px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+            <span class="ms-icon sm" style="font-size:14px;">sync</span> Roving Mode
           </button>
         </div>
       `;
@@ -6609,6 +6723,13 @@ async function renderMobileShiftCard() {
   } catch (err) {
     console.error('Failed to render mobile shift card:', err);
   }
+}
+
+function toggleRovingTimeline() {
+  isRovingScheduleExpanded = !isRovingScheduleExpanded;
+  const wrapper = document.getElementById('rovingTimelineListWrapper');
+  if (wrapper) wrapper.style.display = isRovingScheduleExpanded ? 'block' : 'none';
+  renderMobileShiftCard();
 }
 
 async function openRovingItineraryModal() {
@@ -7182,16 +7303,67 @@ async function openSurveyFillModal(surveyId) {
 
     document.getElementById('surveyFillTitle').innerText = s.title;
     document.getElementById('surveyFillDesc').innerText = s.description || 'Complete the questions below.';
-    document.getElementById('surveyFillRespondentName').value = currentUserName || 'Liza Santos';
 
-    // Store Dropdown: For stationary, lock to assigned store. For roving, populate all route stores!
-    const storeSel = document.getElementById('surveyFillStoreSelect');
-    storeSel.innerHTML = '';
-    (data.stores || []).forEach(st => {
-      storeSel.innerHTML += `<option value="${st.id}">${escapeHtml(st.name)} (${escapeHtml(st.storeCode)})</option>`;
-    });
+    // 1. Auto-tag staff identity
+    const avLetter = document.getElementById('surveyFillAvatarLetter');
+    if (avLetter) avLetter.innerText = (currentUserName || 'U').charAt(0).toUpperCase();
 
-    const fieldsContainer = document.getElementById('surveyFillFormFields');
+    const staffNameEl = document.getElementById('surveyFillStaffNameDisplay');
+    if (staffNameEl) staffNameEl.innerText = `${currentUserName} (${currentUserId})`;
+
+    // 2. Auto-tag store location based on stationary vs roving
+    const resState = await fetch(`/api/user/${currentUserId}/state`);
+    const stData = await resState.json();
+    const isRoving = stData.employmentType === 'roving' || currentUserId === 'usr-marco-ph';
+    const effectiveStore = stData.store || stData.defaultStore || { id: 'store-sm-mega', name: 'SM Megamall' };
+
+    const storeContainer = document.getElementById('surveyFillStoreTagContainer');
+    if (storeContainer) {
+      if (isRoving) {
+        // Roving staff: Auto-tag to active checked-in store, with option to select any of today's 8 route stops
+        const resItin = await fetch(`/api/admin/${currentWorkspaceId}/users/${currentUserId}/itinerary`);
+        const itinData = await resItin.json();
+        const visits = itinData.visits || [];
+
+        let optionsHtml = '';
+        visits.forEach(v => {
+          const stName = v.store ? v.store.name : 'Branch';
+          const isSelected = v.store && (v.store.id === effectiveStore.id || (itinData.activeVisit && v.id === itinData.activeVisit.id));
+          const stopStatus = v.status === 'checked_in' ? '📍 ON SITE' : v.status === 'completed' ? '✓ Visited' : '⏳ Scheduled';
+          optionsHtml += `<option value="${v.store?.id || v.storeId}" ${isSelected ? 'selected' : ''}>Stop ${v.sequenceOrder}: ${escapeHtml(stName)} (${stopStatus})</option>`;
+        });
+
+        storeContainer.innerHTML = `
+          <div style="background:#EBF4FF;border:1px solid rgba(0,113,227,0.25);padding:4px 10px;border-radius:8px;display:flex;align-items:center;gap:6px;">
+            <span class="ms-icon sm" style="font-size:14px;color:#0071E3;">route</span>
+            <div>
+              <div style="font-size:9px;color:#0071E3;font-weight:700;text-transform:uppercase;">Store on Roving Route</div>
+              <select id="surveyFillStoreIdSelect" style="font-size:11.5px;font-weight:600;padding:2px 4px;border:none;background:transparent;color:#1D1D1F;cursor:pointer;">
+                ${optionsHtml}
+              </select>
+            </div>
+          </div>
+        `;
+      } else {
+        // Stationary staff: Locked to assigned branch
+        storeContainer.innerHTML = `
+          <div style="background:#E8F8EE;border:1px solid rgba(20,108,46,0.2);padding:4px 10px;border-radius:8px;text-align:right;">
+            <div style="font-size:9.5px;color:#1B5E20;font-weight:700;text-transform:uppercase;">Assigned Branch</div>
+            <b style="font-size:12px;color:#1D1D1F;">${escapeHtml(effectiveStore.name)}</b>
+            <input type="hidden" id="surveyFillStoreIdSelect" value="${effectiveStore.id}">
+          </div>
+        `;
+      }
+    }
+
+    // Toggle customer fields for customer_feedback surveys
+    const custRow = document.getElementById('surveyFillCustomerFieldsRow');
+    if (custRow) {
+      custRow.style.display = s.surveyType === 'customer_feedback' ? 'block' : 'none';
+    }
+
+    // 3. Render questions
+    const fieldsContainer = document.getElementById('surveyFillQuestionsContainer');
     fieldsContainer.innerHTML = '';
 
     (s.questions || []).forEach((q, idx) => {
@@ -7278,24 +7450,29 @@ function simulatePhotoCapture(qId) {
 async function submitSurveyResponse() {
   if (!activeSurveyId) return;
 
-  const respondentName = document.getElementById('surveyFillRespondentName').value.trim() || currentUserName;
-  const storeId = document.getElementById('surveyFillStoreSelect').value;
+  const storeSelEl = document.getElementById('surveyFillStoreIdSelect');
+  const storeId = storeSelEl ? storeSelEl.value : currentStoreId;
+
+  const custNameEl = document.getElementById('surveyFillCustomerName');
+  const custContactEl = document.getElementById('surveyFillCustomerContact');
+  const respondentName = (custNameEl && custNameEl.value.trim()) ? custNameEl.value.trim() : currentUserName;
+  const respondentContact = (custContactEl && custContactEl.value.trim()) ? custContactEl.value.trim() : null;
 
   const answers = {};
 
   // Standard inputs and selects
-  document.querySelectorAll('#surveyFillFormFields .survey-ans-input').forEach(el => {
+  document.querySelectorAll('#surveyFillQuestionsContainer .survey-ans-input').forEach(el => {
     answers[el.getAttribute('data-qid')] = el.value;
   });
 
   // Radios
-  document.querySelectorAll('#surveyFillFormFields .survey-ans-radio:checked').forEach(el => {
+  document.querySelectorAll('#surveyFillQuestionsContainer .survey-ans-radio:checked').forEach(el => {
     answers[el.getAttribute('data-qid')] = el.value;
   });
 
   // Checkboxes
   const chkMap = {};
-  document.querySelectorAll('#surveyFillFormFields .survey-ans-chk:checked').forEach(el => {
+  document.querySelectorAll('#surveyFillQuestionsContainer .survey-ans-chk:checked').forEach(el => {
     const qid = el.getAttribute('data-qid');
     if (!chkMap[qid]) chkMap[qid] = [];
     chkMap[qid].push(el.value);
@@ -7312,6 +7489,7 @@ async function submitSurveyResponse() {
         submittedByUserId: currentUserId,
         storeId,
         respondentName,
+        respondentContact,
         answers,
       }),
     });
@@ -7320,7 +7498,8 @@ async function submitSurveyResponse() {
 
     showToastNotification('✓ Survey response submitted and logged to audit trail!');
     closeSurveyFillModal();
-    await loadSurveys();
+    if (typeof loadSurveys === 'function') loadSurveys();
+    if (typeof loadAuditTrailData === 'function') loadAuditTrailData();
   } catch (err) {
     alert('Failed to submit survey: ' + err.message);
   }

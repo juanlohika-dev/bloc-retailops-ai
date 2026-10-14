@@ -778,14 +778,20 @@ async function ensureManilaStores(ws: string) {
   }
 }
 
-async function ensureRovingItinerary(ws: string, userId: string) {
+export async function ensureRovingItinerary(ws: string, userId: string) {
   await ensureManilaStores(ws);
   const todayDate = new Date().toISOString().split('T')[0];
   const existingVisits = await db.select().from(rovingStoreVisits).where(
     and(eq(rovingStoreVisits.userId, userId), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
   ).orderBy(rovingStoreVisits.sequenceOrder);
 
-  if (existingVisits.length > 0) return existingVisits;
+  if (existingVisits.length >= 8) return existingVisits;
+
+  if (existingVisits.length > 0 && existingVisits.length < 8) {
+    await db.delete(rovingStoreVisits).where(
+      and(eq(rovingStoreVisits.userId, userId), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
+    );
+  }
 
   // Create 8 realistic stops for today's itinerary
   const baseDate = new Date();
