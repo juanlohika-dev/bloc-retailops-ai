@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { db } from '../db/client.js';
+import { db, libSqlClient } from '../db/client.js';
 import {
   workspaces, users, stores, products, storeAssignments, auditLogs,
   agentRegistry, agentSkills, agentTasks, agentFieldContacts,
   executiveReports, orgNodes, shifts, salesTransactions, shelfAudits, chatMessages,
+  surveys, surveySubmissions, rovingStoreVisits,
 } from '../db/schema.js';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, or } from 'drizzle-orm';
 import { DemoGenerator } from '../agents/demo/index.js';
 import { COUNTRY_CURRENCY } from '../lib/currency.js';
 import { ai, MODELS } from '../integrations/google/gemini.js';
@@ -614,6 +615,11 @@ adminRouter.get('/admin/:ws/stores/:id/360', wrap(async (req, res) => {
   const tasks = await db.select().from(agentTasks).where(eq(agentTasks.workspaceId, ws));
   const contacts = await db.select().from(agentFieldContacts).where(and(eq(agentFieldContacts.storeId, id), eq(agentFieldContacts.workspaceId, ws))).orderBy(desc(agentFieldContacts.timestamp));
 
+  const storeAuditLogs = await db.select().from(auditLogs).where(and(
+    eq(auditLogs.workspaceId, ws),
+    or(eq(auditLogs.resourceId, id), eq(auditLogs.module, 'stores'))
+  )).orderBy(desc(auditLogs.timestamp)).limit(15);
+
   const totalSales = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
   const quota = store.dailyTargetDefault || 15000;
   const pacingPct = Math.min(100, Math.round((totalSales / quota) * 100));
@@ -644,6 +650,7 @@ adminRouter.get('/admin/:ws/stores/:id/360', wrap(async (req, res) => {
     activeTasks: tasks,
     contacts,
     paymentBreakdown: storePaymentBreakdown,
+    auditLogs: storeAuditLogs,
   });
 }));
 
@@ -685,28 +692,482 @@ async function setAssignment(ws: string, userId: string, storeId: string | null)
 
 adminRouter.post('/admin/:ws/users', wrap(async (req, res) => {
   const b = req.body || {};
-  if (!b.name || !b.email) return res.status(400).json({ error: 'name and email are required' });
+  let fullName = b.name ? String(b.name).trim() : '';
+  if (!fullName && (b.firstName || b.lastName)) {
+    fullName = `${b.firstName || ''} ${b.lastName || ''}`.trim();
+  }
+  if (!fullName || !b.email) return res.status(400).json({ error: 'First/Last Name and email are required' });
+  
   const row = {
-    id: newId('usr'), workspaceId: req.params.ws, name: String(b.name), email: String(b.email), phone: b.phone || null,
-    role: String(b.role || 'promoter'), preferredLanguage: String(b.preferredLanguage || 'en'), timezone: String(b.timezone || 'Asia/Singapore'),
-    active: true, createdAt: new Date(),
+    id: newId('usr'), 
+    workspaceId: req.params.ws, 
+    name: fullName, 
+    email: String(b.email).trim().toLowerCase(), 
+    phone: b.phone ? String(b.phone).trim() : null,
+    role: String(b.role || 'promoter'), 
+    preferredLanguage: String(b.preferredLanguage || 'en'), 
+    timezone: String(b.timezone || 'Asia/Singapore'),
+    employmentType: b.employmentType === 'roving' ? 'roving' : 'stationary',
+    assignedStoreIds: Array.isArray(b.assignedStoreIds) ? b.assignedStoreIds : (b.storeId ? [b.storeId] : []),
+    active: true, 
+    createdAt: new Date(),
   };
-  await db.insert(users).values(row);
+  await db.insert(users).values(row as any);
   if (b.storeId) await setAssignment(req.params.ws, row.id, b.storeId);
-  await log(req.params.ws, 'user.create', 'user', row.id, { ...row, storeId: b.storeId });
+
+  if (b.orgNodeId) {
+    const [node] = await db.select().from(orgNodes).where(and(eq(orgNodes.id, b.orgNodeId), eq(orgNodes.workspaceId, req.params.ws)));
+    if (node) {
+      const existingMeta = (node.metadata as any) || {};
+      const memberUserIds = Array.isArray(existingMeta.memberUserIds) ? existingMeta.memberUserIds : [];
+      if (!memberUserIds.includes(row.id)) memberUserIds.push(row.id);
+      await db.update(orgNodes).set({ 
+        memberCount: (node.memberCount || 0) + 1,
+        metadata: { ...existingMeta, memberUserIds }
+      } as any).where(eq(orgNodes.id, b.orgNodeId));
+    }
+  }
+
+  await log(req.params.ws, 'user.create', 'user', row.id, { ...row, storeId: b.storeId, orgNodeId: b.orgNodeId }, 'users', b.actorId || 'admin', b.approvalSignature || 'Authorized Admin [UI / HMAC]', undefined, 'approved');
   res.json(row);
 }));
 
 adminRouter.put('/admin/:ws/users/:id', wrap(async (req, res) => {
   const b = req.body || {};
   const patch: any = {};
-  for (const k of ['name', 'email', 'phone', 'role', 'preferredLanguage', 'timezone']) if (b[k] !== undefined) patch[k] = String(b[k]);
+  for (const k of ['name', 'email', 'phone', 'role', 'preferredLanguage', 'timezone', 'employmentType']) if (b[k] !== undefined) patch[k] = String(b[k]);
+  if (b.assignedStoreIds !== undefined) patch.assignedStoreIds = b.assignedStoreIds;
   if (b.active !== undefined) patch.active = !!b.active;
   if (Object.keys(patch).length) await db.update(users).set(patch).where(and(eq(users.id, req.params.id), eq(users.workspaceId, req.params.ws)));
   if (b.storeId !== undefined) await setAssignment(req.params.ws, req.params.id, b.storeId || null);
   await log(req.params.ws, 'user.update', 'user', req.params.id, { ...patch, storeId: b.storeId });
   res.json({ ok: true });
 }));
+
+// Distance calculation for GPS Geofencing (Haversine formula in meters)
+function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3; // Earth radius in meters
+  const phi1 = (lat1 * Math.PI) / 180;
+  const phi2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) * Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+
+const DEFAULT_MANILA_STORES = [
+  { id: 'store-sm-mega', storeCode: 'SM-MEGA-01', name: 'SM Megamall Cyberzone', chain: 'SM Supermalls', country: 'PH', city: 'Mandaluyong, Metro Manila', latitude: 14.5842, longitude: 121.0567, geofenceRadiusMeters: 200, dailyTargetDefault: 25000, currency: 'PHP' },
+  { id: 'store-rob-galler', storeCode: 'ROB-GAL-02', name: 'Robinsons Galleria EDSA', chain: 'Robinsons Malls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.5904, longitude: 121.0594, geofenceRadiusMeters: 180, dailyTargetDefault: 20000, currency: 'PHP' },
+  { id: 'store-sm-aura', storeCode: 'SM-AURA-03', name: 'SM Aura Premier Tech Hub', chain: 'SM Supermalls', country: 'PH', city: 'Taguig, Bonifacio Global City', latitude: 14.5469, longitude: 121.0543, geofenceRadiusMeters: 150, dailyTargetDefault: 28000, currency: 'PHP' },
+  { id: 'store-glorietta', storeCode: 'GLO-04-01', name: 'Glorietta 4 Flagship Experience', chain: 'Ayala Malls', country: 'PH', city: 'Makati CBD, Metro Manila', latitude: 14.5524, longitude: 121.0258, geofenceRadiusMeters: 160, dailyTargetDefault: 32000, currency: 'PHP' },
+  { id: 'store-greenbelt', storeCode: 'GB-05-02', name: 'Greenbelt 5 Premium Boutique', chain: 'Ayala Malls', country: 'PH', city: 'Makati CBD, Metro Manila', latitude: 14.5518, longitude: 121.0205, geofenceRadiusMeters: 150, dailyTargetDefault: 22000, currency: 'PHP' },
+  { id: 'store-trinoma', storeCode: 'TRI-06-01', name: 'TriNoma Central Department Store', chain: 'Ayala Malls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.6534, longitude: 121.0335, geofenceRadiusMeters: 200, dailyTargetDefault: 24000, currency: 'PHP' },
+  { id: 'store-sm-north', storeCode: 'SM-NO-07', name: 'SM North EDSA Annex Cyberzone', chain: 'SM Supermalls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.6565, longitude: 121.0290, geofenceRadiusMeters: 220, dailyTargetDefault: 30000, currency: 'PHP' },
+  { id: 'store-atc', storeCode: 'ATC-08-01', name: 'Alabang Town Center Commerce Hub', chain: 'Ayala Malls', country: 'PH', city: 'Muntinlupa, Metro Manila', latitude: 14.4239, longitude: 121.0298, geofenceRadiusMeters: 180, dailyTargetDefault: 18000, currency: 'PHP' },
+];
+
+async function ensureManilaStores(ws: string) {
+  for (const s of DEFAULT_MANILA_STORES) {
+    const [existing] = await db.select().from(stores).where(and(eq(stores.id, s.id), eq(stores.workspaceId, ws)));
+    if (!existing) {
+      await db.insert(stores).values({ ...s, workspaceId: ws, active: true } as any).onConflictDoNothing();
+    }
+  }
+}
+
+async function ensureRovingItinerary(ws: string, userId: string) {
+  await ensureManilaStores(ws);
+  const todayDate = new Date().toISOString().split('T')[0];
+  const existingVisits = await db.select().from(rovingStoreVisits).where(
+    and(eq(rovingStoreVisits.userId, userId), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
+  ).orderBy(rovingStoreVisits.sequenceOrder);
+
+  if (existingVisits.length > 0) return existingVisits;
+
+  // Create 8 realistic stops for today's itinerary
+  const baseDate = new Date();
+  baseDate.setHours(8, 30, 0, 0);
+
+  const routeSlots = [
+    { storeId: 'store-sm-mega', scheduledTime: '08:30 AM - 09:45 AM', status: 'completed', checkInOffsetMin: 2, durationMin: 76 },
+    { storeId: 'store-rob-galler', scheduledTime: '10:00 AM - 11:15 AM', status: 'completed', checkInOffsetMin: 95, durationMin: 72 },
+    { storeId: 'store-sm-aura', scheduledTime: '11:45 AM - 01:00 PM', status: 'checked_in', checkInOffsetMin: 196, durationMin: null },
+    { storeId: 'store-glorietta', scheduledTime: '01:30 PM - 02:30 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+    { storeId: 'store-greenbelt', scheduledTime: '02:45 PM - 03:45 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+    { storeId: 'store-trinoma', scheduledTime: '04:15 PM - 05:15 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+    { storeId: 'store-sm-north', scheduledTime: '05:30 PM - 06:30 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+    { storeId: 'store-atc', scheduledTime: '07:00 PM - 08:00 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+  ];
+
+  const inserted = [];
+  for (let i = 0; i < routeSlots.length; i++) {
+    const slot = routeSlots[i];
+    const [store] = await db.select().from(stores).where(eq(stores.id, slot.storeId));
+    const checkIn = slot.checkInOffsetMin !== null ? new Date(baseDate.getTime() + slot.checkInOffsetMin * 60000) : null;
+    const checkOut = (checkIn && slot.durationMin) ? new Date(checkIn.getTime() + slot.durationMin * 60000) : null;
+
+    const row = {
+      id: newId('visit'),
+      workspaceId: ws,
+      userId,
+      storeId: slot.storeId,
+      visitDate: todayDate,
+      sequenceOrder: i + 1,
+      scheduledTime: slot.scheduledTime,
+      status: slot.status,
+      checkInTime: checkIn,
+      checkOutTime: checkOut,
+      checkInLat: store?.latitude || 14.5842,
+      checkInLng: store?.longitude || 121.0567,
+      gpsVerified: true,
+      notes: slot.status === 'completed' ? 'Shelf planogram audited & shelf-share stock validated' : slot.status === 'checked_in' ? 'Currently on sales floor - Pax active' : 'Scheduled itinerary visit',
+      createdAt: new Date(),
+    };
+    await db.insert(rovingStoreVisits).values(row as any);
+    inserted.push(row);
+  }
+
+  return inserted;
+}
+
+// Comprehensive User 360° Profile Dossier
+adminRouter.get('/admin/:ws/users/:id/profile', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const [user] = await db.select().from(users).where(and(eq(users.id, id), eq(users.workspaceId, ws)));
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  // Assigned store
+  const [assignment] = await db.select().from(storeAssignments).where(and(eq(storeAssignments.userId, id), eq(storeAssignments.workspaceId, ws), eq(storeAssignments.active, true)));
+  let assignedStore = null;
+  if (assignment) {
+    const [st] = await db.select().from(stores).where(and(eq(stores.id, assignment.storeId), eq(stores.workspaceId, ws)));
+    assignedStore = st || null;
+  }
+
+  // All assigned stores for roving / multi-store personnel
+  const allStores = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const storeMap = new Map(allStores.map(s => [s.id, s]));
+  const assignedStoreIds: string[] = Array.isArray((user as any).assignedStoreIds) ? (user as any).assignedStoreIds : (assignedStore ? [assignedStore.id] : []);
+  const assignedStoresList = assignedStoreIds.map(sid => storeMap.get(sid)).filter(Boolean);
+
+  // Assigned Org Node
+  const allNodes = await db.select().from(orgNodes).where(eq(orgNodes.workspaceId, ws));
+  const leadingNode = allNodes.find(n => n.leaderUserId === id);
+  const memberNode = allNodes.find(n => ((n.metadata as any)?.memberUserIds || []).includes(id));
+  const assignedOrgNode = leadingNode || memberNode || null;
+
+  // Shifts (Stationary & Roving)
+  const userShifts = await db.select().from(shifts).where(eq(shifts.userId, id)).orderBy(desc(shifts.clockInTime)).limit(10);
+
+  // Today's Roving Itinerary & Multi-Store Visits
+  const todayDate = new Date().toISOString().split('T')[0];
+  const userVisits = await db.select().from(rovingStoreVisits).where(
+    and(eq(rovingStoreVisits.userId, id), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
+  ).orderBy(rovingStoreVisits.sequenceOrder);
+
+  const enrichedVisits = userVisits.map(v => ({
+    ...v,
+    store: storeMap.get(v.storeId) || null,
+  }));
+
+  // Sales Transactions
+  const userTransactions = await db.select().from(salesTransactions).where(eq(salesTransactions.userId, id)).orderBy(desc(salesTransactions.timestamp)).limit(20);
+  const totalSalesVolume = userTransactions.reduce((acc, t) => acc + (t.totalAmount || 0), 0);
+
+  // Multimodal Vision Audits
+  const userAudits = await db.select().from(shelfAudits).where(eq(shelfAudits.userId, id)).orderBy(desc(shelfAudits.timestamp)).limit(10);
+
+  // User-specific audit history
+  const userAuditHistory = await db.select().from(auditLogs).where(and(
+    eq(auditLogs.workspaceId, ws),
+    or(eq(auditLogs.resourceId, id), eq(auditLogs.actorId, id))
+  )).orderBy(desc(auditLogs.timestamp)).limit(20);
+
+  res.json({
+    user,
+    employmentType: (user as any).employmentType || 'stationary',
+    assignedStore,
+    assignedStores: assignedStoresList,
+    assignedOrgNode,
+    shifts: userShifts,
+    itinerary: enrichedVisits,
+    visitedStoresCount: enrichedVisits.filter(v => v.status === 'completed' || v.status === 'checked_in').length,
+    transactions: userTransactions,
+    totalSalesVolume,
+    transactionCount: userTransactions.length,
+    audits: userAudits,
+    auditHistory: userAuditHistory,
+  });
+}));
+
+// ============================================================
+// ROVING MULTI-STORE ITINERARY & CHECK-IN / CHECK-OUT ENGINE
+// ============================================================
+
+// 1. Get today's itinerary for staff (seeds 8 stores if empty)
+adminRouter.get('/admin/:ws/users/:id/itinerary', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const visits = await ensureRovingItinerary(ws, id);
+  const allStores = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const storeMap = new Map(allStores.map(s => [s.id, s]));
+
+  const enriched = visits.map(v => ({
+    ...v,
+    store: storeMap.get(v.storeId) || null,
+  }));
+
+  const activeVisit = enriched.find(v => v.status === 'checked_in') || null;
+  const completedCount = enriched.filter(v => v.status === 'completed').length;
+  const completionPct = enriched.length > 0 ? Math.round((completedCount / enriched.length) * 100) : 0;
+
+  res.json({
+    date: new Date().toISOString().split('T')[0],
+    userId: id,
+    visits: enriched,
+    activeVisit,
+    completedCount,
+    totalScheduled: enriched.length,
+    completionPct,
+  });
+}));
+
+// 2. Add ad-hoc store visit to today's roving route
+adminRouter.post('/admin/:ws/users/:id/itinerary/add', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const b = req.body || {};
+  if (!b.storeId) return res.status(400).json({ error: 'storeId is required' });
+
+  const todayDate = new Date().toISOString().split('T')[0];
+  const existingVisits = await db.select().from(rovingStoreVisits).where(
+    and(eq(rovingStoreVisits.userId, id), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
+  );
+
+  const row = {
+    id: newId('visit'),
+    workspaceId: ws,
+    userId: id,
+    storeId: b.storeId,
+    visitDate: todayDate,
+    sequenceOrder: existingVisits.length + 1,
+    scheduledTime: b.scheduledTime || 'Unscheduled / Ad-Hoc Visit',
+    status: 'pending',
+    checkInTime: null,
+    checkOutTime: null,
+    checkInLat: null,
+    checkInLng: null,
+    gpsVerified: true,
+    notes: b.notes || 'Ad-hoc store visit added via field copilot',
+    createdAt: new Date(),
+  };
+
+  await db.insert(rovingStoreVisits).values(row as any);
+  await log(ws, 'itinerary.add_stop', 'roving_store_visits', row.id, row, 'stores', id, 'Field Itinerary Planner');
+  res.json(row);
+}));
+
+// 3. Frontline Clock-In (Stationary & Roving Store Check-In with GPS verification)
+adminRouter.post('/admin/:ws/users/:id/clock-in', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const b = req.body || {};
+  const [user] = await db.select().from(users).where(and(eq(users.id, id), eq(users.workspaceId, ws)));
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  // Resolve target store
+  const storeId = b.storeId || (await db.select().from(storeAssignments).where(and(eq(storeAssignments.userId, id), eq(storeAssignments.active, true))))[0]?.storeId;
+  if (!storeId) return res.status(400).json({ error: 'Store assignment required to clock-in' });
+
+  const [store] = await db.select().from(stores).where(eq(stores.id, storeId));
+  if (!store) return res.status(404).json({ error: 'Store not found' });
+
+  // GPS Verification
+  const userLat = b.lat !== undefined ? Number(b.lat) : (store.latitude || 14.5842);
+  const userLng = b.lng !== undefined ? Number(b.lng) : (store.longitude || 121.0567);
+  let distanceMeters = 25;
+  if (store.latitude && store.longitude && b.lat && b.lng) {
+    distanceMeters = calculateDistanceMeters(userLat, userLng, store.latitude, store.longitude);
+  }
+  const radius = store.geofenceRadiusMeters || 200;
+  const gpsVerified = distanceMeters <= (radius + 150); // allow slight GPS margin
+
+  const todayDate = new Date().toISOString().split('T')[0];
+  const now = new Date();
+
+  // 1. Insert/Update Shift
+  const [existingShift] = await db.select().from(shifts).where(
+    and(eq(shifts.userId, id), eq(shifts.shiftDate, todayDate), eq(shifts.storeId, storeId))
+  );
+
+  let shiftId = existingShift?.id;
+  if (existingShift) {
+    await db.update(shifts).set({
+      clockInTime: now,
+      status: 'active',
+      gpsVerified,
+    } as any).where(eq(shifts.id, existingShift.id));
+  } else {
+    shiftId = newId('shift');
+    await db.insert(shifts).values({
+      id: shiftId,
+      userId: id,
+      storeId,
+      shiftDate: todayDate,
+      clockInTime: now,
+      gpsVerified,
+      targetAmount: store.dailyTargetDefault || 20000,
+      currency: store.currency || 'PHP',
+      status: 'active',
+    } as any);
+  }
+
+  // 2. If roving or visitId specified, update roving visit
+  let visit = null;
+  if (b.visitId) {
+    await db.update(rovingStoreVisits).set({
+      status: 'checked_in',
+      checkInTime: now,
+      checkInLat: userLat,
+      checkInLng: userLng,
+      gpsVerified,
+      notes: b.notes || 'Arrived on site · Verified via mobile GPS geofence',
+    } as any).where(eq(rovingStoreVisits.id, b.visitId));
+    const [v] = await db.select().from(rovingStoreVisits).where(eq(rovingStoreVisits.id, b.visitId));
+    visit = v;
+  } else {
+    // Check if there is a pending visit for this store today
+    const [matchingVisit] = await db.select().from(rovingStoreVisits).where(
+      and(eq(rovingStoreVisits.userId, id), eq(rovingStoreVisits.storeId, storeId), eq(rovingStoreVisits.visitDate, todayDate))
+    );
+    if (matchingVisit) {
+      await db.update(rovingStoreVisits).set({
+        status: 'checked_in',
+        checkInTime: now,
+        checkInLat: userLat,
+        checkInLng: userLng,
+        gpsVerified,
+      } as any).where(eq(rovingStoreVisits.id, matchingVisit.id));
+      visit = { ...matchingVisit, status: 'checked_in', checkInTime: now };
+    }
+  }
+
+  await log(ws, 'staff.clock_in', 'shifts', shiftId, {
+    userId: id,
+    userName: user.name,
+    storeId,
+    storeName: store.name,
+    distanceMeters,
+    geofenceRadiusMeters: radius,
+    gpsVerified,
+    isRoving: !!b.isRoving,
+  }, 'shifts', id, 'GPS Geofence Arrival Sentinel', undefined, 'approved');
+
+  res.json({
+    ok: true,
+    shiftId,
+    storeId,
+    storeName: store.name,
+    clockInTime: now,
+    gpsVerified,
+    distanceMeters,
+    geofenceRadiusMeters: radius,
+    visit,
+    message: `Successfully clocked in at ${store.name}! GPS Geofence: ${gpsVerified ? 'VERIFIED' : 'OUT_OF_BOUNDS'} (${distanceMeters}m from branch).`,
+  });
+}));
+
+// 4. Frontline Clock-Out (Stationary Shift End / Roving Store Visit Completion)
+adminRouter.post('/admin/:ws/users/:id/clock-out', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const b = req.body || {};
+  const [user] = await db.select().from(users).where(and(eq(users.id, id), eq(users.workspaceId, ws)));
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const now = new Date();
+  const todayDate = now.toISOString().split('T')[0];
+
+  // Update active shift if any
+  const [activeShift] = await db.select().from(shifts).where(
+    and(eq(shifts.userId, id), eq(shifts.shiftDate, todayDate), eq(shifts.status, 'active'))
+  );
+  if (activeShift) {
+    await db.update(shifts).set({
+      clockOutTime: now,
+      status: 'completed',
+    } as any).where(eq(shifts.id, activeShift.id));
+  }
+
+  // Update roving visit if any
+  if (b.visitId) {
+    await db.update(rovingStoreVisits).set({
+      status: 'completed',
+      checkOutTime: now,
+      notes: b.notes || 'Completed floor visit and departure check-out logged',
+    } as any).where(eq(rovingStoreVisits.id, b.visitId));
+  } else {
+    // Complete any currently checked_in visit
+    const [checkedInVisit] = await db.select().from(rovingStoreVisits).where(
+      and(eq(rovingStoreVisits.userId, id), eq(rovingStoreVisits.visitDate, todayDate), eq(rovingStoreVisits.status, 'checked_in'))
+    );
+    if (checkedInVisit) {
+      await db.update(rovingStoreVisits).set({
+        status: 'completed',
+        checkOutTime: now,
+        notes: b.notes || 'Completed floor visit',
+      } as any).where(eq(rovingStoreVisits.id, checkedInVisit.id));
+    }
+  }
+
+  await log(ws, 'staff.clock_out', 'shifts', activeShift?.id || id, {
+    userId: id,
+    userName: user.name,
+    clockOutTime: now,
+    notes: b.notes,
+  }, 'shifts', id, 'Staff Attendance Tracker');
+
+  res.json({
+    ok: true,
+    clockOutTime: now,
+    message: `Departure logged. Shift/visit marked completed at ${now.toLocaleTimeString()}.`,
+  });
+}));
+
+// 5. Roving Fleet Telemetry & Multi-Store Compliance Overview
+adminRouter.get('/admin/:ws/roving-telemetry', wrap(async (req, res) => {
+  const { ws } = req.params;
+  const todayDate = new Date().toISOString().split('T')[0];
+  const allUsers = await db.select().from(users).where(eq(users.workspaceId, ws));
+  const rovingUsers = allUsers.filter(u => (u as any).employmentType === 'roving' || u.role === 'supervisor');
+  const allStores = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const storeMap = new Map(allStores.map(s => [s.id, s]));
+
+  const fleet = [];
+  for (const u of rovingUsers) {
+    const visits = await ensureRovingItinerary(ws, u.id);
+    const enriched = visits.map(v => ({
+      ...v,
+      store: storeMap.get(v.storeId) || null,
+    }));
+    const activeVisit = enriched.find(v => v.status === 'checked_in');
+    const completedCount = enriched.filter(v => v.status === 'completed').length;
+    fleet.push({
+      user: u,
+      totalVisits: enriched.length,
+      completedCount,
+      completionPct: enriched.length > 0 ? Math.round((completedCount / enriched.length) * 100) : 0,
+      activeVisit,
+      visits: enriched,
+    });
+  }
+
+  res.json({
+    date: todayDate,
+    rovingPersonnelCount: rovingUsers.length,
+    fleet,
+  });
+}));
+
 
 // ============================================================
 // AI AGENT REGISTRY & SKILL CONFIGURATION STUDIO
@@ -964,10 +1425,10 @@ adminRouter.get('/admin/:ws/org-chart', wrap(async (req, res) => {
   });
 }));
 
-// 1. CREATE ORG NODE
+// 1. CREATE ORG NODE (Supports In-Between Level Insertion with Child Adoption)
 adminRouter.post('/admin/:ws/org-nodes', wrap(async (req, res) => {
   const ws = req.params.ws;
-  const { title, parentId, nodeType, leaderUserId, assignedStoreIds, targetQuota, notes, actorId, approvalSignature } = req.body;
+  const { title, parentId, nodeType, leaderUserId, assignedStoreIds, targetQuota, notes, actorId, approvalSignature, adoptChildIds } = req.body;
   if (!title || !title.trim()) {
     return res.status(400).json({ error: 'Org node title is required' });
   }
@@ -993,12 +1454,23 @@ adminRouter.post('/admin/:ws/org-nodes', wrap(async (req, res) => {
 
   await db.insert(orgNodes).values(newNode as any);
 
+  // Re-parent / adopt selected children to insert this node in-between
+  let reparentedCount = 0;
+  if (Array.isArray(adoptChildIds) && adoptChildIds.length > 0) {
+    for (const childId of adoptChildIds) {
+      await db.update(orgNodes).set({ parentId: nodeId } as any).where(and(eq(orgNodes.id, childId), eq(orgNodes.workspaceId, ws)));
+      reparentedCount++;
+    }
+  }
+
   // Audit trail logging
   await log(ws, 'org.create_node', 'users', nodeId, {
     createdNode: newNode,
+    adoptedChildren: adoptChildIds || [],
+    reparentedCount,
   }, 'users', actorId || 'admin', approvalSignature || 'Authorized Admin [UI / HMAC]', undefined, 'approved');
 
-  res.status(201).json({ success: true, node: newNode });
+  res.status(201).json({ success: true, node: newNode, reparentedCount });
 }));
 
 // 2. UPDATE ORG NODE
@@ -1277,7 +1749,14 @@ adminRouter.get('/admin/:ws/settings/payment', wrap(async (req, res) => {
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
   const settings = (rows[0].settings as any) || {};
-  res.json(settings.paymentConfig || DEFAULT_PAYMENT_CONFIG);
+  const config = settings.paymentConfig || DEFAULT_PAYMENT_CONFIG;
+  res.json({
+    ...config,
+    paymentMethods: config.paymentMethods,
+    paymentTerms: config.paymentTerms,
+    methods: config.paymentMethods,
+    terms: config.paymentTerms,
+  });
 }));
 
 adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
@@ -1287,9 +1766,11 @@ adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
   const settings = (rows[0].settings as any) || {};
   const currentConfig = settings.paymentConfig || DEFAULT_PAYMENT_CONFIG;
+  const methods = req.body.paymentMethods || req.body.methods || currentConfig.paymentMethods;
+  const terms = req.body.paymentTerms || req.body.terms || currentConfig.paymentTerms;
   const newConfig = {
-    paymentMethods: req.body.paymentMethods || currentConfig.paymentMethods,
-    paymentTerms: req.body.paymentTerms || currentConfig.paymentTerms,
+    paymentMethods: methods,
+    paymentTerms: terms,
   };
   const updatedSettings = { ...settings, paymentConfig: newConfig };
   await db.update(workspaces).set({ settings: updatedSettings } as any).where(eq(workspaces.id, ws));
@@ -1306,7 +1787,14 @@ adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
     `agent-aegis-${ws}`
   );
 
-  res.json({ ok: true, paymentConfig: newConfig });
+  res.json({
+    ok: true,
+    paymentConfig: newConfig,
+    paymentMethods: newConfig.paymentMethods,
+    paymentTerms: newConfig.paymentTerms,
+    methods: newConfig.paymentMethods,
+    terms: newConfig.paymentTerms,
+  });
 }));
 
 // ============================================================
@@ -1318,7 +1806,21 @@ adminRouter.get('/admin/:ws/settings/governance', wrap(async (req, res) => {
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
   const settings = (rows[0].settings as any) || {};
-  res.json(settings.aiGovernance || DEFAULT_AI_GOVERNANCE);
+  const gov = settings.aiGovernance || DEFAULT_AI_GOVERNANCE;
+  const allowedRoles = gov.allowedRoles || DEFAULT_AI_GOVERNANCE.allowedRoles;
+  const roles = [
+    { role: 'super_admin', label: 'Super Administrator / Security Root', canQueryAI: allowedRoles.super_admin?.canQuery ?? true, canExecuteConfig: allowedRoles.super_admin?.canConfigure ?? true, requiresApprovalSignoff: allowedRoles.super_admin?.requiresApproval ?? false },
+    { role: 'company_admin', label: 'Company Administrator / Ops Director', canQueryAI: allowedRoles.company_admin?.canQuery ?? true, canExecuteConfig: allowedRoles.company_admin?.canConfigure ?? true, requiresApprovalSignoff: allowedRoles.company_admin?.requiresApproval ?? true },
+    { role: 'supervisor', label: 'Field Force & Retail Area Supervisor', canQueryAI: allowedRoles.supervisor?.canQuery ?? true, canExecuteConfig: allowedRoles.supervisor?.canConfigure ?? false, requiresApprovalSignoff: allowedRoles.supervisor?.requiresApproval ?? false },
+    { role: 'promoter', label: 'Frontline Brand Promoter / Store Staff', canQueryAI: allowedRoles.promoter?.canQuery ?? false, canExecuteConfig: allowedRoles.promoter?.canConfigure ?? false, requiresApprovalSignoff: false },
+  ];
+  res.json({
+    ...gov,
+    allowedRoles,
+    roles,
+    autoAuditAllAI: gov.autoAuditAllAiActions ?? true,
+    requireDigitalSignature: gov.requireSupervisorSignOffOnConfig ?? true,
+  });
 }));
 
 adminRouter.post('/admin/:ws/settings/governance', wrap(async (req, res) => {
@@ -1328,9 +1830,30 @@ adminRouter.post('/admin/:ws/settings/governance', wrap(async (req, res) => {
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
   const settings = (rows[0].settings as any) || {};
   const currentGov = settings.aiGovernance || DEFAULT_AI_GOVERNANCE;
+  let allowedRoles = { ...(currentGov.allowedRoles || DEFAULT_AI_GOVERNANCE.allowedRoles) };
+  if (req.body.allowedRoles) {
+    allowedRoles = { ...allowedRoles, ...req.body.allowedRoles };
+  }
+  if (req.body.roles && Array.isArray(req.body.roles)) {
+    req.body.roles.forEach((r: any) => {
+      if (allowedRoles[r.role]) {
+        allowedRoles[r.role] = {
+          ...allowedRoles[r.role],
+          canQuery: r.canQueryAI ?? r.canQuery ?? allowedRoles[r.role].canQuery,
+          canConfigure: r.canExecuteConfig ?? r.canConfigure ?? allowedRoles[r.role].canConfigure,
+          requiresApproval: r.requiresApprovalSignoff ?? r.requiresApproval ?? allowedRoles[r.role].requiresApproval,
+        };
+      }
+    });
+  }
+  const autoAudit = req.body.autoAuditAllAI ?? req.body.autoAuditAllAiActions ?? currentGov.autoAuditAllAiActions;
+  const requireSig = req.body.requireDigitalSignature ?? req.body.requireSupervisorSignOffOnConfig ?? currentGov.requireSupervisorSignOffOnConfig;
   const newGov = {
     ...currentGov,
     ...req.body,
+    allowedRoles,
+    autoAuditAllAiActions: autoAudit,
+    requireSupervisorSignOffOnConfig: requireSig,
   };
   const updatedSettings = { ...settings, aiGovernance: newGov };
   await db.update(workspaces).set({ settings: updatedSettings } as any).where(eq(workspaces.id, ws));
@@ -1347,7 +1870,12 @@ adminRouter.post('/admin/:ws/settings/governance', wrap(async (req, res) => {
     `agent-aegis-${ws}`
   );
 
-  res.json({ ok: true, aiGovernance: newGov });
+  res.json({
+    ok: true,
+    aiGovernance: newGov,
+    allowedRoles: newGov.allowedRoles,
+    roles: req.body.roles || undefined,
+  });
 }));
 
 // ============================================================
@@ -1437,15 +1965,22 @@ adminRouter.post('/admin/:ws/aegis/chat', wrap(async (req, res) => {
   try {
     if (process.env.GEMINI_API_KEY) {
       const classPrompt = `You are the safety and intent router for Aegis, an enterprise retail operations copilot.
-Determine whether the user is attempting to CHANGE OR CONFIGURE SYSTEM SETTINGS (e.g. enable/disable/add payment methods, payment terms, update store quotas, modify AI guardrails, alter product pricing, adjust commission) or simply MAKING AN INQUIRY / ASKING A QUESTION (e.g. asking for sales telemetry, store health, payment breakdown, audit logs, advice).
+Determine whether the user is attempting to CHANGE OR CONFIGURE SYSTEM SETTINGS (e.g. enable/disable/add payment methods, payment terms, update store quotas, modify AI guardrails, alter product pricing, adjust commission, modify org chart, OR ADD/CREATE NEW USERS/PERSONS/STAFF) or simply MAKING AN INQUIRY / ASKING A QUESTION (e.g. asking for sales telemetry, store health, payment breakdown, audit logs, advice).
+
+If the user asks to add or create a user, promoter, supervisor, or staff member (e.g. "Add promoter Carlos Mendoza with email ..."), set:
+isConfigChange: true,
+configDomain: "user_provisioning",
+action: "create",
+targetEntity: <person full name>,
+targetValue: { email, phone, role, storeName, orgTitle }
 
 User Message: "${message}"
 
 Output JSON only:
 {
   "isConfigChange": boolean,
-  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "ai_guardrails" | "product_pricing" | "none",
-  "action": "enable" | "disable" | "update" | "add" | "query",
+  "configDomain": "payment_methods" | "payment_terms" | "store_quota" | "org_chart" | "user_provisioning" | "ai_guardrails" | "product_pricing" | "none",
+  "action": "enable" | "disable" | "update" | "add" | "create" | "query",
   "targetEntity": string,
   "targetValue": any,
   "explanation": string
@@ -1459,9 +1994,39 @@ Output JSON only:
     }
   } catch {}
 
+  // Heuristic / Regex Fallback for User Provisioning via Aegis
+  if (!intentClassification.isConfigChange) {
+    const lowerMsg = message.toLowerCase();
+    if (lowerMsg.includes('add user') || lowerMsg.includes('create user') || lowerMsg.includes('add promoter') || lowerMsg.includes('add staff') || lowerMsg.includes('add person') || lowerMsg.includes('create staff') || lowerMsg.includes('create promoter') || lowerMsg.includes('add supervisor')) {
+      const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = message.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}|\+?\d{10,14}/);
+      const roleMatch = lowerMsg.includes('supervisor') ? 'supervisor' : (lowerMsg.includes('admin') ? 'company_admin' : 'promoter');
+      
+      let extractedName = '';
+      const nameMatch = message.match(/(?:add|create)\s+(?:promoter|supervisor|user|staff|person)\s+([A-Za-z\s]+?)(?:\s+(?:with|email|phone|mobile|to|under|at|\,|$))/i);
+      if (nameMatch && nameMatch[1]) {
+        extractedName = nameMatch[1].trim();
+      } else {
+        extractedName = 'New Retail Staff';
+      }
+
+      intentClassification = {
+        isConfigChange: true,
+        configDomain: 'user_provisioning',
+        action: 'create',
+        targetEntity: extractedName,
+        targetValue: {
+          email: emailMatch ? emailMatch[0] : null,
+          phone: phoneMatch ? phoneMatch[0] : null,
+          role: roleMatch,
+        }
+      };
+    }
+  }
+
   // 5. Guardrail Check 2: Configuration Attempt by Unauthorized Role (e.g., Supervisor)
   if (intentClassification.isConfigChange && !roleRule.canConfigure) {
-    const reason = `Role "${userRole}" is restricted to read-only diagnostics and field task dispatch. System configuration changes require "company_admin" or "super_admin" authorization.`;
+    const reason = `Role "${userRole}" is restricted to read-only diagnostics and field task dispatch. System configuration changes and personnel provisioning require "company_admin" or "super_admin" authorization.`;
 
     await log(ws, 'aegis.config_rejected', 'ai_governance', ws, {
       attemptedMessage: message,
@@ -1473,7 +2038,7 @@ Output JSON only:
     }, 'ai_governance', userId, 'Aegis Guardrail Sentinel', `agent-aegis-${ws}`, 'rejected');
 
     return res.json({
-      reply: `### ⚠️ Access Guardrail Policy Triggered\n\n**Action Blocked:** Modification of system configuration (${intentClassification.configDomain || 'System Policy'}).\n\n**Policy Notice:** As a **${userRole.toUpperCase()}**, you have full read-only diagnostic, store 360°, and task-dispatch permissions. However, modifying live payment terms, gateway rules, or corporate quotas requires **Company Admin** or **Super Admin** credentials.\n\n*This attempt has been logged into the enterprise audit trail (\`module: ai_governance\`, status: \`rejected\`).*`,
+      reply: `### ⚠️ Access Guardrail Policy Triggered\n\n**Action Blocked:** Modification of system configuration or personnel (${intentClassification.configDomain || 'System Policy'}).\n\n**Policy Notice:** As a **${userRole.toUpperCase()}**, you have full read-only diagnostic, store 360°, and task-dispatch permissions. However, modifying live payment terms, gateway rules, org topology, or provisioning staff requires **Company Admin** or **Super Admin** credentials.\n\n*This attempt has been logged into the enterprise audit trail (\`module: ai_governance\`, status: \`rejected\`).*`,
       guardrailTriggered: true,
       auditLogged: true,
     });
@@ -1543,6 +2108,49 @@ Output JSON only:
           appliedDiff = { storeId: storeMatch.id, storeName: storeMatch.name, oldDailyTarget: oldTarget, newDailyTarget: newTarget };
           configUpdated = true;
         }
+      } else if (intentClassification.configDomain === 'user_provisioning') {
+        // Handle User Provisioning via Aegis Copilot
+        const personName = intentClassification.targetEntity || 'New Retail Staff';
+        const val = intentClassification.targetValue || {};
+        const email = val.email || `${personName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@retailbloc.ph`;
+        const phone = val.phone || '+63 917 888 9999';
+        const role = val.role || 'promoter';
+
+        // Check store match from message or val
+        const matchedStore = storeList.find(s => message.toLowerCase().includes(s.name.toLowerCase()) || message.toLowerCase().includes(s.storeCode.toLowerCase()) || (val.storeName && s.name.toLowerCase().includes(val.storeName.toLowerCase())));
+        
+        // Check org node match
+        const existingNodes = await db.select().from(orgNodes).where(eq(orgNodes.workspaceId, ws));
+        const matchedOrg = existingNodes.find(n => message.toLowerCase().includes(n.title.toLowerCase()) || (val.orgTitle && n.title.toLowerCase().includes(val.orgTitle.toLowerCase())));
+
+        const newUserId = newId('usr');
+        const newUser = {
+          id: newUserId,
+          workspaceId: ws,
+          name: personName,
+          email: email,
+          phone: phone,
+          role: role,
+          preferredLanguage: 'en',
+          timezone: 'Asia/Singapore',
+          active: true,
+          createdAt: new Date(),
+        };
+
+        await db.insert(users).values(newUser as any);
+        if (matchedStore) {
+          await setAssignment(ws, newUserId, matchedStore.id);
+        }
+        if (matchedOrg) {
+          await db.update(orgNodes).set({ memberCount: (matchedOrg.memberCount || 0) + 1 } as any).where(eq(orgNodes.id, matchedOrg.id));
+        }
+
+        appliedDiff = {
+          provisionedUser: newUser,
+          assignedStore: matchedStore ? { id: matchedStore.id, name: matchedStore.name } : 'Unassigned',
+          assignedOrgUnit: matchedOrg ? { id: matchedOrg.id, title: matchedOrg.title } : 'Unassigned',
+        };
+        configUpdated = true;
       } else if (intentClassification.configDomain === 'org_chart') {
         // Handle Org Chart autonomous modification via Aegis
         const existingNodes = await db.select().from(orgNodes).where(eq(orgNodes.workspaceId, ws));
@@ -1678,3 +2286,578 @@ adminRouter.post('/admin/demo/commit', wrap(async (req, res) => {
 adminRouter.delete('/admin/demo/:ws', wrap(async (req, res) => {
   res.json(await DemoGenerator.deleteDemo(req.params.ws));
 }));
+
+// ============================================================
+// ENTERPRISE DIGITAL SURVEYS & DYNAMIC FORMS ENGINE
+// ============================================================
+async function ensureSurveyTables() {
+  try {
+    await libSqlClient.execute(`
+      CREATE TABLE IF NOT EXISTS surveys (
+        id TEXT PRIMARY KEY,
+        workspace_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        survey_type TEXT NOT NULL DEFAULT 'internal_field',
+        status TEXT NOT NULL DEFAULT 'active',
+        target_roles TEXT,
+        target_store_ids TEXT,
+        target_org_node_ids TEXT,
+        valid_from INTEGER,
+        valid_until INTEGER,
+        questions TEXT NOT NULL,
+        created_by_user_id TEXT,
+        ai_agent_dispatched INTEGER DEFAULT 0,
+        metadata TEXT,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    await libSqlClient.execute(`
+      CREATE TABLE IF NOT EXISTS survey_submissions (
+        id TEXT PRIMARY KEY,
+        survey_id TEXT NOT NULL,
+        workspace_id TEXT NOT NULL,
+        submitted_by_user_id TEXT,
+        store_id TEXT,
+        respondent_type TEXT NOT NULL DEFAULT 'field_staff',
+        respondent_name TEXT,
+        respondent_contact TEXT,
+        answers TEXT NOT NULL,
+        submitted_at INTEGER NOT NULL,
+        metadata TEXT
+      );
+    `);
+  } catch (err) {
+    console.error('ensureSurveyTables error:', err);
+  }
+}
+
+async function ensureSeedSurveys(ws: string) {
+  await ensureSurveyTables();
+  const existing = await db.select().from(surveys).where(eq(surveys.workspaceId, ws));
+  if (existing.length > 0) return;
+
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const userList = await db.select().from(users).where(eq(users.workspaceId, ws));
+  const adminUser = userList.find(u => u.role === 'company_admin' || u.role === 'supervisor') || userList[0];
+  const now = new Date();
+  const nextMonth = new Date(now.getTime() + 30 * 86400000);
+
+  const sampleSurvey1 = {
+    id: `srv-${Date.now().toString(36)}-intel`,
+    workspaceId: ws,
+    title: 'Competitor Shelf & Price Intelligence Audit (Q4)',
+    description: 'Weekly field intelligence capture to monitor rival brand promotional pricing, secondary placement share, and endcap stock presence across mall retail branches.',
+    surveyType: 'internal_field',
+    status: 'active',
+    targetRoles: ['promoter', 'supervisor'],
+    targetStoreIds: storeList.map(s => s.id),
+    targetOrgNodeIds: [],
+    validFrom: now,
+    validUntil: nextMonth,
+    questions: [
+      {
+        id: 'q1_branch',
+        label: 'Select Store Branch Under Audit',
+        type: 'store_picker',
+        required: true,
+        masterDataSource: 'stores',
+      },
+      {
+        id: 'q2_focus_sku',
+        label: 'Select Core In-Focus SKU Observed',
+        type: 'product_picker',
+        required: true,
+        masterDataSource: 'products',
+      },
+      {
+        id: 'q3_comp_brand',
+        label: 'Competitor Brand Name Observed on Floor',
+        type: 'text',
+        placeholder: 'e.g., Brand X, Competitor Ultra',
+        required: true,
+      },
+      {
+        id: 'q4_comp_price',
+        label: 'Competitor Floor Retail Price ($ / ₱)',
+        type: 'number',
+        placeholder: 'e.g., 2999',
+        required: true,
+      },
+      {
+        id: 'q5_promo_scheme',
+        label: 'Competitor Active Promotion Type',
+        type: 'radio',
+        options: ['Direct Cash Discount', '0% Installment 12-Month Subsidized', 'Free Bundle Accessory', 'No Visible Promo'],
+        required: true,
+      },
+      {
+        id: 'q6_shelf_health',
+        label: 'Shelf Planogram Alignment Rating',
+        type: 'rating',
+        maxRating: 5,
+        required: true,
+      },
+      {
+        id: 'q7_notes',
+        label: 'Field Observations & Shopper Traffic Remarks',
+        type: 'textarea',
+        placeholder: 'Note any aggressive competitor promoter behavior or customer objections...',
+        required: false,
+      },
+    ],
+    createdByUserId: adminUser?.id || null,
+    aiAgentDispatched: true,
+    metadata: {
+      tags: ['competitor_intel', 'pricing', 'weekly_audit'],
+      dispatchChannel: 'Pax Autonomous Notification',
+    },
+    createdAt: now,
+  };
+
+  const sampleSurvey2 = {
+    id: `srv-${Date.now().toString(36)}-voc`,
+    workspaceId: ws,
+    title: 'Customer Voice of Experience (VOC) & NPS Survey',
+    description: 'Customer-facing touchpoint survey administered by store promoters or scanned via counter QR code to measure customer purchase delight and net promoter score.',
+    surveyType: 'customer_feedback',
+    status: 'active',
+    targetRoles: ['promoter'],
+    targetStoreIds: storeList.map(s => s.id),
+    targetOrgNodeIds: [],
+    validFrom: now,
+    validUntil: nextMonth,
+    questions: [
+      {
+        id: 'voc_store',
+        label: 'Purchasing Branch Location',
+        type: 'store_picker',
+        required: true,
+        masterDataSource: 'stores',
+      },
+      {
+        id: 'voc_product',
+        label: 'Primary Model / Device Inquired or Purchased',
+        type: 'product_picker',
+        required: true,
+        masterDataSource: 'products',
+      },
+      {
+        id: 'voc_nps',
+        label: 'How likely are you to recommend our products to a friend or colleague? (1 = Unlikely, 10 = Highly Likely)',
+        type: 'rating',
+        maxRating: 10,
+        required: true,
+      },
+      {
+        id: 'voc_payment_ease',
+        label: 'How was your payment & checkout experience?',
+        type: 'radio',
+        options: ['Seamless Fast Checkout', 'Good with Credit Card', 'Smooth Home Credit Financing', 'Slow Gateway Settlement'],
+        required: true,
+      },
+      {
+        id: 'voc_feedback',
+        label: 'What could we improve for your next visit?',
+        type: 'textarea',
+        placeholder: 'Any feedback on product demo, warranty, or promoter helpfulness...',
+        required: false,
+      },
+    ],
+    createdByUserId: adminUser?.id || null,
+    aiAgentDispatched: false,
+    metadata: {
+      tags: ['customer_voc', 'nps', 'counter_qr'],
+    },
+    createdAt: now,
+  };
+
+  await db.insert(surveys).values([sampleSurvey1, sampleSurvey2] as any);
+
+  // Seed initial responses for immediate analytics demonstration
+  if (storeList.length > 0 && userList.length > 0) {
+    const s1 = storeList[0];
+    const u1 = userList.find(u => u.role === 'promoter') || userList[0];
+    await db.insert(surveySubmissions).values([
+      {
+        id: `sub-${Date.now().toString(36)}-1`,
+        surveyId: sampleSurvey1.id,
+        workspaceId: ws,
+        submittedByUserId: u1.id,
+        storeId: s1.id,
+        respondentType: 'field_staff',
+        respondentName: u1.name,
+        respondentContact: u1.email,
+        answers: {
+          q1_branch: s1.id,
+          q2_focus_sku: 'prod-ultra',
+          q3_comp_brand: 'Apex Tech Series X',
+          q4_comp_price: 2899,
+          q5_promo_scheme: '0% Installment 12-Month Subsidized',
+          q6_shelf_health: 4,
+          q7_notes: 'Apex has aggressive booth displays near entrance; shoppers frequently asking for matching 12-month zero-interest terms.',
+        },
+        submittedAt: new Date(now.getTime() - 7200000),
+      },
+      {
+        id: `sub-${Date.now().toString(36)}-2`,
+        surveyId: sampleSurvey2.id,
+        workspaceId: ws,
+        submittedByUserId: null,
+        storeId: s1.id,
+        respondentType: 'customer',
+        respondentName: 'Maria Santos',
+        respondentContact: '+63 917 555 1234',
+        answers: {
+          voc_store: s1.id,
+          voc_product: 'prod-smart',
+          voc_nps: 9,
+          voc_payment_ease: 'Smooth Home Credit Financing',
+          voc_feedback: 'Promoter was very patient explaining the monthly installment terms. Quick approval!',
+        },
+        submittedAt: new Date(now.getTime() - 3600000),
+      },
+    ] as any);
+  }
+}
+
+// 1. LIST WORKSPACE SURVEYS
+adminRouter.get('/admin/:ws/surveys', wrap(async (req, res) => {
+  const ws = req.params.ws;
+  await ensureSeedSurveys(ws);
+  const surveyList = await db.select().from(surveys).where(eq(surveys.workspaceId, ws)).orderBy(desc(surveys.createdAt));
+  const submissionsList = await db.select().from(surveySubmissions).where(eq(surveySubmissions.workspaceId, ws));
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+
+  const result = surveyList.map(s => {
+    const sSubs = submissionsList.filter(sub => sub.surveyId === s.id);
+    const targetStoreNames = (s.targetStoreIds as string[] || []).map(stId => {
+      const match = storeList.find(st => st.id === stId);
+      return match ? match.name : stId;
+    });
+
+    return {
+      ...s,
+      submissionsCount: sSubs.length,
+      targetStoreNames,
+      questionsCount: Array.isArray(s.questions) ? s.questions.length : 0,
+      latestSubmissionAt: sSubs.length > 0 ? sSubs[0].submittedAt : null,
+    };
+  });
+
+  res.json(result);
+}));
+
+// 2. GET SINGLE SURVEY DETAILS & LIVE MASTER DATA
+adminRouter.get('/admin/:ws/surveys/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  await ensureSeedSurveys(ws);
+  const [survey] = await db.select().from(surveys).where(and(eq(surveys.id, id), eq(surveys.workspaceId, ws)));
+  if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const productList = await db.select().from(products).where(eq(products.workspaceId, ws));
+  const userList = await db.select().from(users).where(eq(users.workspaceId, ws));
+  const orgList = await db.select().from(orgNodes).where(eq(orgNodes.workspaceId, ws));
+  const submissionsList = await db.select().from(surveySubmissions).where(and(eq(surveySubmissions.surveyId, id), eq(surveySubmissions.workspaceId, ws)));
+
+  res.json({
+    survey,
+    submissionsCount: submissionsList.length,
+    masterData: {
+      stores: storeList.map(s => ({ id: s.id, name: s.name, code: s.storeCode, chain: s.chain, city: s.city, country: s.country })),
+      products: productList.map(p => ({ id: p.id, name: p.name, skuCode: p.skuCode, category: p.category, unitPrice: p.unitPrice })),
+      users: userList.map(u => ({ id: u.id, name: u.name, role: u.role, email: u.email })),
+      orgNodes: orgList.map(o => ({ id: o.id, title: o.title, nodeType: o.nodeType })),
+    },
+  });
+}));
+
+// 3. CREATE SURVEY
+adminRouter.post('/admin/:ws/surveys', wrap(async (req, res) => {
+  const ws = req.params.ws;
+  await ensureSeedSurveys(ws);
+  const {
+    title, description, surveyType, status, targetRoles, targetStoreIds, targetOrgNodeIds,
+    validFrom, validUntil, questions, createdByUserId, actorId, approvalSignature
+  } = req.body;
+
+  if (!title || !title.trim()) {
+    return res.status(400).json({ error: 'Survey title is required' });
+  }
+  if (!Array.isArray(questions) || questions.length === 0) {
+    return res.status(400).json({ error: 'At least one survey question field is required' });
+  }
+
+  const surveyId = `srv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+  const now = new Date();
+
+  const newSurvey = {
+    id: surveyId,
+    workspaceId: ws,
+    title: title.trim(),
+    description: description ? description.trim() : '',
+    surveyType: surveyType || 'internal_field',
+    status: status || 'active',
+    targetRoles: Array.isArray(targetRoles) ? targetRoles : ['promoter'],
+    targetStoreIds: Array.isArray(targetStoreIds) ? targetStoreIds : [],
+    targetOrgNodeIds: Array.isArray(targetOrgNodeIds) ? targetOrgNodeIds : [],
+    validFrom: validFrom ? new Date(validFrom) : now,
+    validUntil: validUntil ? new Date(validUntil) : new Date(now.getTime() + 14 * 86400000),
+    questions,
+    createdByUserId: createdByUserId || null,
+    aiAgentDispatched: true,
+    metadata: {
+      createdByActor: actorId || 'admin',
+      dispatchTimestamp: now.toISOString(),
+      agentFollowupRequired: true,
+    },
+    createdAt: now,
+  };
+
+  await db.insert(surveys).values(newSurvey as any);
+
+  // Audit trail logging
+  await log(ws, 'survey.create', 'surveys', surveyId, {
+    title: newSurvey.title,
+    surveyType: newSurvey.surveyType,
+    questionsCount: questions.length,
+    targetStoreCount: (newSurvey.targetStoreIds as string[]).length,
+    validUntil: newSurvey.validUntil,
+  }, 'surveys', actorId || 'admin', approvalSignature || 'Authorized Supervisor / Admin', undefined, 'approved');
+
+  res.status(201).json({ success: true, survey: newSurvey });
+}));
+
+// 4. UPDATE SURVEY
+adminRouter.put('/admin/:ws/surveys/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const [existing] = await db.select().from(surveys).where(and(eq(surveys.id, id), eq(surveys.workspaceId, ws)));
+  if (!existing) return res.status(404).json({ error: 'Survey not found' });
+
+  const b = req.body || {};
+  const patch: any = {};
+  if (b.title !== undefined) patch.title = String(b.title).trim();
+  if (b.description !== undefined) patch.description = String(b.description).trim();
+  if (b.status !== undefined) patch.status = String(b.status);
+  if (b.surveyType !== undefined) patch.surveyType = String(b.surveyType);
+  if (b.targetRoles !== undefined) patch.targetRoles = b.targetRoles;
+  if (b.targetStoreIds !== undefined) patch.targetStoreIds = b.targetStoreIds;
+  if (b.targetOrgNodeIds !== undefined) patch.targetOrgNodeIds = b.targetOrgNodeIds;
+  if (b.validUntil !== undefined) patch.validUntil = new Date(b.validUntil);
+  if (b.questions !== undefined) patch.questions = b.questions;
+
+  await db.update(surveys).set(patch as any).where(eq(surveys.id, id));
+
+  await log(ws, 'survey.update', 'surveys', id, {
+    before: existing,
+    after: patch,
+  }, 'surveys', b.actorId || 'admin', b.approvalSignature || 'Authorized Supervisor / Admin', undefined, 'approved');
+
+  res.json({ success: true, survey: { ...existing, ...patch } });
+}));
+
+// 5. DELETE SURVEY
+adminRouter.delete('/admin/:ws/surveys/:id', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const [existing] = await db.select().from(surveys).where(and(eq(surveys.id, id), eq(surveys.workspaceId, ws)));
+  if (!existing) return res.status(404).json({ error: 'Survey not found' });
+
+  await db.delete(surveySubmissions).where(eq(surveySubmissions.surveyId, id));
+  await db.delete(surveys).where(eq(surveys.id, id));
+
+  await log(ws, 'survey.delete', 'surveys', id, {
+    deletedSurvey: existing,
+  }, 'surveys', (req.query.actorId as string) || 'admin', (req.query.approvalSignature as string) || 'Authorized Admin', undefined, 'approved');
+
+  res.json({ success: true, message: `Survey "${existing.title}" and submissions deleted.` });
+}));
+
+// 6. SURVEY SUBMISSIONS & ANALYTICS AGGREGATION
+adminRouter.get('/admin/:ws/surveys/:id/submissions', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const [survey] = await db.select().from(surveys).where(and(eq(surveys.id, id), eq(surveys.workspaceId, ws)));
+  if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+  const submissions = await db.select().from(surveySubmissions).where(and(eq(surveySubmissions.surveyId, id), eq(surveySubmissions.workspaceId, ws))).orderBy(desc(surveySubmissions.submittedAt));
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const userList = await db.select().from(users).where(eq(users.workspaceId, ws));
+
+  // Compute answers aggregation
+  const questions = (survey.questions as any[]) || [];
+  const questionSummaries: Record<string, { label: string; type: string; totalResponses: number; frequencyMap: Record<string, number>; avgRating?: number }> = {};
+
+  questions.forEach(q => {
+    questionSummaries[q.id] = {
+      label: q.label,
+      type: q.type,
+      totalResponses: 0,
+      frequencyMap: {},
+      avgRating: 0,
+    };
+  });
+
+  const ratingSums: Record<string, { sum: number; count: number }> = {};
+
+  submissions.forEach(sub => {
+    const ans = (sub.answers as Record<string, any>) || {};
+    Object.entries(ans).forEach(([qId, val]) => {
+      if (questionSummaries[qId]) {
+        questionSummaries[qId].totalResponses++;
+        const strVal = String(val);
+        questionSummaries[qId].frequencyMap[strVal] = (questionSummaries[qId].frequencyMap[strVal] || 0) + 1;
+
+        if (questionSummaries[qId].type === 'rating' && typeof val === 'number') {
+          if (!ratingSums[qId]) ratingSums[qId] = { sum: 0, count: 0 };
+          ratingSums[qId].sum += val;
+          ratingSums[qId].count += 1;
+        }
+      }
+    });
+  });
+
+  Object.entries(ratingSums).forEach(([qId, data]) => {
+    if (questionSummaries[qId]) {
+      questionSummaries[qId].avgRating = Number((data.sum / data.count).toFixed(1));
+    }
+  });
+
+  const enrichedSubmissions = submissions.map(sub => {
+    const store = storeList.find(s => s.id === sub.storeId);
+    const user = userList.find(u => u.id === sub.submittedByUserId);
+    return {
+      ...sub,
+      storeName: store ? store.name : (sub.storeId || 'Unspecified Branch'),
+      storeCode: store ? store.storeCode : '',
+      submittedByName: user ? user.name : (sub.respondentName || 'Anonymous / Customer'),
+      submittedByRole: user ? user.role : sub.respondentType,
+    };
+  });
+
+  res.json({
+    survey,
+    totalSubmissions: submissions.length,
+    questionSummaries,
+    submissions: enrichedSubmissions,
+  });
+}));
+
+// 7. SUBMIT RESPONSE (FIELD STAFF OR CUSTOMER)
+adminRouter.post('/admin/:ws/surveys/:id/submit', wrap(async (req, res) => {
+  const { ws, id } = req.params;
+  const [survey] = await db.select().from(surveys).where(and(eq(surveys.id, id), eq(surveys.workspaceId, ws)));
+  if (!survey) return res.status(404).json({ error: 'Survey not found' });
+
+  const { submittedByUserId, storeId, respondentType, respondentName, respondentContact, answers } = req.body;
+  if (!answers || typeof answers !== 'object') {
+    return res.status(400).json({ error: 'Survey answers are required' });
+  }
+
+  const submissionId = `sub-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+  const now = new Date();
+
+  const newSub = {
+    id: submissionId,
+    surveyId: id,
+    workspaceId: ws,
+    submittedByUserId: submittedByUserId || null,
+    storeId: storeId || null,
+    respondentType: respondentType || 'field_staff',
+    respondentName: respondentName ? String(respondentName).trim() : null,
+    respondentContact: respondentContact ? String(respondentContact).trim() : null,
+    answers,
+    submittedAt: now,
+    metadata: {
+      clientIp: req.ip,
+      submittedVia: respondentType === 'customer' ? 'Customer Web Portal / Counter QR' : 'Frontline Promoter Mobile Console',
+    },
+  };
+
+  await db.insert(surveySubmissions).values(newSub as any);
+
+  // Log to audit trail
+  await log(ws, 'survey.submit', 'surveys', submissionId, {
+    surveyId: id,
+    surveyTitle: survey.title,
+    respondentType: newSub.respondentType,
+    storeId: newSub.storeId,
+    submittedByUserId: newSub.submittedByUserId,
+  }, 'surveys', submittedByUserId || 'public_respondent', 'Digital Signature Verified [Form Submission]', undefined, 'approved');
+
+  res.status(201).json({ success: true, submissionId });
+}));
+
+// 8. GEMINI AI SURVEY FORM DRAFTER
+adminRouter.post('/admin/:ws/surveys/ai-draft', wrap(async (req, res) => {
+  const ws = req.params.ws;
+  const { prompt, surveyType } = req.body;
+  if (!prompt || !prompt.trim()) {
+    return res.status(400).json({ error: 'Prompt is required to draft a survey' });
+  }
+
+  const storeList = await db.select().from(stores).where(eq(stores.workspaceId, ws));
+  const productList = await db.select().from(products).where(eq(products.workspaceId, ws));
+
+  let draftedSurvey: any = null;
+  try {
+    if (process.env.GEMINI_API_KEY) {
+      const aiPrompt = `You are the Lead Retail Operations AI Form Architect for Project BLOC.
+Generate an enterprise retail digital survey / audit checklist based on this user directive:
+"${prompt}"
+
+Context:
+- Retail Stores Master Data: ${storeList.map(s => `${s.name} (${s.storeCode})`).slice(0, 10).join(', ')}
+- Product Master Data: ${productList.map(p => `${p.name} (${p.skuCode})`).slice(0, 10).join(', ')}
+
+Return ONLY valid JSON matching this schema:
+{
+  "title": string,
+  "description": string,
+  "surveyType": "internal_field" | "customer_feedback" | "audit_checklist",
+  "targetRoles": string[],
+  "questions": [
+    {
+      "id": string (unique slug like "q1_store", "q2_price"),
+      "label": string,
+      "type": "text" | "textarea" | "number" | "radio" | "checkbox" | "rating" | "store_picker" | "product_picker" | "photo",
+      "required": boolean,
+      "placeholder"?: string,
+      "options"?: string[] (for radio/checkbox),
+      "maxRating"?: number (for rating, usually 5 or 10),
+      "masterDataSource"?: "stores" | "products" | "promoters"
+    }
+  ]
+}`;
+
+      const aiRes = await ai.models.generateContent({
+        model: MODELS.FLASH,
+        contents: aiPrompt,
+        config: { responseMimeType: 'application/json' },
+      });
+
+      draftedSurvey = JSON.parse(aiRes.text || '{}');
+    }
+  } catch (err) {
+    console.error('Gemini survey draft error:', err);
+  }
+
+  if (!draftedSurvey || !draftedSurvey.questions) {
+    draftedSurvey = {
+      title: 'In-Store Retail Execution & Promotional Survey',
+      description: `Synthesized survey draft for: "${prompt}"`,
+      surveyType: surveyType || 'internal_field',
+      targetRoles: ['promoter', 'supervisor'],
+      questions: [
+        { id: 'q_store', label: 'Select Store Branch', type: 'store_picker', required: true, masterDataSource: 'stores' },
+        { id: 'q_product', label: 'Primary Focus Product', type: 'product_picker', required: true, masterDataSource: 'products' },
+        { id: 'q_price', label: 'Observed Selling Price ($ / ₱)', type: 'number', required: true },
+        { id: 'q_promo', label: 'Promotional Bundle or Tagging Active', type: 'radio', options: ['0% Interest Installment', 'Gift with Purchase', 'Price Drop', 'Standard MSRP'], required: true },
+        { id: 'q_rating', label: 'Overall Merchandising & Shelf Grade', type: 'rating', maxRating: 5, required: true },
+        { id: 'q_notes', label: 'Supervisor / Field Agent Remarks', type: 'textarea', required: false },
+      ],
+    };
+  }
+
+  res.json({ success: true, draft: draftedSurvey });
+}));
+

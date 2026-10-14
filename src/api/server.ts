@@ -7,9 +7,10 @@ import { PaxAgent } from '../agents/pax/index.js';
 import { VeraAgent } from '../agents/vera/index.js';
 import { NexusAgent } from '../agents/nexus/index.js';
 import { db } from '../db/client.js';
-import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces } from '../db/schema.js';
+import { users, stores, storeAssignments, products, shifts, chatMessages, salesTransactions, workspaces, rovingStoreVisits } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { adminRouter } from './admin.js';
+import { ensureTablesAndColumns } from '../db/ensure_schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,16 +75,35 @@ app.get('/api/user/:userId/state', async (req, res) => {
 
     const messages = await db.select().from(chatMessages).where(eq(chatMessages.userId, user.id));
 
+    // Roving itinerary & visits for today
+    const userVisits = await db.select().from(rovingStoreVisits).where(
+      and(eq(rovingStoreVisits.userId, user.id), eq(rovingStoreVisits.workspaceId, user.workspaceId), eq(rovingStoreVisits.visitDate, todayDate))
+    ).orderBy(rovingStoreVisits.sequenceOrder);
+
+    const allStores = await db.select().from(stores).where(eq(stores.workspaceId, user.workspaceId));
+    const storeMap = new Map(allStores.map(s => [s.id, s]));
+    const enrichedVisits = userVisits.map(v => ({
+      ...v,
+      store: storeMap.get(v.storeId) || null,
+    }));
+    const activeVisit = enrichedVisits.find(v => v.status === 'checked_in') || null;
+    const effectiveStore = (activeVisit?.store) || store;
+
     res.json({
       user,
-      store,
+      store: effectiveStore,
+      defaultStore: store,
       supervisor,
       workspace: workspace ? { id: workspace.id, name: workspace.name } : null,
       shift,
+      isClockedIn: !!(shift && shift.status === 'active'),
+      employmentType: (user as any).employmentType || 'stationary',
+      activeVisit,
+      itinerary: enrichedVisits,
       focusProducts,
       currentShiftTotal,
-      targetAmount: shift ? shift.targetAmount : (store?.dailyTargetDefault || 15000),
-      currency: store?.currency || 'PHP',
+      targetAmount: shift ? shift.targetAmount : (effectiveStore?.dailyTargetDefault || 15000),
+      currency: effectiveStore?.currency || 'PHP',
       messages,
     });
   } catch (err: any) {
@@ -334,6 +354,8 @@ app.use((req, res) => {
   res.sendFile(path.join(webDir, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Project BLOC Server running on http://localhost:${PORT}`);
+ensureTablesAndColumns().catch(console.warn).finally(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Project BLOC Server running on http://localhost:${PORT}`);
+  });
 });

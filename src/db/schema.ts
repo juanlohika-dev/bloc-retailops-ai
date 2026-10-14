@@ -30,6 +30,8 @@ export const users = sqliteTable('users', {
   timezone: text('timezone').default('Asia/Singapore'),
   active: integer('active', { mode: 'boolean' }).default(true),
   avatarUrl: text('avatar_url'),
+  employmentType: text('employment_type').default('stationary'), // 'stationary' | 'roving'
+  assignedStoreIds: text('assigned_store_ids', { mode: 'json' }), // JSON array of assigned store ids
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
@@ -339,5 +341,65 @@ export const orgNodes = sqliteTable('org_nodes', {
   memberCount: integer('member_count').default(0),
   metadata: text('metadata', { mode: 'json' }),
   displayOrder: integer('display_order').default(0),
+});
+
+// ==========================================
+// 21. ENTERPRISE DIGITAL SURVEYS & FORMS
+// ==========================================
+export const surveys = sqliteTable('surveys', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  title: text('title').notNull(),
+  description: text('description'),
+  surveyType: text('survey_type').notNull().default('internal_field'), // 'internal_field' | 'customer_feedback' | 'audit_checklist'
+  status: text('status').notNull().default('active'),                   // 'draft' | 'active' | 'closed'
+  targetRoles: text('target_roles', { mode: 'json' }),                 // ['promoter', 'supervisor']
+  targetStoreIds: text('target_store_ids', { mode: 'json' }),           // ['store-1', ...]
+  targetOrgNodeIds: text('target_org_node_ids', { mode: 'json' }),       // ['org-1', ...]
+  validFrom: integer('valid_from', { mode: 'timestamp' }),
+  validUntil: integer('valid_until', { mode: 'timestamp' }),
+  questions: text('questions', { mode: 'json' }).notNull(),            // Array of form fields with master data bindings
+  createdByUserId: text('created_by_user_id').references(() => users.id),
+  aiAgentDispatched: integer('ai_agent_dispatched', { mode: 'boolean' }).default(false),
+  metadata: text('metadata', { mode: 'json' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 22. SURVEY SUBMISSIONS & AUDIT RESPONSES
+// ==========================================
+export const surveySubmissions = sqliteTable('survey_submissions', {
+  id: text('id').primaryKey(),
+  surveyId: text('survey_id').notNull().references(() => surveys.id),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  submittedByUserId: text('submitted_by_user_id').references(() => users.id),
+  storeId: text('store_id').references(() => stores.id),
+  respondentType: text('respondent_type').notNull().default('field_staff'), // 'field_staff' | 'customer'
+  respondentName: text('respondent_name'),
+  respondentContact: text('respondent_contact'),
+  answers: text('answers', { mode: 'json' }).notNull(),
+  submittedAt: integer('submitted_at', { mode: 'timestamp' }).notNull(),
+  metadata: text('metadata', { mode: 'json' }),
+});
+
+// ==========================================
+// 23. ROVING MULTI-STORE VISITS & ITINERARY
+// ==========================================
+export const rovingStoreVisits = sqliteTable('roving_store_visits', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  storeId: text('store_id').notNull().references(() => stores.id),
+  visitDate: text('visit_date').notNull(),                      // YYYY-MM-DD
+  sequenceOrder: integer('sequence_order').notNull().default(1),// 1..8
+  scheduledTime: text('scheduled_time').notNull(),              // e.g. "09:00 AM - 10:15 AM"
+  status: text('status').notNull().default('pending'),          // 'pending' | 'checked_in' | 'completed' | 'skipped'
+  checkInTime: integer('check_in_time', { mode: 'timestamp' }),
+  checkOutTime: integer('check_out_time', { mode: 'timestamp' }),
+  checkInLat: real('check_in_lat'),
+  checkInLng: real('check_in_lng'),
+  gpsVerified: integer('gps_verified', { mode: 'boolean' }).default(true),
+  notes: text('notes'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
