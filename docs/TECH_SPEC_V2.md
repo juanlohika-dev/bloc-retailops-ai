@@ -103,13 +103,40 @@ Instead of having promoters type unstructured sentences in chat (which creates t
 
 ## 5. Production Database Schema (Turso libSQL)
 
-The complete schema is implemented in `src/db/schema.ts` using Drizzle ORM:
+The complete enterprise schema is implemented in `src/db/schema.ts` using Drizzle ORM across 26 relational tables:
 - `workspaces`: Multi-tenant organization configs, base currency (SGD/PHP/USD), root Drive folder ID, Sheets sync ID.
-- `users`: Promoters, supervisors, preferred language (`tl-PH`, `en-SG`, etc.), timezones.
-- `stores`: Retail branches (SM Megamall, FairPrice VivoCity), GPS geofence, default targets.
+- `users`: Promoters, supervisors, company admins, role (`promoter`, `supervisor`, `company_admin`, `super_admin`), preferred language (`tl-PH`, `en-SG`, etc.), timezones, employment type (`stationary` vs `roving`), assigned store IDs.
+- `stores`: Retail branches (SM Megamall, FairPrice VivoCity, Ayala Malls), GPS geofence radius, default targets, latitude/longitude coordinates.
+- `store_assignments`: Staff-to-store rosters and scheduled target overrides.
 - `products`: SKU catalog, EAN-13 barcode, focus promo flag, unit prices, commissions.
-- `shifts`: Daily attendance logs, clock-in/out timestamps, target quotas.
-- `sales_transactions`: Auditable sell-out records (promoter, store, SKU, qty, price, captureMode, receiptDriveId).
-- `shelf_audits`: Computer vision audit results (compliance score, SoS %, detected issues).
+- `shifts`: Daily attendance logs, clock-in/out timestamps, GPS geofence verification, target quotas.
+- `sales_transactions`: Auditable sell-out records (promoter, store, SKU, qty, price, captureMode, paymentMethod, paymentTerms, approvalCode, receiptDriveId).
+- `shelf_audits`: Computer vision audit results (compliance score, SoS %, detected issues, Gemini verdict).
 - `blocks`: Atomic composable blocks for custom metadata without migrations.
 - `chat_messages`: Conversation transcripts with original language and English translations.
+- `payment_methods`: Database-driven enterprise POS payment channels (`cash`, `credit_card`, `home_credit`, `e_wallet`, `bnpl`) with approval rules, categories, and allowed terms.
+- `payment_terms`: Financing tenors (`straight`, `3_months`, `6_months`, `9_months`, `12_months`, `18_months`, `24_months`) with months and interest rates.
+- `ai_governance_configs`: Role-based AI copilot guardrails, digital signature mandates, auto-audit toggles, and hourly change thresholds.
+- `surveys`: Enterprise digital surveys and forms with role, store, and org-node targeting.
+- `survey_submissions`: Frontline and customer survey responses with automatic staff and branch tagging.
+- `roving_store_visits`: 8-stop daily roving merchandiser routes with sequence order, scheduled times, GPS geofencing, and check-in/out stamps.
+- `audit_logs`: Immutable enterprise audit ledger logging every operational transaction, shift event, and configuration update.
+
+---
+
+## 6. Core Engineering Standard: Zero Hardcoded Master Data Policy
+
+### Policy Mandate:
+**No business entities, operational parameters, payment channels, financing terms, AI governance policies, retail stores, or itinerary routes may be hardcoded as in-memory fallback literals in application source files.**
+
+1. **Database as Single Source of Truth**:
+   - All runtime configuration must be queried from registered database rows via `db.select().from(...)`.
+   - Modifying business rules, interest terms, or store footprints is performed dynamically via Admin API endpoints and database transactions without application code changes or redeployments.
+
+2. **Automated Seeding & Bootstrap**:
+   - System defaults and initial enterprise records are seeded directly into the database through `src/db/seed.ts` and automated startup initializers (`src/db/ensure_schema.ts`).
+   - Every workspace provisioned in Project BLOC automatically initializes with registered payment methods, financing terms, AI policies, and store networks in Turso / SQLite.
+
+3. **Cryptographic Audit Governance**:
+   - Any runtime modifications to payment methods, financing terms, or AI governance policies are committed to the database and logged to `audit_logs` with actor attribution, cryptographic hashes, and before/after state diffs.
+

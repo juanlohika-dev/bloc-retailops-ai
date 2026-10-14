@@ -1,8 +1,10 @@
 import { db } from './client.js';
-import { workspaces, users, stores, storeAssignments, products, shifts, shelfAudits } from './schema.js';
+import { workspaces, users, stores, storeAssignments, products, shifts, shelfAudits, paymentMethods, paymentTerms, aiGovernanceConfigs } from './schema.js';
+import { ensureTablesAndColumns } from './ensure_schema.js';
 
 export async function seedDatabase() {
-  console.log('🌱 Seeding Project BLOC Turso Database...');
+  console.log('🌱 Seeding Project BLOC Database with registered master entries...');
+  await ensureTablesAndColumns();
 
   // 1. Workspace
   const workspaceId = 'ws-japac-retail';

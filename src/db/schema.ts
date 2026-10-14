@@ -403,3 +403,49 @@ export const rovingStoreVisits = sqliteTable('roving_store_visits', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 });
 
+// ==========================================
+// 24. ENTERPRISE PAYMENT METHODS (Database-Driven POS Channels)
+// ==========================================
+export const paymentMethods = sqliteTable('payment_methods', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  code: text('code').notNull(),                                  // 'cash', 'credit_card', 'home_credit', 'e_wallet', 'bnpl', 'maya'
+  label: text('label').notNull(),                                // 'Cash', 'Credit Card', 'Home Credit Installment', etc.
+  category: text('category').default('cash'),                    // 'cash' | 'card' | 'financing' | 'ewallet' | 'bnpl'
+  enabled: integer('enabled', { mode: 'boolean' }).default(true),
+  requiresApproval: integer('requires_approval', { mode: 'boolean' }).default(false),
+  allowedTerms: text('allowed_terms', { mode: 'json' }),         // JSON array of permitted term codes e.g. ['straight', '3_months']
+  displayOrder: integer('display_order').default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 25. ENTERPRISE PAYMENT TERMS (Financing & Installment Tenors)
+// ==========================================
+export const paymentTerms = sqliteTable('payment_terms', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().references(() => workspaces.id),
+  code: text('code').notNull(),                                  // 'straight', '3_months', '6_months', '9_months', '12_months', '18_months', '24_months'
+  label: text('label').notNull(),                                // 'Straight Payment', '3 Months (0% Interest)', etc.
+  months: integer('months').default(0),
+  interestRate: real('interest_rate').default(0),
+  enabled: integer('enabled', { mode: 'boolean' }).default(true),
+  displayOrder: integer('display_order').default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+// ==========================================
+// 26. AI GOVERNANCE & AEGIS COMPLIANCE POLICIES
+// ==========================================
+export const aiGovernanceConfigs = sqliteTable('ai_governance_configs', {
+  id: text('id').primaryKey(),
+  workspaceId: text('workspace_id').notNull().unique().references(() => workspaces.id),
+  enabled: integer('enabled', { mode: 'boolean' }).default(true),
+  requireSupervisorSignOffOnConfig: integer('require_supervisor_sign_off_on_config', { mode: 'boolean' }).default(true),
+  autoAuditAllAiActions: integer('auto_audit_all_ai_actions', { mode: 'boolean' }).default(true),
+  maxConfigChangesPerHour: integer('max_config_changes_per_hour').default(20),
+  riskThreshold: text('risk_threshold').default('high'),
+  allowedRoles: text('allowed_roles', { mode: 'json' }).notNull(), // RBAC role authorization matrix
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});
+

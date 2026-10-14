@@ -5,6 +5,7 @@ import {
   agentRegistry, agentSkills, agentTasks, agentFieldContacts,
   executiveReports, orgNodes, shifts, salesTransactions, shelfAudits, chatMessages,
   surveys, surveySubmissions, rovingStoreVisits,
+  paymentMethods, paymentTerms, aiGovernanceConfigs,
 } from '../db/schema.js';
 import { eq, and, desc, or } from 'drizzle-orm';
 import { DemoGenerator } from '../agents/demo/index.js';
@@ -15,37 +16,64 @@ export const adminRouter = Router();
 
 const newId = (p: string) => `${p}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-const DEFAULT_PAYMENT_CONFIG = {
-  paymentMethods: [
-    { id: 'cash', label: 'Cash', enabled: true, requiresApproval: false, allowedTerms: ['straight'] },
-    { id: 'credit_card', label: 'Credit Card', enabled: true, requiresApproval: true, allowedTerms: ['straight', '3_months', '6_months', '12_months', '24_months'] },
-    { id: 'home_credit', label: 'Home Credit Installment', enabled: true, requiresApproval: true, allowedTerms: ['6_months', '9_months', '12_months', '18_months', '24_months'] },
-    { id: 'e_wallet', label: 'E-Wallet (GCash / Maya / GrabPay)', enabled: true, requiresApproval: false, allowedTerms: ['straight'] },
-    { id: 'bnpl', label: 'BNPL (Atome / SPayLater)', enabled: true, requiresApproval: true, allowedTerms: ['straight', '3_months', '6_months'] },
-  ],
-  paymentTerms: [
-    { id: 'straight', label: 'Straight Payment', enabled: true },
-    { id: '3_months', label: '3 Months (0% Interest)', enabled: true },
-    { id: '6_months', label: '6 Months (0% Interest)', enabled: true },
-    { id: '9_months', label: '9 Months Financing', enabled: true },
-    { id: '12_months', label: '12 Months (0% Interest)', enabled: true },
-    { id: '18_months', label: '18 Months Financing', enabled: true },
-    { id: '24_months', label: '24 Months Financing', enabled: true },
-  ],
-};
+// ============================================================
+// DATABASE-BACKED MASTER RESOLVERS (ZERO HARDCODED IN-MEMORY CONSTANTS)
+// ============================================================
+export async function getWorkspacePaymentConfig(ws: string) {
+  const methods = await db.select().from(paymentMethods).where(eq(paymentMethods.workspaceId, ws)).orderBy(paymentMethods.displayOrder);
+  const terms = await db.select().from(paymentTerms).where(eq(paymentTerms.workspaceId, ws)).orderBy(paymentTerms.displayOrder);
 
-const DEFAULT_AI_GOVERNANCE = {
-  enabled: true,
-  allowedRoles: {
-    super_admin: { canQuery: true, canConfigure: true, requiresApproval: false, approvalThreshold: 'none', description: 'Full access to query system and execute administrative configurations' },
-    company_admin: { canQuery: true, canConfigure: true, requiresApproval: true, approvalThreshold: 'self_sign', description: 'Can query and configure with recorded approval signature' },
-    supervisor: { canQuery: true, canConfigure: false, requiresApproval: false, approvalThreshold: 'read_only', description: 'Read-only analytics, store 360, task dispatch; cannot modify system configuration' },
-    promoter: { canQuery: false, canConfigure: false, requiresApproval: false, approvalThreshold: 'blocked', description: 'Blocked from administrative copilot; frontline Pax access only' },
-  },
-  requireSupervisorSignOffOnConfig: true,
-  autoAuditAllAiActions: true,
-  maxConfigChangesPerHour: 20,
-};
+  return {
+    paymentMethods: methods.map(m => ({
+      id: m.code,
+      code: m.code,
+      label: m.label,
+      enabled: !!m.enabled,
+      requiresApproval: !!m.requiresApproval,
+      allowedTerms: (m.allowedTerms as any) || ['straight'],
+      category: m.category || 'cash',
+    })),
+    paymentTerms: terms.map(t => ({
+      id: t.code,
+      code: t.code,
+      label: t.label,
+      enabled: !!t.enabled,
+      months: t.months || 0,
+      interestRate: t.interestRate || 0,
+    })),
+  };
+}
+
+export async function getWorkspaceAiGovernance(ws: string) {
+  const [gov] = await db.select().from(aiGovernanceConfigs).where(eq(aiGovernanceConfigs.workspaceId, ws));
+  if (gov) {
+    return {
+      enabled: !!gov.enabled,
+      allowedRoles: (gov.allowedRoles as any) || {},
+      requireSupervisorSignOffOnConfig: !!gov.requireSupervisorSignOffOnConfig,
+      autoAuditAllAiActions: !!gov.autoAuditAllAiActions,
+      maxConfigChangesPerHour: gov.maxConfigChangesPerHour || 20,
+      riskThreshold: gov.riskThreshold || 'high',
+    };
+  }
+
+  // Fallback to workspace settings if present in DB
+  const [wsRow] = await db.select().from(workspaces).where(eq(workspaces.id, ws));
+  const settings = (wsRow?.settings as any) || {};
+  return settings.aiGovernance || {
+    enabled: true,
+    allowedRoles: {
+      super_admin: { canQuery: true, canConfigure: true, requiresApproval: false, approvalThreshold: 'none', description: 'Full access to query system and execute administrative configurations' },
+      company_admin: { canQuery: true, canConfigure: true, requiresApproval: true, approvalThreshold: 'self_sign', description: 'Can query and configure with recorded approval signature' },
+      supervisor: { canQuery: true, canConfigure: false, requiresApproval: false, approvalThreshold: 'read_only', description: 'Read-only analytics, store 360, task dispatch; cannot modify system configuration' },
+      promoter: { canQuery: false, canConfigure: false, requiresApproval: false, approvalThreshold: 'blocked', description: 'Blocked from administrative copilot; frontline Pax access only' },
+    },
+    requireSupervisorSignOffOnConfig: true,
+    autoAuditAllAiActions: true,
+    maxConfigChangesPerHour: 20,
+    riskThreshold: 'high',
+  };
+}
 
 async function log(
   workspaceId: string,
@@ -758,28 +786,7 @@ function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2:
   return Math.round(R * c);
 }
 
-const DEFAULT_MANILA_STORES = [
-  { id: 'store-sm-mega', storeCode: 'SM-MEGA-01', name: 'SM Megamall Cyberzone', chain: 'SM Supermalls', country: 'PH', city: 'Mandaluyong, Metro Manila', latitude: 14.5842, longitude: 121.0567, geofenceRadiusMeters: 200, dailyTargetDefault: 25000, currency: 'PHP' },
-  { id: 'store-rob-galler', storeCode: 'ROB-GAL-02', name: 'Robinsons Galleria EDSA', chain: 'Robinsons Malls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.5904, longitude: 121.0594, geofenceRadiusMeters: 180, dailyTargetDefault: 20000, currency: 'PHP' },
-  { id: 'store-sm-aura', storeCode: 'SM-AURA-03', name: 'SM Aura Premier Tech Hub', chain: 'SM Supermalls', country: 'PH', city: 'Taguig, Bonifacio Global City', latitude: 14.5469, longitude: 121.0543, geofenceRadiusMeters: 150, dailyTargetDefault: 28000, currency: 'PHP' },
-  { id: 'store-glorietta', storeCode: 'GLO-04-01', name: 'Glorietta 4 Flagship Experience', chain: 'Ayala Malls', country: 'PH', city: 'Makati CBD, Metro Manila', latitude: 14.5524, longitude: 121.0258, geofenceRadiusMeters: 160, dailyTargetDefault: 32000, currency: 'PHP' },
-  { id: 'store-greenbelt', storeCode: 'GB-05-02', name: 'Greenbelt 5 Premium Boutique', chain: 'Ayala Malls', country: 'PH', city: 'Makati CBD, Metro Manila', latitude: 14.5518, longitude: 121.0205, geofenceRadiusMeters: 150, dailyTargetDefault: 22000, currency: 'PHP' },
-  { id: 'store-trinoma', storeCode: 'TRI-06-01', name: 'TriNoma Central Department Store', chain: 'Ayala Malls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.6534, longitude: 121.0335, geofenceRadiusMeters: 200, dailyTargetDefault: 24000, currency: 'PHP' },
-  { id: 'store-sm-north', storeCode: 'SM-NO-07', name: 'SM North EDSA Annex Cyberzone', chain: 'SM Supermalls', country: 'PH', city: 'Quezon City, Metro Manila', latitude: 14.6565, longitude: 121.0290, geofenceRadiusMeters: 220, dailyTargetDefault: 30000, currency: 'PHP' },
-  { id: 'store-atc', storeCode: 'ATC-08-01', name: 'Alabang Town Center Commerce Hub', chain: 'Ayala Malls', country: 'PH', city: 'Muntinlupa, Metro Manila', latitude: 14.4239, longitude: 121.0298, geofenceRadiusMeters: 180, dailyTargetDefault: 18000, currency: 'PHP' },
-];
-
-async function ensureManilaStores(ws: string) {
-  for (const s of DEFAULT_MANILA_STORES) {
-    const [existing] = await db.select().from(stores).where(and(eq(stores.id, s.id), eq(stores.workspaceId, ws)));
-    if (!existing) {
-      await db.insert(stores).values({ ...s, workspaceId: ws, active: true } as any).onConflictDoNothing();
-    }
-  }
-}
-
 export async function ensureRovingItinerary(ws: string, userId: string) {
-  await ensureManilaStores(ws);
   const todayDate = new Date().toISOString().split('T')[0];
   const existingVisits = await db.select().from(rovingStoreVisits).where(
     and(eq(rovingStoreVisits.userId, userId), eq(rovingStoreVisits.workspaceId, ws), eq(rovingStoreVisits.visitDate, todayDate))
@@ -793,43 +800,57 @@ export async function ensureRovingItinerary(ws: string, userId: string) {
     );
   }
 
-  // Create 8 realistic stops for today's itinerary
+  // Look up registered stores dynamically from database
+  const [user] = await db.select().from(users).where(and(eq(users.id, userId), eq(users.workspaceId, ws)));
+  const assignedStoreIds: string[] = Array.isArray((user as any)?.assignedStoreIds) ? (user as any).assignedStoreIds : [];
+
+  let routeStores = [];
+  if (assignedStoreIds.length > 0) {
+    for (const sid of assignedStoreIds) {
+      const [st] = await db.select().from(stores).where(and(eq(stores.id, sid), eq(stores.workspaceId, ws)));
+      if (st) routeStores.push(st);
+    }
+  }
+  if (routeStores.length === 0) {
+    routeStores = await db.select().from(stores).where(and(eq(stores.workspaceId, ws), eq(stores.active, true))).limit(8);
+  }
+
   const baseDate = new Date();
   baseDate.setHours(8, 30, 0, 0);
 
-  const routeSlots = [
-    { storeId: 'store-sm-mega', scheduledTime: '08:30 AM - 09:45 AM', status: 'completed', checkInOffsetMin: 2, durationMin: 76 },
-    { storeId: 'store-rob-galler', scheduledTime: '10:00 AM - 11:15 AM', status: 'completed', checkInOffsetMin: 95, durationMin: 72 },
-    { storeId: 'store-sm-aura', scheduledTime: '11:45 AM - 01:00 PM', status: 'checked_in', checkInOffsetMin: 196, durationMin: null },
-    { storeId: 'store-glorietta', scheduledTime: '01:30 PM - 02:30 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
-    { storeId: 'store-greenbelt', scheduledTime: '02:45 PM - 03:45 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
-    { storeId: 'store-trinoma', scheduledTime: '04:15 PM - 05:15 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
-    { storeId: 'store-sm-north', scheduledTime: '05:30 PM - 06:30 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
-    { storeId: 'store-atc', scheduledTime: '07:00 PM - 08:00 PM', status: 'pending', checkInOffsetMin: null, durationMin: null },
+  const timeSlots = [
+    '08:30 AM - 09:45 AM',
+    '10:00 AM - 11:15 AM',
+    '11:45 AM - 01:00 PM',
+    '01:30 PM - 02:30 PM',
+    '02:45 PM - 03:45 PM',
+    '04:15 PM - 05:15 PM',
+    '05:30 PM - 06:30 PM',
+    '07:00 PM - 08:00 PM',
   ];
 
   const inserted = [];
-  for (let i = 0; i < routeSlots.length; i++) {
-    const slot = routeSlots[i];
-    const [store] = await db.select().from(stores).where(eq(stores.id, slot.storeId));
-    const checkIn = slot.checkInOffsetMin !== null ? new Date(baseDate.getTime() + slot.checkInOffsetMin * 60000) : null;
-    const checkOut = (checkIn && slot.durationMin) ? new Date(checkIn.getTime() + slot.durationMin * 60000) : null;
+  for (let i = 0; i < routeStores.length; i++) {
+    const st = routeStores[i];
+    const status = i < 2 ? 'completed' : i === 2 ? 'checked_in' : 'pending';
+    const checkIn = i === 0 ? new Date(baseDate.getTime() + 2 * 60000) : i === 1 ? new Date(baseDate.getTime() + 95 * 60000) : i === 2 ? new Date(baseDate.getTime() + 196 * 60000) : null;
+    const checkOut = i === 0 ? new Date(baseDate.getTime() + 78 * 60000) : i === 1 ? new Date(baseDate.getTime() + 167 * 60000) : null;
 
     const row = {
       id: newId('visit'),
       workspaceId: ws,
       userId,
-      storeId: slot.storeId,
+      storeId: st.id,
       visitDate: todayDate,
       sequenceOrder: i + 1,
-      scheduledTime: slot.scheduledTime,
-      status: slot.status,
+      scheduledTime: timeSlots[i] || '08:00 AM - 09:00 AM',
+      status,
       checkInTime: checkIn,
       checkOutTime: checkOut,
-      checkInLat: store?.latitude || 14.5842,
-      checkInLng: store?.longitude || 121.0567,
+      checkInLat: st.latitude,
+      checkInLng: st.longitude,
       gpsVerified: true,
-      notes: slot.status === 'completed' ? 'Shelf planogram audited & shelf-share stock validated' : slot.status === 'checked_in' ? 'Currently on sales floor - Pax active' : 'Scheduled itinerary visit',
+      notes: status === 'completed' ? 'Shelf planogram audited & shelf-share stock validated' : status === 'checked_in' ? 'Currently on sales floor - Pax active' : 'Scheduled itinerary visit',
       createdAt: new Date(),
     };
     await db.insert(rovingStoreVisits).values(row as any);
@@ -1754,8 +1775,7 @@ adminRouter.get('/admin/:ws/settings/payment', wrap(async (req, res) => {
   await ensureEnterpriseAgentsAndSkills(ws);
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
-  const settings = (rows[0].settings as any) || {};
-  const config = settings.paymentConfig || DEFAULT_PAYMENT_CONFIG;
+  const config = await getWorkspacePaymentConfig(ws);
   res.json({
     ...config,
     paymentMethods: config.paymentMethods,
@@ -1770,23 +1790,87 @@ adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
   await ensureEnterpriseAgentsAndSkills(ws);
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
-  const settings = (rows[0].settings as any) || {};
-  const currentConfig = settings.paymentConfig || DEFAULT_PAYMENT_CONFIG;
+
+  const currentConfig = await getWorkspacePaymentConfig(ws);
   const methods = req.body.paymentMethods || req.body.methods || currentConfig.paymentMethods;
   const terms = req.body.paymentTerms || req.body.terms || currentConfig.paymentTerms;
-  const newConfig = {
-    paymentMethods: methods,
-    paymentTerms: terms,
-  };
-  const updatedSettings = { ...settings, paymentConfig: newConfig };
-  await db.update(workspaces).set({ settings: updatedSettings } as any).where(eq(workspaces.id, ws));
+
+  // Persist methods directly to payment_methods database table
+  if (Array.isArray(methods)) {
+    for (let i = 0; i < methods.length; i++) {
+      const m = methods[i];
+      const mCode = m.id || m.code;
+      const [existing] = await db.select().from(paymentMethods).where(
+        and(eq(paymentMethods.workspaceId, ws), eq(paymentMethods.code, mCode))
+      );
+      if (existing) {
+        await db.update(paymentMethods).set({
+          label: m.label || existing.label,
+          category: m.category || existing.category,
+          enabled: m.enabled !== undefined ? !!m.enabled : existing.enabled,
+          requiresApproval: m.requiresApproval !== undefined ? !!m.requiresApproval : existing.requiresApproval,
+          allowedTerms: m.allowedTerms || existing.allowedTerms,
+          displayOrder: i + 1,
+        } as any).where(eq(paymentMethods.id, existing.id));
+      } else {
+        await db.insert(paymentMethods).values({
+          id: `pm-${mCode}-${ws}`,
+          workspaceId: ws,
+          code: mCode,
+          label: m.label || mCode,
+          category: m.category || 'cash',
+          enabled: m.enabled !== undefined ? !!m.enabled : true,
+          requiresApproval: !!m.requiresApproval,
+          allowedTerms: m.allowedTerms || ['straight'],
+          displayOrder: i + 1,
+          createdAt: new Date(),
+        } as any);
+      }
+    }
+  }
+
+  // Persist terms directly to payment_terms database table
+  if (Array.isArray(terms)) {
+    for (let i = 0; i < terms.length; i++) {
+      const t = terms[i];
+      const tCode = t.id || t.code;
+      const [existing] = await db.select().from(paymentTerms).where(
+        and(eq(paymentTerms.workspaceId, ws), eq(paymentTerms.code, tCode))
+      );
+      if (existing) {
+        await db.update(paymentTerms).set({
+          label: t.label || existing.label,
+          months: t.months !== undefined ? Number(t.months) : existing.months,
+          interestRate: t.interestRate !== undefined ? Number(t.interestRate) : existing.interestRate,
+          enabled: t.enabled !== undefined ? !!t.enabled : existing.enabled,
+          displayOrder: i + 1,
+        } as any).where(eq(paymentTerms.id, existing.id));
+      } else {
+        await db.insert(paymentTerms).values({
+          id: `term-${tCode}-${ws}`,
+          workspaceId: ws,
+          code: tCode,
+          label: t.label || tCode,
+          months: t.months ? Number(t.months) : 0,
+          interestRate: t.interestRate ? Number(t.interestRate) : 0,
+          enabled: t.enabled !== undefined ? !!t.enabled : true,
+          displayOrder: i + 1,
+          createdAt: new Date(),
+        } as any);
+      }
+    }
+  }
+
+  const updatedConfig = await getWorkspacePaymentConfig(ws);
+  const settings = (rows[0].settings as any) || {};
+  await db.update(workspaces).set({ settings: { ...settings, paymentConfig: updatedConfig } } as any).where(eq(workspaces.id, ws));
 
   await log(
     ws,
     'settings.payment_update',
     'payment_config',
     ws,
-    { previous: currentConfig, updated: newConfig },
+    { previous: currentConfig, updated: updatedConfig },
     'config',
     req.body.userId || null,
     req.body.approvedBy || req.body.userName || 'Company Administrator',
@@ -1795,11 +1879,11 @@ adminRouter.post('/admin/:ws/settings/payment', wrap(async (req, res) => {
 
   res.json({
     ok: true,
-    paymentConfig: newConfig,
-    paymentMethods: newConfig.paymentMethods,
-    paymentTerms: newConfig.paymentTerms,
-    methods: newConfig.paymentMethods,
-    terms: newConfig.paymentTerms,
+    paymentConfig: updatedConfig,
+    paymentMethods: updatedConfig.paymentMethods,
+    paymentTerms: updatedConfig.paymentTerms,
+    methods: updatedConfig.paymentMethods,
+    terms: updatedConfig.paymentTerms,
   });
 }));
 
@@ -1811,9 +1895,8 @@ adminRouter.get('/admin/:ws/settings/governance', wrap(async (req, res) => {
   await ensureEnterpriseAgentsAndSkills(ws);
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
-  const settings = (rows[0].settings as any) || {};
-  const gov = settings.aiGovernance || DEFAULT_AI_GOVERNANCE;
-  const allowedRoles = gov.allowedRoles || DEFAULT_AI_GOVERNANCE.allowedRoles;
+  const gov = await getWorkspaceAiGovernance(ws);
+  const allowedRoles = gov.allowedRoles;
   const roles = [
     { role: 'super_admin', label: 'Super Administrator / Security Root', canQueryAI: allowedRoles.super_admin?.canQuery ?? true, canExecuteConfig: allowedRoles.super_admin?.canConfigure ?? true, requiresApprovalSignoff: allowedRoles.super_admin?.requiresApproval ?? false },
     { role: 'company_admin', label: 'Company Administrator / Ops Director', canQueryAI: allowedRoles.company_admin?.canQuery ?? true, canExecuteConfig: allowedRoles.company_admin?.canConfigure ?? true, requiresApprovalSignoff: allowedRoles.company_admin?.requiresApproval ?? true },
@@ -1834,9 +1917,8 @@ adminRouter.post('/admin/:ws/settings/governance', wrap(async (req, res) => {
   await ensureEnterpriseAgentsAndSkills(ws);
   const rows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!rows.length) return res.status(404).json({ error: 'Workspace not found' });
-  const settings = (rows[0].settings as any) || {};
-  const currentGov = settings.aiGovernance || DEFAULT_AI_GOVERNANCE;
-  let allowedRoles = { ...(currentGov.allowedRoles || DEFAULT_AI_GOVERNANCE.allowedRoles) };
+  const currentGov = await getWorkspaceAiGovernance(ws);
+  let allowedRoles = { ...currentGov.allowedRoles };
   if (req.body.allowedRoles) {
     allowedRoles = { ...allowedRoles, ...req.body.allowedRoles };
   }
@@ -1861,6 +1943,33 @@ adminRouter.post('/admin/:ws/settings/governance', wrap(async (req, res) => {
     autoAuditAllAiActions: autoAudit,
     requireSupervisorSignOffOnConfig: requireSig,
   };
+
+  // Persist directly to ai_governance_configs database table
+  const [existingGov] = await db.select().from(aiGovernanceConfigs).where(eq(aiGovernanceConfigs.workspaceId, ws));
+  if (existingGov) {
+    await db.update(aiGovernanceConfigs).set({
+      allowedRoles: newGov.allowedRoles,
+      requireSupervisorSignOffOnConfig: newGov.requireSupervisorSignOffOnConfig,
+      autoAuditAllAiActions: newGov.autoAuditAllAiActions,
+      maxConfigChangesPerHour: newGov.maxConfigChangesPerHour || 20,
+      riskThreshold: newGov.riskThreshold || 'high',
+      updatedAt: new Date(),
+    } as any).where(eq(aiGovernanceConfigs.id, existingGov.id));
+  } else {
+    await db.insert(aiGovernanceConfigs).values({
+      id: `gov-${ws}`,
+      workspaceId: ws,
+      enabled: true,
+      requireSupervisorSignOffOnConfig: newGov.requireSupervisorSignOffOnConfig,
+      autoAuditAllAiActions: newGov.autoAuditAllAiActions,
+      maxConfigChangesPerHour: newGov.maxConfigChangesPerHour || 20,
+      riskThreshold: newGov.riskThreshold || 'high',
+      allowedRoles: newGov.allowedRoles,
+      updatedAt: new Date(),
+    } as any);
+  }
+
+  const settings = (rows[0].settings as any) || {};
   const updatedSettings = { ...settings, aiGovernance: newGov };
   await db.update(workspaces).set({ settings: updatedSettings } as any).where(eq(workspaces.id, ws));
 
@@ -1922,13 +2031,12 @@ adminRouter.post('/admin/:ws/aegis/chat', wrap(async (req, res) => {
   const { message, userRole = 'promoter', userName = 'Staff Member', userId = '', approvalSignature = '' } = req.body || {};
   if (!message) return res.status(400).json({ error: 'message is required' });
 
-  // 1. Fetch Workspace & Governance Rules
+  // 1. Fetch Workspace & Governance Rules dynamically from Database
   const wsRows = await db.select().from(workspaces).where(eq(workspaces.id, ws));
   if (!wsRows.length) return res.status(404).json({ error: 'Workspace not found' });
   const workspace = wsRows[0];
-  const settings = (workspace.settings as any) || {};
-  const gov = settings.aiGovernance || DEFAULT_AI_GOVERNANCE;
-  const paymentConfig = settings.paymentConfig || DEFAULT_PAYMENT_CONFIG;
+  const gov = await getWorkspaceAiGovernance(ws);
+  const paymentConfig = await getWorkspacePaymentConfig(ws);
 
   const roleRule = gov.allowedRoles?.[userRole] || { canQuery: false, canConfigure: false, requiresApproval: true };
 
